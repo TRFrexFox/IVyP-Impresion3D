@@ -10,6 +10,9 @@
 .wrapper {
     text-align: center;
 }
+.contenedor-tabbar{
+    margin-top: 30px;
+}
 
 .tabs {
     font-size: 15px;

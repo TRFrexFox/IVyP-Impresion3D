@@ -1,5 +1,5 @@
 var Init = {
-    Index: function () {
+    Index: () => {
         // $("body").append(Template.Sidebar()); //Error al cargar pantalla
         $("body").prepend(Template.SideNav());
         $("main").prepend(Template.NavBar());
@@ -29,6 +29,16 @@ var Init = {
         //DTask
         $("#DTask").append(Template.Project(8, 6, 'Projects', 'fa fa-check', 30, 'this month'));
         $("#DTask").append(Template.Order());
+    },
+    Mantenedor: () => {
+        let tabs = ['Cliente', 'Marca', 'Estado', 'Color', 'Comuna', 'Region', 'Materia'];
+        $(".row").eq(0).prepend(Template.TabBar(tabs))
+        $("body").prepend(Template.SideNav());
+        $("#Contenedor").append(Template.Card('Cliente', true, 12, true, 'Clientes', false));
+
+        Functions.ChargeList('Region').then((data) => {
+            $("#Cliente .card-body").append(Template.Table(data))
+        })
     }
 }
 
@@ -323,12 +333,16 @@ var Template = {
         '</div>' +
         '</div>' +
         '</div>',
-    TabBar: () => {
+    TabBar: (tabs) => {
+        let active = true;
         let html = '<div class="wrapper">' +
             '<nav class="tabs">' +
-            '<div class="selector"></div>' +
-            '<a tab="Cliente" onclick="Functions.ChargeList(this)" class="active"><i class="fa fa-user"></i>Cliente</a>' +
-            '<a tab="Marca" onclick="SelectTab(this)"><i class="fas fa-copyright"></i>Marca</a>' +
+            '<div class="selector"></div>';
+            tabs.forEach(tab => {
+                html += '<a tab="'+tab+'" class="'+((active)?'active':'')+'" onclick="SelectTab(this)"><i class="fa fa-user"></i>'+tab+'</a>';
+                active = false;
+            });
+            html += '<a tab="Marca" ><i class="fas fa-copyright"></i>Marca</a>' +
             '<a href="#"><i class="fas fa-shoe-prints"></i>Estado</a>' +
             '<a href="#"><i class="fas fa-eye-dropper"></i>Color</a>' +
             '<a href="#"><i class="fas fa-flag-checkered"></i>Comuna</a>' +
@@ -550,6 +564,52 @@ var Template = {
             '</div>' +
             '</div>' +
             '</nav>';
+    },
+    Card: (id, row, col, header, headerTitle, footer) => {
+        let html = (row) ? '<div class="row">' : '';
+        html += '<div id="' + id + '" class="col-"' + col + '>' +
+            '<div class="card my-4">';
+        html += (header) ? '<div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">' +
+            '<div class="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3">' +
+            '<h6 class="text-white text-capitalize ps-3">' + headerTitle + '</h6>' +
+            '</div>' : '';
+        html += '</div>' +
+            '<div class="card-body px-0 pb-2">' +
+            '</div>';
+        html += (footer) ? '<div class="card-footer p-3">' +
+            '</div>' : '';
+        html += '</div>' +
+            '</div>';
+        html += (row) ? '</div>' : '';
+        return html;
+    },
+    Table: (data) => {
+        let th = true;
+        let html = '<div class="table-responsive p-0">' +
+            '<table class="table align-items-center mb-0">';
+        data.forEach((e, k) => {
+            if (th) {
+                html += '<thead>' +
+                    '<tr>';
+                (Object.keys(e)).forEach(key => {
+                    html += '<th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 text-center">' + key + '</th>';
+                    console.log(e.key)
+                });
+                html += '</tr>' +
+                    '</thead>';
+                html += '<tbody>';
+            }
+            th = false;
+            html += '<tr>';
+            (Object.keys(e)).forEach(key => {
+                html += '<td class="align-middle text-center">' + e[key] + '</th>';
+            });
+            html += '</tr>';
+        });
+        html += '</tbody>' +
+            '</table>' +
+            '</div>';
+        return html;
     }
 };
 
@@ -558,10 +618,15 @@ var Functions = {
         $(".tab-panel").removeClass("tab-panel-active")
         $("#" + obj.attributes.tab.value).addClass("tab-panel-active")
     },
-    ChargeList: (obj) => {
-        $.post("connection/model.php", { Funcion: "Color" })
-            .done(function (data) {
-                alert("Data Loaded: " + data);
-            });
+    ChargeList: (funcion) => {
+        return new Promise((res, rej) => {
+            $.post("connection/model.php", { Funcion: funcion })
+                .done(function (data) {
+                    res(JSON.parse(data));
+                })
+                .fail(() => {
+                    rej({ Error: 'No se pude procesar los datos solicitados' })
+                });
+        })
     }
 }
