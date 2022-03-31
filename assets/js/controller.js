@@ -31,13 +31,31 @@ var Init = {
         $("#DTask").append(Template.Order());
     },
     Mantenedor: () => {
-        let tabs = ['Cliente', 'Marca', 'Estado', 'Color', 'Comuna', 'Region', 'Materia'];
+        let tabs = [
+            { tab: 'Cliente', icon: 'fa fa-user' },
+            { tab: 'Marca', icon: 'fas fa-copyright' },
+            { tab: 'Estado', icon: 'fas fa-shoe-prints' },
+            { tab: 'Color', icon: 'fas fa-eye-dropper' },
+            { tab: 'Comuna', icon: 'fas fa-flag-checkered' },
+            { tab: 'Region', icon: 'fas fa-align-justify' },
+            { tab: 'Materia', icon: 'fas fa-dollar-sign' }
+        ];
         $(".row").eq(0).prepend(Template.TabBar(tabs))
         $("body").prepend(Template.SideNav());
         $("#Contenedor").append(Template.Card('Cliente', true, 12, true, 'Clientes', false));
 
-        Functions.ChargeList('Region').then((data) => {
-            $("#Cliente .card-body").append(Template.Table(data))
+        let datos = Functions.ChargeList('Cliente', 'Read');
+        $("#Cliente .card-body").append(Template.Table("Cliente", datos, false, true, true));
+        $("table").DataTable();
+
+        $(".tabs a").click((obj) => {
+            $("#Contenedor").empty();
+            let atr = obj.currentTarget.attributes[0].value;
+            $("#Contenedor").append(Template.Card(atr, true, 12, true, atr, false));
+
+            let datos = Functions.ChargeList(atr, 'Read');
+            $("#" + atr + " .card-body").append(Template.Table(atr, datos, false, true, true));
+            $("table").DataTable();
         })
     }
 }
@@ -338,17 +356,11 @@ var Template = {
         let html = '<div class="wrapper">' +
             '<nav class="tabs">' +
             '<div class="selector"></div>';
-            tabs.forEach(tab => {
-                html += '<a tab="'+tab+'" class="'+((active)?'active':'')+'" onclick="SelectTab(this)"><i class="fa fa-user"></i>'+tab+'</a>';
-                active = false;
-            });
-            html += '<a tab="Marca" ><i class="fas fa-copyright"></i>Marca</a>' +
-            '<a href="#"><i class="fas fa-shoe-prints"></i>Estado</a>' +
-            '<a href="#"><i class="fas fa-eye-dropper"></i>Color</a>' +
-            '<a href="#"><i class="fas fa-flag-checkered"></i>Comuna</a>' +
-            '<a href="#"><i class="fas fa-align-justify"></i>Region</a>' +
-            '<a href="#"><i class="fas fa-dollar-sign"></i>Valor</a>' +
-            '</nav>' +
+        tabs.forEach(e => {
+            html += '<a tab="' + e.tab + '" class="' + ((active) ? 'active' : '') + '"><i class="' + e.icon + '"></i>' + e.tab + '</a>';
+            active = false;
+        });
+        html += '</nav>' +
             '</div>';
         return html;
     },
@@ -572,29 +584,29 @@ var Template = {
         html += (header) ? '<div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">' +
             '<div class="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3">' +
             '<h6 class="text-white text-capitalize ps-3">' + headerTitle + '</h6>' +
+            '<button class="btn btn-success btn-accion" style="float: right; margin: -35px 20px 0 0;" onclick="Formulario.add' + id + '()"><i class="fa fa-plus"></i></button>' +
             '</div>' : '';
         html += '</div>' +
             '<div class="card-body px-0 pb-2">' +
             '</div>';
-        html += (footer) ? '<div class="card-footer p-3">' +
-            '</div>' : '';
+        html += (footer) ? '<div class="card-footer p-3"></div>' : '';
         html += '</div>' +
             '</div>';
         html += (row) ? '</div>' : '';
         return html;
     },
-    Table: (data) => {
+    Table: (id, data, view, edit, del) => {
         let th = true;
-        let html = '<div class="table-responsive p-0">' +
-            '<table class="table align-items-center mb-0">';
+        let html = '<div class="table-responsive p-0" style="padding: 0px 25px 20px 25px !important;">' +
+            '<table id="' + id + '" class="table hover stripe align-items-center mb-0">';
         data.forEach((e, k) => {
             if (th) {
                 html += '<thead>' +
                     '<tr>';
                 (Object.keys(e)).forEach(key => {
-                    html += '<th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 text-center">' + key + '</th>';
-                    console.log(e.key)
+                    html += '<th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 text-center">' + key.replace("_", " ") + '</th>';
                 });
+                html += (view || edit || del) ? '<th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 text-center">Acciones</th>' : '';
                 html += '</tr>' +
                     '</thead>';
                 html += '<tbody>';
@@ -604,23 +616,138 @@ var Template = {
             (Object.keys(e)).forEach(key => {
                 html += '<td class="align-middle text-center">' + e[key] + '</th>';
             });
+            html += (view || edit || del) ? '<td class="align-middle text-center">' : '';
+            html += (view) ? '<button class="btn btn-info btn-accion"><i class="fas fa-eye"></i></button>' : '';
+            html += (edit) ? '<button class="btn btn-success btn-accion"><i class="fas fa-edit"></i></button>' : '';
+            html += (del) ? '<button class="btn btn-danger btn-accion" onclick="Functions.delData(\'' + id + '\', ' + e['id'] + ')"><i class="fas fa-trash"></i></button>' : '';
+            html += (view || edit || del) ? '</td>' : '';
             html += '</tr>';
         });
         html += '</tbody>' +
             '</table>' +
             '</div>';
         return html;
+    },
+    Modal: (btn) => {
+        let html = '<div class="modal fade" id="modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">' +
+            '<div class="modal-dialog">' +
+            '<div class="modal-content">' +
+            '<div class="modal-header">' +
+            '<h5 class="modal-title"></h5>' +
+            '<button type="button" class="btn-close" style="background-color: red" data-bs-dismiss="modal" aria-label="Close" ></button>' +
+            '</div>' +
+            '<div class="modal-body"></div>' +
+            '<div class="modal-footer">';
+            btn.forEach(e => {
+                html += '<button class="'+e.class+'" onclick="'+e.fn+'">'+e.text+'</button>';
+            });
+            html += '</div>' +
+            '</div>' +
+            '</div>' +
+            '</div>';
+        return html;
+    },
+    Formulario: form => {
+        let html = '<form id="formulario">' +
+            '<div class="row">';
+        form.forEach(Val => {
+            html += '<div class="col-' + Val.col + '">' +
+                '<label>' + Val.label + '</label>';
+            if (Val.type == "text") {
+                html += '<input type="text" id="' + Val.ref + '" name="' + Val.ref + '" class="form-control '+Val.class+'" onclick="'+Val.fn+'" style="border: 1px solid #d2d6da !important" ' + Val.disabled + '>';
+            } else if (Val.type == "select") {
+                let data = Functions.ChargeList(Val.ref, 'Read')
+                html += Template.Select(Val.ref, data, Val.fn);
+            } else if (Val.type == "password") {
+                html += '<input type="password" id="' + Val.ref + '" name="' + Val.ref + '" class="form-control '+Val.class+'" onclick="'+Val.fn+'" style="border: 1px solid #d2d6da !important">';
+            } else if (Val.type == "date") {
+                html += '<input type="date" id="' + Val.ref + '" name="' + Val.ref + '" class="form-control '+Val.class+'" onclick="'+Val.fn+'" style="border: 1px solid #d2d6da !important">';
+            } else if (Val.type == "email") {
+                html += '<input type="email" id="' + Val.ref + '" name="' + Val.ref + '" class="form-control '+Val.class+'" onclick="'+Val.fn+'" style="border: 1px solid #d2d6da !important">';
+            } else if (Val.type == "file") {
+                html += '<input type="file" id="' + Val.ref + '" name="' + Val.ref + '" class="form-control '+Val.class+'" onclick="'+Val.fn+'" style="border: 1px solid #d2d6da !important">';
+            } else if (Val.type == "number") {
+                html += '<input type="number" id="' + Val.ref + '" name="' + Val.ref + '" class="form-control '+Val.class+'" onclick="'+Val.fn+'" style="border: 1px solid #d2d6da !important">';
+            } else if (Val.type == "radio") {
+                html += '<input type="radio" id="' + Val.ref + '" name="' + Val.ref + '" class="form-control '+Val.class+'" onclick="'+Val.fn+'" style="border: 1px solid #d2d6da !important">';
+            } else if (Val.type == "checkbox") {
+                html += '<input type="checkbox" id="' + Val.ref + '" name="' + Val.ref + '" class="form-control '+Val.class+'" onclick="'+Val.fn+'" style="border: 1px solid #d2d6da !important">';
+            }
+            html += '</div>';
+        });
+        html += '</div>' +
+            '</form>';
+        return html;
+    },
+    Select: (id, data, fn) => {
+        let html = '<select id="' + id + '" name="' + id + '" class="form-control" onclick="'+fn+'" style="border: 1px solid #d2d6da !important">';
+        html += '<option selected disabled>Seleccione</option>';
+        data.forEach(e => {
+            html += '<option value="' + e.id + '">' + e.nombre + '</option>';
+        });
+        html += '</select>';
+        return html;
     }
 };
 
+var Formulario = {
+    addCliente: () => {
+        $("body").append(Template.Modal([
+            {class:'btn btn-success', text: 'Agregar', fn: 'Functions.setData(\'Cliente\', $(\'#formulario\').serializeArray())'}
+        ]));
+        $(".modal-title").empty().append("Agregar Color");
+        $(".modal-body").empty().append(Template.Formulario([
+            { type: 'text', col: 12, disabled: '', label: "nombre*", ref: 'nombre' },
+            { type: 'text', col: 12, disabled: '', label: "apellido paterno*", ref: 'apellido_paterno' },
+            { type: 'text', col: 12, disabled: '', label: "apellido materno*", ref: 'apellido_materno' },
+            { type: 'date', col: 12, disabled: '', label: "fecha de nacimiento", ref: 'fecha_nacimiento' },
+            { type: 'select', col: 12, disabled: '', label: "region", ref: 'region' },
+            { type: 'select', col: 12, disabled: '', label: "comuna", ref: 'comuna' },
+            { type: 'number', col: 12, disabled: '', label: "codigo postal", ref: 'codigo_postal' },
+            { type: 'text', col: 12, disabled: '', label: "rut", ref: 'rut' },
+            { type: 'email', col: 12, disabled: '', label: "correo", ref: 'correo' },
+            { type: 'number', col: 12, disabled: '', label: "telefono", ref: 'telefono' },
+        ]));
+        $("#modal").modal("show");
+    },
+    addColor: () => {
+        $(".modal-title").empty().append("Agregar Color");
+        $(".modal-body").empty().append(Template.Formulario([{ type: 'text', col: 12, disabled: '', label: "nombre", ref: 'nombre' }]));
+    },
+    addComuna: () => {
+        $(".modal-title").empty().append("Agregar Comuna");
+        $(".modal-body").empty().append(Template.Formulario([
+            { type: 'text', col: 6, disabled: '', label: "nombre", ref: 'nombre' },
+            { type: 'select', col: 6, disabled: 'false', label: "region", ref: 'region' }
+        ]));
+        setTimeout(() => {
+            $("select").select2({ dropdownParent: $('#modal') });
+        }, 200);
+    }
+}
+
 var Functions = {
-    SelectTab: (obj) => {
+    SelectTab: obj => {
         $(".tab-panel").removeClass("tab-panel-active")
         $("#" + obj.attributes.tab.value).addClass("tab-panel-active")
     },
-    ChargeList: (funcion) => {
+    ChargeList: (funcion, accion) => {
+        let datos = $.ajax({
+            url: "connection/model.php",
+            dataType: "script",
+            type: 'POST',
+            data: { Funcion: funcion, Accion: accion },
+            success: function (data) { },
+            async: false,
+            error: function (err) {
+                console.log(err);
+            }
+        }).responseText;
+        return JSON.parse(datos);
+    },
+    setData: (funcion, obj) => {
         return new Promise((res, rej) => {
-            $.post("connection/model.php", { Funcion: funcion })
+            $.post("connection/model.php", { Funcion: funcion, Accion: "Create", Obj: obj })
                 .done(function (data) {
                     res(JSON.parse(data));
                 })
@@ -628,5 +755,43 @@ var Functions = {
                     rej({ Error: 'No se pude procesar los datos solicitados' })
                 });
         })
+    },
+    delData: (funcion, id) => {
+        return new Promise((res, rej) => {
+            $.post("connection/model.php", { Funcion: funcion, Accion: "Delete", Id: id })
+                .done(function (data) {
+                    res(JSON.parse(data));
+                })
+                .fail(() => {
+                    rej({ Error: 'No se pude procesar los datos solicitados' })
+                });
+        })
+    }
+}
+
+var Fix = {
+    RenderFocus: () => {
+        var inputs = document.querySelectorAll('input');
+
+        for (var i = 0; i < inputs.length; i++) {
+            inputs[i].addEventListener('focus', function (e) {
+                this.parentElement.classList.add('is-focused');
+            }, false);
+
+            inputs[i].onkeyup = function (e) {
+                if (this.value != "") {
+                    this.parentElement.classList.add('is-filled');
+                } else {
+                    this.parentElement.classList.remove('is-filled');
+                }
+            };
+
+            inputs[i].addEventListener('focusout', function (e) {
+                if (this.value != "") {
+                    this.parentElement.classList.add('is-filled');
+                }
+                this.parentElement.classList.remove('is-focused');
+            }, false);
+        }
     }
 }

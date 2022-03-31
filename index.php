@@ -40,6 +40,12 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <!-- Controlador -->
     <script src="assets/js/controller.js"></script>
+
+    <link id="pagestyle" href="http://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css" rel="stylesheet" />
+    <script src="http://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 </head>
 <?php
 if (isset($_GET['page']))
@@ -63,4 +69,5 @@ if (isset($_GET['page']))
 else
     include 'pages/home.php';
 ?>
+
 </html>
