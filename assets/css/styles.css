@@ -1,20 +1,64 @@
 /*Common*/
-label{
+label {
     text-transform: capitalize;
 }
+
+.btn-Card-Title{
+    float: right;
+    margin: -2.95% 10px 0 0;
+    padding: 5px 12px !important;
+}
+
+.custom-input {
+    padding-left: 12px !important;
+    border: 1px solid #d2d6da !important;
+    margin-bottom: 15px;
+}
+
+/*Override Select2 Styles*/
+.select2-selection__rendered {
+    color: #495057 !important;
+    font-size: 0.875rem;
+    font-weight: 400;
+    line-height: 35px !important;
+    padding-top: 2px;
+}
+
+.select2-container .select2-selection--single {
+    height: 40px !important;
+    border: 1px solid #d2d6da !important;
+    margin-bottom: 15px;
+    font-size: 0.875rem;
+    font-weight: 400;
+}
+
+.select2-selection__arrow {
+    height: 36px !important;
+}
+
+
+/*Formulario*/
+#Clientes .row {
+    font-size: 14px;
+    text-align: center;
+}
+
 /*Tab Panel*/
 .tab-panel {
     position: absolute;
     display: none;
 }
+
 .tab-panel-active {
     display: block !important;
 }
+
 /*Tab Bar Styles*/
 .wrapper {
     text-align: center;
 }
-.contenedor-tabbar{
+
+.contenedor-tabbar {
     margin-top: 30px;
 }
 
@@ -68,11 +112,15 @@ label{
 }
 
 /*Override*/
-.btn-accion{
- margin-bottom: unset !important;
- padding: 6px 11px;
- margin-right: 4px;
+.custom-pad-title-car{
+    padding: 10px 0 5px 0;
 }
-.table > :not(caption) > * > * {
+.btn-accion {
+    margin-bottom: unset !important;
+    padding: 6px 11px;
+    margin-right: 4px;
+}
+
+.table> :not(caption)>*>* {
     border-bottom-width: 0px !important;
 }

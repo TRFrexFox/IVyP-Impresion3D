@@ -1,16 +1,17 @@
 var Init = {
     Index: () => {
+        $("a[page=Dashboard]").addClass("active bg-gradient-primary");
         // $("body").append(Template.Sidebar()); //Error al cargar pantalla
         $("body").prepend(Template.SideNav());
         $("main").prepend(Template.NavBar());
         //Cards
+        let datos = Functions.ChargeData('Dashboard', 'Card-Data', true);
         let Datos = [
             { xl: 3, sm: 6, icon: 'weekend', title: 'today Money', value: 50, footer: '50 than last week', color: 'bg-gradient-dark' },
             { xl: 3, sm: 6, icon: 'person', title: 'today Users', value: 2300, footer: '5 than lask month', color: 'bg-gradient-primary' },
             { xl: 3, sm: 6, icon: 'person', title: 'today Clients', value: 3462, footer: '5 than yesterday', color: 'bg-gradient-success' },
             { xl: 3, sm: 6, icon: 'weekend', title: 'Sales', value: 103430, footer: '4 than yesterday', color: 'bg-gradient-info' }
         ]
-        console.log(Datos)
         Datos.forEach((e, i) => {
             $("#DCard").append(Template.Card(e.xl, e.sm, e.icon, e.title, e.value, e.footer, e.color));
         });
@@ -21,7 +22,6 @@ var Init = {
             { lg: 4, md: 6, chid: 'chart-line', chheight: 170, title: 'Daily Sales', subtitle: '5 than lask month', icon: 'schedule', footer: 'test', color: 'bg-gradient-success' },
             { lg: 4, md: 6, chid: 'chart-line-tasks', chheight: 170, title: 'Completed Tasks', subtitle: '5 than yesterday', icon: 'schedule', footer: 'test', color: 'bg-gradient-dark' }
         ]
-        console.log(Datos)
         Datos2.forEach((e, i) => {
             $("#DGraph").append(Template.Graph(e.lg, e.md, e.chid, e.chheight, e.title, e.subtitle, e.icon, e.footer, e.color));
         });
@@ -31,34 +31,62 @@ var Init = {
         $("#DTask").append(Template.Order());
     },
     Mantenedor: () => {
+        $("a[page=Mantenedor]").addClass("active bg-gradient-primary")
         let tabs = [
             { tab: 'Cliente', icon: 'fa fa-user' },
             { tab: 'Marca', icon: 'fas fa-copyright' },
-            { tab: 'Estado', icon: 'fas fa-shoe-prints' },
+            { tab: 'Estado', icon: 'fas fa-hourglass-half' },
             { tab: 'Color', icon: 'fas fa-eye-dropper' },
             { tab: 'Comuna', icon: 'fas fa-flag-checkered' },
             { tab: 'Region', icon: 'fas fa-align-justify' },
-            { tab: 'Materia', icon: 'fas fa-dollar-sign' }
+            { tab: 'Pla', icon: 'fas fa-wave-square' },
+            { tab: 'Categoria', icon: 'far fa-list-alt' },
+            { tab: 'Valorizacion', icon: 'fas fa-dollar-sign' }
         ];
         $(".row").eq(0).prepend(Template.TabBar(tabs))
         $("body").prepend(Template.SideNav());
-        $("#Contenedor").append(Template.Card('Cliente', true, 12, true, 'Clientes', false));
+        $("#Contenedor").append(Template.CardTable('Cliente', true, 12, true, 'Clientes', false, { fn: 'Formulario.Cliente()' }));
 
-        let datos = Functions.ChargeList('Cliente', 'Read');
+        let datos = Functions.ChargeData('Cliente', 'Read', true);
         $("#Cliente .card-body").append(Template.Table("Cliente", datos, false, true, true));
         $("table").DataTable();
 
         $(".tabs a").click((obj) => {
             $("#Contenedor").empty();
             let atr = obj.currentTarget.attributes[0].value;
-            $("#Contenedor").append(Template.Card(atr, true, 12, true, atr, false));
+            $("#Contenedor").append(Template.CardTable(atr, true, 12, true, atr, false, { fn: 'Formulario.' + atr + '()' }));
 
-            let datos = Functions.ChargeList(atr, 'Read');
+            let datos = Functions.ChargeData(atr, 'Read', true);
             $("#" + atr + " .card-body").append(Template.Table(atr, datos, false, true, true));
             $("table").DataTable();
         })
+    },
+    Formulario: () => {
+        $("a[page=Impresion]").addClass("active bg-gradient-primary");
+        Persistant.Incremental = 0;
+        $("#Contenedor")
+            .append(Template.CardTable('Detalle', false, 3, true, 'Detalle', false, false))
+            .append(Template.CardTable('Solicitud', false, 9, true, 'Solicitud', false, { fn: "Functions.addParte()" }));
+        $("#Solicitud .card-body").append(Formulario.Solicitud());
+        $("#Solicitud").append(Template.CardTable('Parte', false, 12, true, 'Parte', false, false, 'margin-top:50px'));
+        $("#Parte > .card > .card-header > .card-body").append(Formulario.Parte());
+
+        $("#Detalle").append(Template.CardTable('Clientes', false, 12, true, 'Clientes', false, false, 'margin-top:50px'));
+        $("#Detalle > .card > .card-header > .card-body").append(Formulario.Detalle([
+            { nombre: 'Horas', hr: false },
+            { nombre: 'KW', hr: false },
+            { nombre: 'Costo', hr: true },
+            { nombre: 'Subtotal', hr: false },
+            { nombre: 'Descuento', hr: false },
+            { nombre: 'Total a Pagar', hr: true },
+            { nombre: 'Ganancia', hr: true },
+        ]))
+        $("#Clientes > .card > .card-header > .card-body").append(Formulario.ListClientes('Cliente', Functions.ChargeData("Cliente", "Read", false)));
+        Functions.ChargeData("Valorizacion", "Read", true);
     }
 }
+
+var Persistant = {};
 
 var Template = {
     Sidebar: () => '<aside class="sidenav navbar navbar-vertical navbar-expand-xs border-0 border-radius-xl my-3 fixed-start ms-3   bg-gradient-dark" id="sidenav-main">' +
@@ -577,15 +605,16 @@ var Template = {
             '</div>' +
             '</nav>';
     },
-    Card: (id, row, col, header, headerTitle, footer) => {
+    CardTable: (id, row, col, header, headerTitle, footer, addBtn, customStyle = '') => {
         let html = (row) ? '<div class="row">' : '';
-        html += '<div id="' + id + '" class="col-"' + col + '>' +
+        html += '<div id="' + id + '" class="col-' + col + '" style="' + customStyle + '">' +
             '<div class="card my-4">';
         html += (header) ? '<div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">' +
-            '<div class="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3">' +
-            '<h6 class="text-white text-capitalize ps-3">' + headerTitle + '</h6>' +
-            '<button class="btn btn-success btn-accion" style="float: right; margin: -35px 20px 0 0;" onclick="Formulario.add' + id + '()"><i class="fa fa-plus"></i></button>' +
-            '</div>' : '';
+            // '<div class="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3">' +
+            '<div class="bg-gradient-primary shadow-primary border-radius-lg custom-pad-title-car">' +
+            '<h6 class="text-white text-capitalize ps-3">' + headerTitle + '</h6>' : '';
+        // html += (addBtn) ? '<button class="btn btn-success btn-accion btn-Card-Title" onclick="Formulario.' + id + '()"><i class="fa fa-plus"></i></button>':'';
+        html += (addBtn != false) ? '<button class="btn btn-success btn-Card-Title" onclick="' + addBtn.fn + '"><i class="fa fa-plus"></i></button>' : '';
         html += '</div>' +
             '<div class="card-body px-0 pb-2">' +
             '</div>';
@@ -597,7 +626,7 @@ var Template = {
     },
     Table: (id, data, view, edit, del) => {
         let th = true;
-        let html = '<div class="table-responsive p-0" style="padding: 0px 25px 20px 25px !important;">' +
+        let html = '<div class="table-responsive p-0" style="padding: 0px 5px 5px 5px !important;">' +
             '<table id="' + id + '" class="table hover stripe align-items-center mb-0">';
         data.forEach((e, k) => {
             if (th) {
@@ -618,8 +647,8 @@ var Template = {
             });
             html += (view || edit || del) ? '<td class="align-middle text-center">' : '';
             html += (view) ? '<button class="btn btn-info btn-accion"><i class="fas fa-eye"></i></button>' : '';
-            html += (edit) ? '<button class="btn btn-success btn-accion"><i class="fas fa-edit"></i></button>' : '';
-            html += (del) ? '<button class="btn btn-danger btn-accion" onclick="Functions.delData(\'' + id + '\', ' + e['id'] + ')"><i class="fas fa-trash"></i></button>' : '';
+            html += (edit) ? '<button class="btn btn-success btn-accion" onclick="Formulario.' + id + '(\'' + e['id'] + '\', true)"><i class="fas fa-edit"></i></button>' : '';
+            html += (del) ? '<button class="btn btn-danger btn-accion" onclick="Functions.setData(\'' + id + '\', \'Delete\', ' + e['id'] + ').then(()=>{$(\'#modal\').modal(\'hide\');$(\'[tab=' + id + ']\').click()})"><i class="fas fa-trash"></i></button>' : '';
             html += (view || edit || del) ? '</td>' : '';
             html += '</tr>';
         });
@@ -638,40 +667,40 @@ var Template = {
             '</div>' +
             '<div class="modal-body"></div>' +
             '<div class="modal-footer">';
-            btn.forEach(e => {
-                html += '<button class="'+e.class+'" onclick="'+e.fn+'">'+e.text+'</button>';
-            });
-            html += '</div>' +
+        btn.forEach(e => {
+            html += '<button class="' + e.class + '" onclick="' + e.fn + '">' + e.text + '</button>';
+        });
+        html += '</div>' +
             '</div>' +
             '</div>' +
             '</div>';
         return html;
     },
-    Formulario: form => {
-        let html = '<form id="formulario">' +
+    Formulario: (id, ref, form) => {
+        let html = '<form id="' + id + '" ref="' + ref + '">' +
             '<div class="row">';
         form.forEach(Val => {
             html += '<div class="col-' + Val.col + '">' +
                 '<label>' + Val.label + '</label>';
             if (Val.type == "text") {
-                html += '<input type="text" id="' + Val.ref + '" name="' + Val.ref + '" class="form-control '+Val.class+'" onclick="'+Val.fn+'" style="border: 1px solid #d2d6da !important" ' + Val.disabled + '>';
+                html += '<input type="text" id="' + Val.ref + '" name="' + Val.ref + '" class="form-control custom-input ' + Val.class + '" ' + Val.fn + ' value="' + ((Val.def != undefined) ? Val.def : "") + '" ' + Val.disabled + ' ' + Val.required + '/>';
             } else if (Val.type == "select") {
-                let data = Functions.ChargeList(Val.ref, 'Read')
-                html += Template.Select(Val.ref, data, Val.fn);
+                let data = Functions.ChargeData(Val.ref, 'Read');
+                html += Template.Select(Val.ref, data, Val.fn, Val.def);
             } else if (Val.type == "password") {
-                html += '<input type="password" id="' + Val.ref + '" name="' + Val.ref + '" class="form-control '+Val.class+'" onclick="'+Val.fn+'" style="border: 1px solid #d2d6da !important">';
+                html += '<input type="password" id="' + Val.ref + '" name="' + Val.ref + '" class="form-control custom-input ' + Val.class + '" ' + Val.fn + ' value="' + ((Val.def != undefined) ? Val.def : "") + '" ' + Val.disabled + ' ' + Val.required + '/>';
             } else if (Val.type == "date") {
-                html += '<input type="date" id="' + Val.ref + '" name="' + Val.ref + '" class="form-control '+Val.class+'" onclick="'+Val.fn+'" style="border: 1px solid #d2d6da !important">';
+                html += '<input type="date" id="' + Val.ref + '" name="' + Val.ref + '" class="form-control custom-input ' + Val.class + '" ' + Val.fn + ' value="' + ((Val.def != undefined) ? Val.def : "") + '" ' + Val.disabled + ' ' + Val.required + '/>';
             } else if (Val.type == "email") {
-                html += '<input type="email" id="' + Val.ref + '" name="' + Val.ref + '" class="form-control '+Val.class+'" onclick="'+Val.fn+'" style="border: 1px solid #d2d6da !important">';
+                html += '<input type="email" id="' + Val.ref + '" name="' + Val.ref + '" class="form-control custom-input ' + Val.class + '" ' + Val.fn + ' value="' + ((Val.def != undefined) ? Val.def : "") + '" ' + Val.disabled + ' ' + Val.required + '/>';
             } else if (Val.type == "file") {
-                html += '<input type="file" id="' + Val.ref + '" name="' + Val.ref + '" class="form-control '+Val.class+'" onclick="'+Val.fn+'" style="border: 1px solid #d2d6da !important">';
+                html += '<input type="file" id="' + Val.ref + '" name="' + Val.ref + '" class="form-control custom-input ' + Val.class + '" ' + Val.fn + ' value="' + ((Val.def != undefined) ? Val.def : "") + '" ' + Val.disabled + ' ' + Val.required + '/>';
             } else if (Val.type == "number") {
-                html += '<input type="number" id="' + Val.ref + '" name="' + Val.ref + '" class="form-control '+Val.class+'" onclick="'+Val.fn+'" style="border: 1px solid #d2d6da !important">';
+                html += '<input type="number" id="' + Val.ref + '" name="' + Val.ref + '" class="form-control custom-input ' + Val.class + '" ' + Val.fn + ' value="' + ((Val.def != undefined) ? Val.def : "") + '" ' + Val.disabled + ' ' + Val.required + '/>';
             } else if (Val.type == "radio") {
-                html += '<input type="radio" id="' + Val.ref + '" name="' + Val.ref + '" class="form-control '+Val.class+'" onclick="'+Val.fn+'" style="border: 1px solid #d2d6da !important">';
+                html += '<input type="radio" id="' + Val.ref + '" name="' + Val.ref + '" class="form-control custom-input ' + Val.class + '" ' + Val.fn + ' value="' + ((Val.def != undefined) ? Val.def : "") + '" ' + Val.disabled + ' ' + Val.required + '/>';
             } else if (Val.type == "checkbox") {
-                html += '<input type="checkbox" id="' + Val.ref + '" name="' + Val.ref + '" class="form-control '+Val.class+'" onclick="'+Val.fn+'" style="border: 1px solid #d2d6da !important">';
+                html += '<input type="checkbox" id="' + Val.ref + '" name="' + Val.ref + '" class="form-control custom-input ' + Val.class + '" ' + Val.fn + ' value="' + ((Val.def != undefined) ? Val.def : "") + '" ' + Val.disabled + ' ' + Val.required + '/>';
             }
             html += '</div>';
         });
@@ -679,50 +708,204 @@ var Template = {
             '</form>';
         return html;
     },
-    Select: (id, data, fn) => {
-        let html = '<select id="' + id + '" name="' + id + '" class="form-control" onclick="'+fn+'" style="border: 1px solid #d2d6da !important">';
-        html += '<option selected disabled>Seleccione</option>';
+    Select: (id, data, fn, def) => {
+        let attr;
+        let html = '<select id="' + id + '" name="' + id + '" class="form-control custom-input" ' + fn + ' style="border: 1px solid #d2d6da !important; width: 100% !important;">';
+        html += '<option ' + ((def == "") ? 'selected' : '') + ' disabled>Seleccione</option>';
         data.forEach(e => {
-            html += '<option value="' + e.id + '">' + e.nombre + '</option>';
+            attr = "";
+            (Object.keys(e)).forEach(key => {
+                attr += key + '="' + e[key] + '"';
+            });
+            html += '<option ' + ((def == e.nombre) ? 'selected' : '') + ' value="' + e.id + '" ' + attr + '>' + e.nombre + '</option>';
         });
         html += '</select>';
         return html;
+    },
+    Toast: (icon, title, time = 3000, position = 'top-end', progressbar = true) => {
+        const Toast = Swal.mixin({
+            toast: true,
+            position: position,
+            showConfirmButton: false,
+            timer: time,
+            timerProgressBar: progressbar,
+            didOpen: (toast) => {
+                toast.addEventListener('mouseenter', Swal.stopTimer)
+                toast.addEventListener('mouseleave', Swal.resumeTimer)
+            }
+        })
+
+        Toast.fire({
+            icon: icon,
+            title: title
+        })
     }
 };
 
 var Formulario = {
-    addCliente: () => {
-        $("body").append(Template.Modal([
-            {class:'btn btn-success', text: 'Agregar', fn: 'Functions.setData(\'Cliente\', $(\'#formulario\').serializeArray())'}
-        ]));
-        $(".modal-title").empty().append("Agregar Color");
-        $(".modal-body").empty().append(Template.Formulario([
-            { type: 'text', col: 12, disabled: '', label: "nombre*", ref: 'nombre' },
-            { type: 'text', col: 12, disabled: '', label: "apellido paterno*", ref: 'apellido_paterno' },
-            { type: 'text', col: 12, disabled: '', label: "apellido materno*", ref: 'apellido_materno' },
-            { type: 'date', col: 12, disabled: '', label: "fecha de nacimiento", ref: 'fecha_nacimiento' },
-            { type: 'select', col: 12, disabled: '', label: "region", ref: 'region' },
-            { type: 'select', col: 12, disabled: '', label: "comuna", ref: 'comuna' },
-            { type: 'number', col: 12, disabled: '', label: "codigo postal", ref: 'codigo_postal' },
-            { type: 'text', col: 12, disabled: '', label: "rut", ref: 'rut' },
-            { type: 'email', col: 12, disabled: '', label: "correo", ref: 'correo' },
-            { type: 'number', col: 12, disabled: '', label: "telefono", ref: 'telefono' },
-        ]));
-        $("#modal").modal("show");
+    Modal: (ref, id, filled) => {
+        return new Promise((res, rej) => {
+            let def;
+            $("#modal").remove();
+            $("body").append(Template.Modal([
+                { class: 'btn btn-info', text: 'Limpiar', fn: '$(\'form\').reset()' },
+                { class: 'btn btn-success', text: ((!filled) ? 'Agregar' : 'Actualizar'), fn: 'Functions.setData(\'' + ref + '\', \'' + ((!filled) ? 'Create' : 'Update') + '\', ' + ((!filled) ? 0 : id) + ', $(\'form\').serializeArray()).then(()=>{$(\'#modal\').modal(\'hide\');$(\'[tab=' + ref + ']\').click()})' }
+            ]));
+            if (filled) {
+                $(".modal-title").empty().append("Editar " + ref);
+                def = Persistant[ref].find(x => x.id == id);
+            } else
+                $(".modal-title").empty().append("Agregar " + ref);
+
+            $("#modal").modal("show");
+            res(def);
+        })
     },
-    addColor: () => {
-        $(".modal-title").empty().append("Agregar Color");
-        $(".modal-body").empty().append(Template.Formulario([{ type: 'text', col: 12, disabled: '', label: "nombre", ref: 'nombre' }]));
+    Cliente: (id, filled) => {
+        Formulario.Modal("Cliente", id, filled).then((def) => {
+            $(".modal-body").empty().append(Template.Formulario('Cliente', 'Cliente', [
+                { type: 'text', col: 6, disabled: '', def: (filled) ? def.nombre : "", label: "nombre*", ref: 'nombre' },
+                { type: 'text', col: 6, disabled: '', def: (filled) ? def.apellido_paterno : "", label: "apellido paterno*", ref: 'apellido_paterno' },
+                { type: 'text', col: 6, disabled: '', def: (filled) ? def.apellido_materno : "", label: "apellido materno*", ref: 'apellido_materno' },
+                { type: 'date', col: 6, disabled: '', def: (filled) ? def.fecha_nacimiento : "", label: "fecha de nacimiento", ref: 'fecha_nacimiento' },
+                { type: 'select', col: 6, disabled: '', def: (filled) ? def.region : "", label: "region", ref: 'region' },
+                { type: 'select', col: 6, disabled: '', def: (filled) ? def.comuna : "", label: "comuna", ref: 'comuna' },
+                { type: 'number', col: 6, disabled: '', def: (filled) ? def.codigo_postal : "", label: "codigo postal", ref: 'codigo_postal' },
+                { type: 'text', col: 6, disabled: '', def: (filled) ? def.rut : "", label: "rut", ref: 'rut' },
+                { type: 'email', col: 6, disabled: '', def: (filled) ? def.correo : "", label: "correo", ref: 'correo' },
+                { type: 'number', col: 6, disabled: '', def: (filled) ? def.telefono : "", label: "telefono", ref: 'telefono' },
+            ]));
+            $('select').select2({
+                dropdownParent: $('#modal')
+            });
+        })
     },
-    addComuna: () => {
-        $(".modal-title").empty().append("Agregar Comuna");
-        $(".modal-body").empty().append(Template.Formulario([
-            { type: 'text', col: 6, disabled: '', label: "nombre", ref: 'nombre' },
-            { type: 'select', col: 6, disabled: 'false', label: "region", ref: 'region' }
+    Marca: (id, filled) => {
+        Formulario.Modal("Marca", id, filled).then((def) => {
+            $(".modal-body").empty().append(Template.Formulario('Marca', 'Marca', [
+                { type: 'text', col: 12, disabled: '', def: (filled) ? def.nombre : "", label: "nombre", ref: 'nombre' },
+            ]));
+        })
+    },
+    Estado: (id, filled) => {
+        Formulario.Modal("Estado", id, filled).then((def) => {
+            $(".modal-body").empty().append(Template.Formulario('Estado', 'Estado', [
+                { type: 'text', col: 12, disabled: '', def: (filled) ? def.nombre : "", label: "nombre", ref: 'nombre' },
+            ]));
+        })
+    },
+    Color: (id, filled) => {
+        Formulario.Modal("Color", id, filled).then((def) => {
+            $(".modal-body").empty().append(Template.Formulario('Color', 'Color', [
+                { type: 'text', col: 12, disabled: '', def: (filled) ? def.nombre : "", label: "nombre", ref: 'nombre' },
+            ]));
+        })
+    },
+    Comuna: (id, filled) => {
+        Formulario.Modal("Comuna", id, filled).then((def) => {
+            $(".modal-body").empty().append(Template.Formulario('Comuna', 'Comuna', [
+                { type: 'text', col: 6, disabled: '', def: (filled) ? def.nombre : "", label: "nombre", ref: 'nombre' },
+                { type: 'select', col: 6, disabled: '', def: (filled) ? def.region : "", label: "region", ref: 'region' },
+                { type: 'number', col: 6, disabled: '', def: (filled) ? def.cut : "", label: "cut", ref: 'cut' },
+            ]));
+        })
+    },
+    Region: (id, filled) => {
+        Formulario.Modal("Region", id, filled).then((def) => {
+            $(".modal-body").empty().append(Template.Formulario('Region', 'Region', [
+                { type: 'text', col: 6, disabled: '', def: (filled) ? def.nombre : "", label: "nombre", ref: 'nombre' },
+                { type: 'text', col: 6, disabled: '', def: (filled) ? def.abreviacion : "", label: "abreviacion", ref: 'abreviacion' },
+            ]));
+        })
+    },
+    Pla: (id, filled) => {
+        Formulario.Modal("Pla", id, filled).then((def) => {
+            $(".modal-body").empty().append(Template.Formulario('Pla', 'Pla', [
+                { type: 'select', col: 6, disabled: '', def: (filled) ? def.color : "", label: "color", ref: 'color' },
+                { type: 'select', col: 6, disabled: '', def: (filled) ? def.marca : "", label: "marca", ref: 'marca' },
+                { type: 'number', col: 6, disabled: '', def: (filled) ? def.diametro : "", label: "diametro", ref: 'diametro' },
+                { type: 'text', col: 6, disabled: '', def: (filled) ? def.temperatura : "", label: "temperatura", ref: 'temperatura' },
+                { type: 'number', col: 6, disabled: '', def: (filled) ? def.gramos : "", label: "gramos", ref: 'gramos' },
+                { type: 'select', col: 6, disabled: '', def: (filled) ? def.categoria : "", label: "categoria", ref: 'categoria' },
+                { type: 'number', col: 6, disabled: '', def: (filled) ? def.valor : "", label: "valor", ref: 'valor' },
+            ]));
+        })
+    },
+    Categoria: (id, filled) => {
+        Formulario.Modal("Categoria", id, filled).then((def) => {
+            $(".modal-body").empty().append(Template.Formulario('Categoria', 'Categoria', [
+                { type: 'text', col: 6, disabled: '', def: (filled) ? def.nombre : "", label: "nombre", ref: 'nombre' },
+            ]));
+        })
+    },
+    Valorizacion: (id, filled) => {
+        Formulario.Modal("Valorizacion", id, filled).then((def) => {
+            $(".modal-body").empty().append(Template.Formulario('Valorizacion', 'Valorizacion', [
+                { type: 'text', col: 6, disabled: '', def: (filled) ? def.material : "", label: "material", ref: 'material' },
+                { type: 'text', col: 6, disabled: '', def: (filled) ? def.medida : "", label: "medida", ref: 'medida' },
+                { type: 'number', col: 6, disabled: '', def: (filled) ? def.costo : "", label: "costo", ref: 'costo' },
+                { type: 'number', col: 6, disabled: '', def: (filled) ? def.venta : "", label: "venta", ref: 'venta' },
+            ]));
+        })
+    },
+    ListClientes: (name, Data) => {
+        let html = "";
+        Data.forEach(e => {
+            html += '<div class="row">' +
+                '<div class="col-4" data-bs-toggle="tooltip" data-bs-placement="top" title="' + e.nombre + ' ' + e.apellido_paterno + ' ' + e.apellido_materno + '">' +
+                e.rut +
+                '</div>' +
+                '<div class="col-4" data-bs-toggle="tooltip" data-bs-placement="top" title="' + e.region + '">' +
+                e.comuna +
+                '</div>' +
+                '<div class="col-4">' +
+                '<div class="pretty p-switch p-fill">' +
+                '<input type="radio" name="' + name + '" value="' + e.id + '" />' +
+                '<div class="state p-success">' +
+                '<label></label>' +
+                '</div>' +
+                '</div>' +
+                '</div>' +
+                '</div>' +
+                '<hr>';
+        });
+        return html;
+    },
+    Detalle: (Data) => {
+        let html = "";
+        Data.forEach(e => {
+            html += '<div class="row">' +
+                '<div class="col-6" style="text-align:center">' +
+                e.nombre +
+                '</div>' +
+                '<div class="col-6" style="text-align:center;" id="' + e.nombre + '">' +
+                '0' +
+                '</div>' +
+                '</div>';
+            html += (e.hr) ? '<hr>' : '';
+        });
+        html += '<div class="row">' +
+            '<div class="col-12" style="text-align:center;">' +
+            '<button class="btn btn-success" onclick="Functions.PrepararSolicitud3D()">Preparar</button>' +
+            '</div>' +
+            '</div>';
+        return html;
+    },
+    Solicitud: () => {
+        $("#Solicitud > .card > .card-header > .card-body").empty().append(Template.Formulario('Solicitud', 'Solicitud', [
+            { type: 'text', col: 3, disabled: '', label: "nombre*", ref: 'nombre', required: 'required' },
+            { type: 'number', col: 3, disabled: '', label: "descuento (Opcional)", ref: 'descuento', fn: 'oninput="Functions.CalcularDetalle()"', required: 'required' },
         ]));
-        setTimeout(() => {
-            $("select").select2({ dropdownParent: $('#modal') });
-        }, 200);
+    },
+    Parte: () => {
+        return Template.Formulario('Parte', 'Parte', [
+            { type: 'text', col: 3, disabled: '', label: "nombre", ref: 'nombre' },
+            { type: 'number', col: 3, disabled: '', label: "cantidad", ref: 'cantidad', fn: 'oninput="Functions.CalcularDetalle()"' },
+            { type: 'number', col: 3, disabled: '', label: "minutos", ref: 'minutos', fn: 'oninput="Functions.CalcularDetalle()"' },
+            { type: 'select', col: 3, disabled: '', label: "impresora", ref: 'impresora', fn: 'onchange="Functions.CalcularDetalle()"' },
+            { type: 'select', col: 3, disabled: '', label: "color", ref: 'color' },
+            { type: 'number', col: 3, disabled: '', label: "gramos", ref: 'gramos', fn: 'oninput="Functions.CalcularDetalle()"' },
+        ]);
     }
 }
 
@@ -731,7 +914,7 @@ var Functions = {
         $(".tab-panel").removeClass("tab-panel-active")
         $("#" + obj.attributes.tab.value).addClass("tab-panel-active")
     },
-    ChargeList: (funcion, accion) => {
+    ChargeData: (funcion, accion, persistant = false) => {
         let datos = $.ajax({
             url: "connection/model.php",
             dataType: "script",
@@ -743,29 +926,114 @@ var Functions = {
                 console.log(err);
             }
         }).responseText;
+        (persistant) ? Persistant[funcion.toString()] = JSON.parse(datos) : "";
         return JSON.parse(datos);
     },
-    setData: (funcion, obj) => {
+    setData: (funcion, accion, id = 0, obj = [{}]) => {
         return new Promise((res, rej) => {
-            $.post("connection/model.php", { Funcion: funcion, Accion: "Create", Obj: obj })
-                .done(function (data) {
-                    res(JSON.parse(data));
+            $.post("connection/model.php", { Funcion: funcion, Accion: accion, Obj: obj, Id: id })
+                .done((data) => {
+                    let datos = JSON.parse(data);
+                    Template.Toast('success', datos.status);
+                    res(datos);
                 })
-                .fail(() => {
-                    rej({ Error: 'No se pude procesar los datos solicitados' })
+                .fail((data) => {
+                    let datos = JSON.parse(data);
+                    Template.Toast('success', datos.status);
+                    rej(datos);
                 });
         })
     },
-    delData: (funcion, id) => {
-        return new Promise((res, rej) => {
-            $.post("connection/model.php", { Funcion: funcion, Accion: "Delete", Id: id })
-                .done(function (data) {
-                    res(JSON.parse(data));
-                })
-                .fail(() => {
-                    rej({ Error: 'No se pude procesar los datos solicitados' })
-                });
+    // delData: (funcion, id) => {
+    //     return new Promise((res, rej) => {
+    //         $.post("connection/model.php", { Funcion: funcion, Accion: "Delete", Id: id })
+    //             .done(function (data) {
+    //                 res(JSON.parse(data));
+    //             })
+    //             .fail(() => {
+    //                 rej({ Error: 'No se pude procesar los datos solicitados' })
+    //             });
+    //     })
+    // },
+    addParte: () => {
+        let version = Persistant.Incremental++;
+        $("#Solicitud").append(Template.CardTable('Parte' + version, false, 12, true, 'Parte', false, false, 'margin-top:50px'));
+        $("#Parte" + version + " > .card > .card-header > .card-body").append(Formulario.Parte());
+    },
+    CalcularHoras: (valor) => {
+        Persistant.Horas = parseInt(valor) / 60;
+        // $("#Horas").empty().html(Functions.FloatToTime(Persistant.Horas));
+    },
+    CalcularUso: (valor) => {
+        Persistant.KW = (valor * Persistant.Horas).toFixed(2);
+        // $("#KW").empty().html(Persistant.KW);
+    },
+    CalcularDetalle: () => {
+        Persistant.Detalle = { Costo: 0, Subtotal: 0, Horas: 0, Kw: 0, Descuento: 0, Total: 0, Ganancia: 0 };
+
+        Persistant.Detalle.Descuento = $('#descuento').val();
+        $("form").each(function (i, e) {
+            if (i != 0) {
+                Persistant.Cantidad = ($(this).find("#cantidad").val() != undefined) ? $(this).find("#cantidad").val() : 0;
+                Functions.CalcularHoras($(this).find("#minutos").val() * Persistant.Cantidad);
+                Functions.CalcularUso(($(this).find("#impresora option:selected").attr('kwh') != undefined) ? $(this).find("#impresora option:selected").attr('kwh') * Persistant.Cantidad : 0);
+
+                Persistant.Detalle.Horas += Persistant.Horas;
+                Persistant.Detalle.Kw += parseFloat(Persistant.KW);
+                Persistant.Detalle.Costo += Math.round((Persistant.Valorizacion[0].costo * $(this).find("#gramos").val()) + (Persistant.Valorizacion[1].costo * Persistant.KW) + (Persistant.Valorizacion[2].costo * Persistant.Horas));
+                Persistant.Detalle.Subtotal += Math.round((Persistant.Valorizacion[0].venta * $(this).find("#gramos").val()) + (Persistant.Valorizacion[1].venta * Persistant.KW) + (Persistant.Valorizacion[2].venta * Persistant.Horas));
+            }
+        });
+
+        Persistant.Detalle.Total = Persistant.Detalle.Subtotal - Persistant.Detalle.Descuento;
+        Persistant.Detalle.Ganancia = ((Persistant.Detalle.Subtotal - Persistant.Detalle.Descuento) - Persistant.Detalle.Costo);
+
+        $("#Horas").empty().html(Functions.FloatToTime(Persistant.Detalle.Horas));
+        $("#KW").empty().html(Persistant.Detalle.Kw);
+        $("#Costo").html(Persistant.Detalle.Costo);
+        $("#Subtotal").html(Persistant.Detalle.Subtotal);
+        $("#Descuento").html(Persistant.Detalle.Descuento + '(' + ((Persistant.Detalle.Descuento * 100) / Persistant.Detalle.Subtotal).toFixed(1) + '%)');
+        $("#Total\\ a\\ Pagar").html(Persistant.Detalle.Total);
+        $("#Ganancia").html(Persistant.Detalle.Ganancia);
+    },
+    PrepararSolicitud3D: () => {
+        let modelo = [{ name: 'nombre', value: $("form#Solicitud").find("#nombre").val() }];
+        Functions.setData('Modelo', 'Create', 0, modelo).then((mod) => {
+            let impresion = [
+                { name: 'modelo', value: mod.returning },
+                { name: 'costo', value: Persistant.Detalle.Costo },
+                { name: 'subtotal', value: Persistant.Detalle.Subtotal },
+                { name: 'descuento', value: Persistant.Detalle.Descuento },
+                { name: 'total', value: Persistant.Detalle.Total },
+                { name: 'cliente', value: $("[name='Cliente']:checked").val() },
+            ]
+            Functions.setData('Impresion', 'Create', 0, impresion);
+
+            $("form[ref='Parte']").each(function (i, e) {
+                let parte = $(this).serializeArray();
+                parte = parte.concat({ name: 'modelo', value: mod.returning });
+                Functions.setData('Parte', 'Create', 0, parte);
+            })
         })
+    },
+    FloatToTime: (number) => {
+        var sign = (number >= 0) ? 1 : -1;
+        number = number * sign;
+        var hour = Math.floor(number);
+        var decpart = number - hour;
+
+        var min = 1 / 60;
+        decpart = min * Math.round(decpart / min);
+        var minute = Math.floor(decpart * 60) + '';
+
+        if (minute.length < 2) {
+            minute = '0' + minute;
+        }
+
+        sign = sign == 1 ? '' : '-';
+        time = sign + hour + ':' + minute;
+
+        return (!time.includes('NaN')) ? time : 0;
     }
 }
 

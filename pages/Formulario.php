@@ -156,7 +156,7 @@
     </nav>
     <!-- End Navbar -->
     <div class="container-fluid py-4">
-      <div class="row">
+      <div class="row" id="Contenedor">
         
       </div>
       <?php include 'pages/common/footer.php'; ?>
@@ -241,6 +241,7 @@
   <script src="assets/js/plugins/perfect-scrollbar.min.js"></script>
   <script src="assets/js/plugins/smooth-scrollbar.min.js"></script>
   <script>
+    Init.Formulario();
     var win = navigator.platform.indexOf('Win') > -1;
     if (win && document.querySelector('#sidenav-scrollbar')) {
       var options = {
