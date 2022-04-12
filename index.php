@@ -50,29 +50,42 @@
     <link href="https://cdn.jsdelivr.net/npm/pretty-checkbox@3.0/dist/pretty-checkbox.min.css" rel="stylesheet" />
 
     <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.3/jquery.validate.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.css" integrity="sha512-phGxLIsvHFArdI7IyLjv14dchvbVkEDaH95efvAae/y2exeWBQCQDpNFbOTdV1p4/pIa/XtbuDCnfhDEIXhvGQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <script src="./assets/js/plugins/chartjs.min.js"></script>
 </head>
-<?php
-if (isset($_GET['page']))
-    switch ($_GET['page']) {
-        case '':
-            include 'pages/home.php';
-            break;
-        case 'Home':
-            include 'pages/home.php';
-            break;
-        case 'Impresion':
-            include 'pages/Formulario.php';
-            break;
-        case 'Mantenedor':
-            include 'pages/Mantenedor.php';
-            break;
-        default:
-            include 'error.php';
-            break;
+
+<body class="g-sidenav-show  bg-gray-200">
+    <?php include "pages/common/sidebar.php" ?>
+    <main class="main-content position-relative max-height-vh-100 h-100 border-radius-lg ">
+        <div class="container-fluid py-4">
+            <div class="row" id="Contenedor">
+            </div>
+            <?php include 'pages/common/footer.php'; ?>
+        </div>
+    </main>
+</body>
+<script>
+    Init.Index();
+    Init.Home();
+</script>
+<!--   Core JS Files   -->
+<script src="assets/js/core/popper.min.js"></script>
+<script src="assets/js/core/bootstrap.min.js"></script>
+<script src="assets/js/plugins/perfect-scrollbar.min.js"></script>
+<script src="assets/js/plugins/smooth-scrollbar.min.js"></script>
+<script>
+    var win = navigator.platform.indexOf('Win') > -1;
+    if (win && document.querySelector('#sidenav-scrollbar')) {
+        var options = {
+            damping: '0.5'
+        }
+        Scrollbar.init(document.querySelector('#sidenav-scrollbar'), options);
     }
-else
-    include 'pages/home.php';
-?>
+</script>
+<!-- Github buttons -->
+<script async defer src="https://buttons.github.io/buttons.js"></script>
+<!-- Control Center for Material Dashboard: parallax effects, scripts for the example pages etc -->
+<script src="assets/js/material-dashboard.min.js?v=3.0.0"></script>
 
 </html>

@@ -16,7 +16,7 @@
   <script src="./assets/js/plugins/smooth-scrollbar.min.js"></script>
   <script src="./assets/js/plugins/chartjs.min.js"></script>
   <script>
-    Init.Index();
+    Init.Home();
 
     var ctx = document.getElementById("chart-bars").getContext("2d");
 

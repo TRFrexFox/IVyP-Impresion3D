@@ -4,6 +4,7 @@ $Accion = $_POST["Accion"];
 require "conn.php";
 
 $process = new Process($conexion);
+// echo $process->getEncKey('Isidora221518');
 switch (ucwords($Funcion)) {
     case 'Dashboard':
         if ($Accion == 'Card-Data') echo $process->read("*", "comun", "marca", "", "", true);
@@ -63,23 +64,64 @@ switch (ucwords($Funcion)) {
         else if ($Accion == 'Update') echo $process->update("comun", "valorizacion", $_POST['Obj'], $_POST['Id']);
         else if ($Accion == 'Delete') echo $process->delete("comun", "valorizacion", $_POST['Id']);
         break;
+    case 'Formato_papel':
+    case 'Formato_Papel':
+        if ($Accion == 'Read') echo $process->read("a.id, a.nombre, a.medida, b.nombre medicion", "comun", "formato_papel a", "", "JOIN comun.medicion b ON a.medicion = b.id", true);
+        else if ($Accion == 'Create') echo $process->create("comun", "formato_papel", $_POST['Obj']);
+        else if ($Accion == 'Update') echo $process->update("comun", "formato_papel", $_POST['Obj'], $_POST['Id']);
+        else if ($Accion == 'Delete') echo $process->delete("comun", "formato_papel", $_POST['Id']);
+        break;
+    case 'Textura':
+        if ($Accion == 'Read') echo $process->read("*", "comun", "textura", "", "", true);
+        else if ($Accion == 'Create') echo $process->create("comun", "textura", $_POST['Obj']);
+        else if ($Accion == 'Update') echo $process->update("comun", "textura", $_POST['Obj'], $_POST['Id']);
+        else if ($Accion == 'Delete') echo $process->delete("comun", "textura", $_POST['Id']);
+        break;
+    case 'Papel':
+        if ($Accion == 'Read') echo $process->read("*", "comun", "papel", "", "", true);
+        else if ($Accion == 'Create') echo $process->create("comun", "papel", $_POST['Obj']);
+        else if ($Accion == 'Update') echo $process->update("comun", "papel", $_POST['Obj'], $_POST['Id']);
+        else if ($Accion == 'Delete') echo $process->delete("comun", "papel", $_POST['Id']);
+        break;
+    case 'Papeleria':
+        if ($Accion == 'Read') echo $process->read("a.id, a.nombre, b.nombre marca, a.cantidad, c.nombre formato_papel, a.precio, d.nombre color, e.nombre textura", "materia", "papeleria a", "", "JOIN comun.marca b ON a.marca = b.id JOIN comun.formato_papel c ON a.formato_papel = c.id JOIN comun.color d ON a.color = d.id JOIN comun.textura e ON a.textura = e.id ", true);
+        else if ($Accion == 'Create') echo $process->create("materia", "papeleria", $_POST['Obj']);
+        else if ($Accion == 'Update') echo $process->update("materia", "papeleria", $_POST['Obj'], $_POST['Id']);
+        else if ($Accion == 'Delete') echo $process->delete("materia", "papeleria", $_POST['Id']);
+        break;
+    case 'Medicion':
+        if ($Accion == 'Read') echo $process->read("*", "comun", "medicion", "", "", true);
+        else if ($Accion == 'Create') echo $process->create("comun", "medicion", $_POST['Obj']);
+        else if ($Accion == 'Update') echo $process->update("comun", "medicion", $_POST['Obj'], $_POST['Id']);
+        else if ($Accion == 'Delete') echo $process->delete("comun", "medicion", $_POST['Id']);
+        break;
+    case 'Tienda':
+        if ($Accion == 'Read') echo $process->read("a.id, a.nombre, a.direccion, b.nombre comuna, c.nombre region, a.telefono, a.correo", "comun", "tienda a", "", "JOIN comun.comuna b ON a.comuna = b.id JOIN comun.region c ON a.region = c.id", true);
+        else if ($Accion == 'Create') echo $process->create("comun", "tienda", $_POST['Obj']);
+        else if ($Accion == 'Update') echo $process->update("comun", "tienda", $_POST['Obj'], $_POST['Id']);
+        else if ($Accion == 'Delete') echo $process->delete("comun", "tienda", $_POST['Id']);
+        break;
     case 'Impresora':
         if ($Accion == 'Read') echo $process->read("*", "comun", "impresora", "", "", true);
         break;
     case 'Categoria':
-        if ($Accion == 'Read') echo $process->read("*", "materia", "categoria", "", "", true);
-        break;
-    case 'Modelo':
-        if ($Accion == 'Read') echo $process->read("*", "impresion", "modelo", "", "", true);
-        else if ($Accion == 'Create') echo $process->create("impresion", "modelo", $_POST['Obj']);
-        break;
     case 'Parte':
-        if ($Accion == 'Read') echo $process->read("*", "impresion", "parte", "", "", true);
-        else if ($Accion == 'Create') echo $process->create("impresion", "parte", $_POST['Obj']);
+        if ($Accion == 'Read') echo $process->read("*", "impresion3d", "parte", "", "", true);
+        else if ($Accion == 'Create') echo $process->create("impresion3d", "parte", $_POST['Obj']);
         break;
     case 'Impresion':
-        if ($Accion == 'Read') echo $process->read("*", "impresion", "impresion", "", "", true);
-        else if ($Accion == 'Create') echo $process->create("impresion", "impresion", $_POST['Obj']);
+        if ($Accion == 'Read') echo $process->read("*", "impresion3d", "impresion", "", "", true);
+        else if ($Accion == 'Create') echo $process->create("impresion3d", "impresion", $_POST['Obj']);
+        else if ($Accion == 'Listar') echo $process->read("a.id, a.costo, a.subtotal, a.descuento, a.total, a.modelo, b.nombre parte, b.minutos, b.gramos,
+        b.cantidad, c.nombre, c.apellido_paterno, c.apellido_materno, c.fecha_nacimiento, g.nombre region, h.nombre comuna,
+        c.codigo_postal, c.rut, c.correo, c.telefono, d.nombre estado, e.nombre impresora, e.kwh, e.marca, 
+        f.nombre color", "impresion3d", "impresion a", "", "JOIN impresion3d.parte b ON a.id = b.impresion
+        JOIN cliente.cliente c ON a.cliente = c.id
+        JOIN comun.estado d ON a.estado = d.id
+        JOIN comun.impresora e ON b.impresora = e.id
+        JOIN comun.color f ON b.color = f.id
+        JOIN comun.region g ON c.region = g.id
+        JOIN comun.comuna h ON c.comuna = h.id", true);
         break;
 }
 
@@ -152,8 +194,75 @@ class Process
         return (pg_query($this->conexion, $Query)) ? json_encode(array('status' => 'Registro Exitoso')) : 'Ocurrio un error';
     }
 
+    public function getEncKey($text)
+    {
+        return $this->encript($text);
+    }
+
+    public function getDecKey($text)
+    {
+        return $this->decript($text);
+    }
+
     private function toJson($data)
     {
         return json_encode($data);
+    }
+
+    private function encript($string)
+    {
+
+        // Store the cipher method
+        $ciphering = "AES-128-CTR";
+
+        // Use OpenSSl Encryption method
+        $iv_length = openssl_cipher_iv_length($ciphering);
+        $options = 0;
+
+        // Non-NULL Initialization Vector for encryption
+        $encryption_iv = '1503897453602459';
+
+        // Store the encryption key
+        $encryption_key = "trfftrff282122";
+
+        // Use openssl_encrypt() function to encrypt the data
+        $encryption = openssl_encrypt(
+            $string,
+            $ciphering,
+            $encryption_key,
+            $options,
+            $encryption_iv
+        );
+
+        // Display the encrypted string
+        return $encryption;
+    }
+
+    private function decript($string)
+    {
+        // Store the cipher method
+        $ciphering = "AES-128-CTR";
+
+        // Use OpenSSl Encryption method
+        $iv_length = openssl_cipher_iv_length($ciphering);
+        $options = 0;
+
+        // Non-NULL Initialization Vector for decryption
+        $decryption_iv = '1503897453602459';
+
+        // Store the decryption key
+        $decryption_key = "trfftrff282122";
+
+        // Use openssl_decrypt() function to decrypt the data
+        $decryption = openssl_decrypt(
+            $string,
+            $ciphering,
+            $decryption_key,
+            $options,
+            $decryption_iv
+        );
+
+        // Display the decrypted string
+        return $decryption;
     }
 }

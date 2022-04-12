@@ -1,9 +1,11 @@
 var Init = {
     Index: () => {
-        $("a[page=Dashboard]").addClass("active bg-gradient-primary");
-        // $("body").append(Template.Sidebar()); //Error al cargar pantalla
         $("body").prepend(Template.SideNav());
         $("main").prepend(Template.NavBar());
+    },
+    Home: () => {
+        $("#Contenedor").empty();
+        Functions.MenuSelection("Dashboard", "bg-gradient-primary", 'animate__animated animate__headShake');
         //Cards
         let datos = Functions.ChargeData('Dashboard', 'Card-Data', true);
         let Datos = [
@@ -12,6 +14,7 @@ var Init = {
             { xl: 3, sm: 6, icon: 'person', title: 'today Clients', value: 3462, footer: '5 than yesterday', color: 'bg-gradient-success' },
             { xl: 3, sm: 6, icon: 'weekend', title: 'Sales', value: 103430, footer: '4 than yesterday', color: 'bg-gradient-info' }
         ]
+        $("#Contenedor").append('<div id="DCard" class="row"></div><div id="DGraph" class="row mt-4"></div><div id="DTask" class="row mb-4"></div>')
         Datos.forEach((e, i) => {
             $("#DCard").append(Template.Card(e.xl, e.sm, e.icon, e.title, e.value, e.footer, e.color));
         });
@@ -29,9 +32,12 @@ var Init = {
         //DTask
         $("#DTask").append(Template.Project(8, 6, 'Projects', 'fa fa-check', 30, 'this month'));
         $("#DTask").append(Template.Order());
+
+        Functions.Graphics();
     },
     Mantenedor: () => {
-        $("a[page=Mantenedor]").addClass("active bg-gradient-primary")
+        $("#Contenedor").empty();
+        Functions.MenuSelection("Mantenedor", "bg-gradient-primary", 'animate__animated animate__headShake');
         let tabs = [
             { tab: 'Cliente', icon: 'fa fa-user' },
             { tab: 'Marca', icon: 'fas fa-copyright' },
@@ -41,28 +47,37 @@ var Init = {
             { tab: 'Region', icon: 'fas fa-align-justify' },
             { tab: 'Pla', icon: 'fas fa-wave-square' },
             { tab: 'Categoria', icon: 'far fa-list-alt' },
-            { tab: 'Valorizacion', icon: 'fas fa-dollar-sign' }
+            { tab: 'Valorizacion', icon: 'fas fa-dollar-sign' },
+            { tab: 'Papeleria', icon: 'fas fa-scroll' },
+            { tab: 'Formato_Papel', icon: 'fas fa-ruler-combined' },
+            { tab: 'Textura', icon: 'fas fa-hand-sparkles' },
+            { tab: 'Medicion', icon: 'fas fa-ruler' },
+            { tab: 'Tienda', icon: 'fas fa-store' },
         ];
-        $(".row").eq(0).prepend(Template.TabBar(tabs))
-        $("body").prepend(Template.SideNav());
-        $("#Contenedor").append(Template.CardTable('Cliente', true, 12, true, 'Clientes', false, { fn: 'Formulario.Cliente()' }));
-
-        let datos = Functions.ChargeData('Cliente', 'Read', true);
-        $("#Cliente .card-body").append(Template.Table("Cliente", datos, false, true, true));
-        $("table").DataTable();
+        $("#Contenedor").eq(0).prepend(Template.TabBar(tabs))
 
         $(".tabs a").click((obj) => {
-            $("#Contenedor").empty();
-            let atr = obj.currentTarget.attributes[0].value;
+            $("#Contenedor .row").empty();
+            let atr = obj.currentTarget.attributes.tab.value;
             $("#Contenedor").append(Template.CardTable(atr, true, 12, true, atr, false, { fn: 'Formulario.' + atr + '()' }));
 
             let datos = Functions.ChargeData(atr, 'Read', true);
-            $("#" + atr + " .card-body").append(Template.Table(atr, datos, false, true, true));
+            $("#" + atr + " .card-body").append(Template.Table(atr, datos,
+                false,
+                { fn: 'Formulario.' + atr + '(this.attributes.rowid.value, true)' },
+                { fn: 'Template.SADecision(\'question\',\'¿Elimnar registro?\', \'Se eliminar el registro \'+ this.attributes.rowid.value).then((d)=>{if(d)Functions.setData(\'' + atr + '\', \'Delete\', this.attributes.rowid.value).then(()=>{$(\'[tab=' + atr + ']\').click()})})' }
+            ));
             $("table").DataTable();
         })
+
+        $("a[tab]:eq(0)").click()
+        $("table").DataTable();
+
+        Functions.TabsInit();
     },
     Formulario: () => {
-        $("a[page=Impresion]").addClass("active bg-gradient-primary");
+        $("#Contenedor").empty();
+        Functions.MenuSelection("Solicitud3D", "bg-gradient-primary", 'animate__animated animate__headShake');
         Persistant.Incremental = 0;
         $("#Contenedor")
             .append(Template.CardTable('Detalle', false, 3, true, 'Detalle', false, false))
@@ -72,17 +87,61 @@ var Init = {
         $("#Parte > .card > .card-header > .card-body").append(Formulario.Parte());
 
         $("#Detalle").append(Template.CardTable('Clientes', false, 12, true, 'Clientes', false, false, 'margin-top:50px'));
-        $("#Detalle > .card > .card-header > .card-body").append(Formulario.Detalle([
-            { nombre: 'Horas', hr: false },
-            { nombre: 'KW', hr: false },
-            { nombre: 'Costo', hr: true },
+        $("#Detalle > .card > .card-header > .card-body").append(Template.Detalle([
+            { nombre: 'Horas', hr: false, iconn: '<i class="far fa-clock"></i>' },
+            { nombre: 'KW', hr: false, iconn: '<i class="fas fa-bolt"></i>' },
+            { nombre: 'Costo', hr: true, iconn: '<i class="fas fa-dollar-sign"></i>' },
             { nombre: 'Subtotal', hr: false },
             { nombre: 'Descuento', hr: false },
             { nombre: 'Total a Pagar', hr: true },
             { nombre: 'Ganancia', hr: true },
-        ]))
-        $("#Clientes > .card > .card-header > .card-body").append(Formulario.ListClientes('Cliente', Functions.ChargeData("Cliente", "Read", false)));
+        ], true));
+        $("#Clientes > .card > .card-header > .card-body").append(Template.ListClientes('Cliente', Functions.ChargeData("Cliente", "Read", false)));
         Functions.ChargeData("Valorizacion", "Read", true);
+    },
+    Impresiones: () => {
+        $("#Contenedor").empty();
+        Functions.MenuSelection("Impresiones", "bg-gradient-primary", 'animate__animated animate__headShake');
+        $("#Contenedor").append(Template.CardTable('ListImpresiones', true, 12, true, 'Impresion - Partes', false, false));
+        $("#ListImpresiones .card-body").append(Template.Table("ListImpresiones", Functions.ChargeData('Impresion', 'Listar', true),
+            { fn: " $('#etiqueta-content').empty().append(Template.Imp3DDetalle(this.attributes.rowid.value,'Impresion'));const ps = new PerfectScrollbar('#etiqueta', {wheelSpeed: 2,wheelPropagation: true,minScrollbarLength: 20});$('#etiqueta').removeClass('animate__animated animate__fadeOutBottomRight')" },
+            { fn: 'Formulario.Impresion(this.attributes.rowid.value, true)' },
+            false,
+            [1, 2, 3, 4, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 22, 23]
+        ));
+        $("body").append(Template.Modal([{}]))
+        $("table").DataTable();
+    },
+    FormularioPapel: () => {
+        $("#Contenedor").empty();
+        Functions.MenuSelection("SolicitudPapel", "bg-gradient-primary", 'animate__animated animate__headShake');
+        Persistant.Incremental = 0;
+        $("#Contenedor")
+            .append(Template.CardTable('Detalle', false, 3, true, 'Detalle', false, false))
+            .append(Template.CardTable('Solicitud', false, 9, true, 'Solicitud', false, { fn: "Functions.addParte()" }));
+        $("#Solicitud .card-body").append(Formulario.Solicitud());
+        $("#Solicitud").append(Template.CardTable('Parte', false, 12, true, 'Parte', false, false, 'margin-top:50px'));
+        $("#Parte > .card > .card-header > .card-body").append(Formulario.Parte());
+
+        $("#Detalle").append(Template.CardTable('Clientes', false, 12, true, 'Clientes', false, false, 'margin-top:50px'));
+        $("#Detalle > .card > .card-header > .card-body").append(Template.Detalle([
+            { nombre: 'Horas', hr: false, iconn: '<i class="far fa-clock"></i>' },
+            { nombre: 'KW', hr: false, iconn: '<i class="fas fa-bolt"></i>' },
+            { nombre: 'Costo', hr: true, iconn: '<i class="fas fa-dollar-sign"></i>' },
+            { nombre: 'Subtotal', hr: false },
+            { nombre: 'Descuento', hr: false },
+            { nombre: 'Total a Pagar', hr: true },
+            { nombre: 'Ganancia', hr: true },
+        ], true));
+        $("#Clientes > .card > .card-header > .card-body").append(Template.ListClientes('Cliente', Functions.ChargeData("Cliente", "Read", false)));
+        Functions.ChargeData("Valorizacion", "Read", true);
+    },
+    Perfil: () => {
+        $("#Contenedor").empty();
+        Functions.MenuSelection("Perfil", "bg-gradient-primary", 'animate__animated animate__headShake');
+        $("#Contenedor")
+            .append(Template.CardMask())
+            .append(Template.BigCard())
     }
 }
 
@@ -381,11 +440,11 @@ var Template = {
         '</div>',
     TabBar: (tabs) => {
         let active = true;
-        let html = '<div class="wrapper">' +
+        let html = '<div class="wrapper contenedor-tabbar">' +
             '<nav class="tabs">' +
             '<div class="selector"></div>';
         tabs.forEach(e => {
-            html += '<a tab="' + e.tab + '" class="' + ((active) ? 'active' : '') + '"><i class="' + e.icon + '"></i>' + e.tab + '</a>';
+            html += '<a tab="' + e.tab + '" class="' + ((active) ? 'active' : '') + '"><i class="' + e.icon + '"></i>' + e.tab.replace("_", " ") + '</a>';
             active = false;
         });
         html += '</nav>' +
@@ -399,13 +458,7 @@ var Template = {
         '<div class="card shadow-lg">' +
         '<div class="card-header pb-0 pt-3">' +
         '<div class="float-start">' +
-        '<h5 class="mt-3 mb-0">Material UI Configurator</h5>' +
-        '<p>See our dashboard options.</p>' +
-        '</div>' +
-        '<div class="float-end mt-4">' +
-        '<button class="btn btn-link text-dark p-0 fixed-plugin-close-button">' +
-        '<i class="material-icons">clear</i>' +
-        '</button>' +
+        '<h5 class="mt-3 mb-0">Visualizacion</h5>' +
         '</div>' +
         '<!-- End Toggle Button -->' +
         '</div>' +
@@ -451,7 +504,6 @@ var Template = {
         '</div>' +
         '</div>' +
         '<hr class="horizontal dark my-sm-4">' +
-        '<a class="btn btn-outline-dark w-100" href="">View documentation</a>' +
         '<div class="w-100 text-center">' +
         '</div>' +
         '</div>' +
@@ -501,36 +553,7 @@ var Template = {
             '</nav>' +
             '<div class="collapse navbar-collapse mt-sm-0 mt-2 me-md-0 me-sm-4" id="navbar">' +
             '<div class="ms-md-auto pe-md-3 d-flex align-items-center">' +
-            '<div class="input-group input-group-outline">' +
-            '<label class="form-label">Type here...</label>' +
-            '<input type="text" class="form-control">' +
             '</div>' +
-            '</div>' +
-            '<ul class="navbar-nav  justify-content-end">' +
-            '<li class="nav-item d-flex align-items-center">' +
-            '<a href="javascript:;" class="nav-link text-body font-weight-bold px-0">' +
-            '<i class="fa fa-user me-sm-1"></i>' +
-            '<span class="d-sm-inline d-none">Sign In</span>' +
-            '</a>' +
-            '</li>' +
-            '<li class="nav-item d-xl-none ps-3 d-flex align-items-center">' +
-            '<a href="javascript:;" class="nav-link text-body p-0" id="iconNavbarSidenav">' +
-            '<div class="sidenav-toggler-inner">' +
-            '<i class="sidenav-toggler-line"></i>' +
-            '<i class="sidenav-toggler-line"></i>' +
-            '<i class="sidenav-toggler-line"></i>' +
-            '</div>' +
-            '</a>' +
-            '</li>' +
-            '<li class="nav-item px-3 d-flex align-items-center">' +
-            '<a href="javascript:;" class="nav-link text-body p-0">' +
-            '<i class="fa fa-cog fixed-plugin-button-nav cursor-pointer"></i>' +
-            '</a>' +
-            '</li>' +
-            '<li class="nav-item dropdown pe-2 d-flex align-items-center">' +
-            '<a href="javascript:;" class="nav-link text-body p-0" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">' +
-            '<i class="fa fa-bell cursor-pointer"></i>' +
-            '</a>' +
             '<ul class="dropdown-menu  dropdown-menu-end  px-2 py-3 me-sm-n4" aria-labelledby="dropdownMenuButton">' +
             '<li class="mb-2">' +
             '<a class="dropdown-item border-radius-md" href="javascript:;">' +
@@ -612,7 +635,7 @@ var Template = {
         html += (header) ? '<div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">' +
             // '<div class="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3">' +
             '<div class="bg-gradient-primary shadow-primary border-radius-lg custom-pad-title-car">' +
-            '<h6 class="text-white text-capitalize ps-3">' + headerTitle + '</h6>' : '';
+            '<h6 class="text-white text-capitalize ps-3">' + headerTitle.replace("_", " ") + '</h6>' : '';
         // html += (addBtn) ? '<button class="btn btn-success btn-accion btn-Card-Title" onclick="Formulario.' + id + '()"><i class="fa fa-plus"></i></button>':'';
         html += (addBtn != false) ? '<button class="btn btn-success btn-Card-Title" onclick="' + addBtn.fn + '"><i class="fa fa-plus"></i></button>' : '';
         html += '</div>' +
@@ -624,7 +647,7 @@ var Template = {
         html += (row) ? '</div>' : '';
         return html;
     },
-    Table: (id, data, view, edit, del) => {
+    Table: (id, data, view, edit, del, remCols = []) => {
         let th = true;
         let html = '<div class="table-responsive p-0" style="padding: 0px 5px 5px 5px !important;">' +
             '<table id="' + id + '" class="table hover stripe align-items-center mb-0">';
@@ -632,8 +655,9 @@ var Template = {
             if (th) {
                 html += '<thead>' +
                     '<tr>';
-                (Object.keys(e)).forEach(key => {
-                    html += '<th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 text-center">' + key.replace("_", " ") + '</th>';
+                (Object.keys(e)).forEach((key, idx) => {
+                    if (!remCols.some(x => x == idx))
+                        html += '<th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 text-center">' + key.replace("_", " ") + '</th>';
                 });
                 html += (view || edit || del) ? '<th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 text-center">Acciones</th>' : '';
                 html += '</tr>' +
@@ -642,13 +666,14 @@ var Template = {
             }
             th = false;
             html += '<tr>';
-            (Object.keys(e)).forEach(key => {
-                html += '<td class="align-middle text-center">' + e[key] + '</th>';
+            (Object.keys(e)).forEach((key, idx) => {
+                if (!remCols.some(x => x == idx))
+                    html += '<td class="align-middle text-center">' + e[key] + '</th>';
             });
             html += (view || edit || del) ? '<td class="align-middle text-center">' : '';
-            html += (view) ? '<button class="btn btn-info btn-accion"><i class="fas fa-eye"></i></button>' : '';
-            html += (edit) ? '<button class="btn btn-success btn-accion" onclick="Formulario.' + id + '(\'' + e['id'] + '\', true)"><i class="fas fa-edit"></i></button>' : '';
-            html += (del) ? '<button class="btn btn-danger btn-accion" onclick="Functions.setData(\'' + id + '\', \'Delete\', ' + e['id'] + ').then(()=>{$(\'#modal\').modal(\'hide\');$(\'[tab=' + id + ']\').click()})"><i class="fas fa-trash"></i></button>' : '';
+            html += (view) ? '<button class="btn btn-info btn-accion" rowid="' + e['id'] + '" onclick="' + view.fn + '"><i class="fas fa-eye"></i></button>' : '';
+            html += (edit) ? '<button class="btn btn-success btn-accion" rowid="' + e['id'] + '" onclick="' + edit.fn + '"><i class="fas fa-edit"></i></button>' : '';
+            html += (del) ? '<button class="btn btn-danger btn-accion" rowid="' + e['id'] + '" onclick="' + del.fn + '"><i class="fas fa-trash"></i></button>' : '';
             html += (view || edit || del) ? '</td>' : '';
             html += '</tr>';
         });
@@ -710,8 +735,8 @@ var Template = {
     },
     Select: (id, data, fn, def) => {
         let attr;
-        let html = '<select id="' + id + '" name="' + id + '" class="form-control custom-input" ' + fn + ' style="border: 1px solid #d2d6da !important; width: 100% !important;">';
-        html += '<option ' + ((def == "") ? 'selected' : '') + ' disabled>Seleccione</option>';
+        let html = '<select id="' + id + '" name="' + id + '" class="form-control custom-input" ' + fn + ' style="width: 100% !important;">';
+        html += '<option value="-1" ' + ((def == undefined) ? 'selected' : '') + ' readonly>Seleccione</option>';
         data.forEach(e => {
             attr = "";
             (Object.keys(e)).forEach(key => {
@@ -739,6 +764,328 @@ var Template = {
             icon: icon,
             title: title
         })
+    },
+    ListClientes: (name, Data) => {
+        let html = "";
+        Data.forEach(e => {
+            html += '<div class="row">' +
+                '<div class="col-8" data-bs-toggle="tooltip" data-bs-placement="top" title="' + e.rut + ' - ' + e.region + ' - ' + e.comuna + '">' +
+                e.nombre + ' ' + e.apellido_paterno + ' ' + e.apellido_materno +
+                '</div>' +
+                // '<div class="col-4" data-bs-toggle="tooltip" data-bs-placement="top" title="' + e.region + '">' +
+                // e.comuna +
+                // '</div>' +
+                '<div class="col-4">' +
+                '<div class="pretty p-switch p-fill">' +
+                '<input type="radio" name="' + name + '" value="' + e.id + '" />' +
+                '<div class="state p-success">' +
+                '<label></label>' +
+                '</div>' +
+                '</div>' +
+                '</div>' +
+                '</div>' +
+                '<hr>';
+        });
+        return html;
+    },
+    Detalle: (Data, btn = false) => {
+        let html = "";
+        Data.forEach(e => {
+            html += (e.icon == undefined) ? '<div class="row">' +
+                '<div class="col-6" style="text-align:center">' +
+                e.nombre +
+                '</div>' +
+                '<div class="col-6" style="text-align:center;" id="' + e.nombre + '">' +
+                ((e.value == undefined) ? '0' : e.value) +
+                '</div>' +
+                '</div>' :
+                // TODO: Hacer listado vertical con iconos 
+                '<div class="row">' +
+                '<div class="col-4" style="text-align:center">' +
+                e.icon +
+                '</div>' +
+                '</div>' +
+                '<div class="row">' +
+                '<div class="col-4" style="text-align:center" id="' + e.nombre + '">' +
+                e.nombre +
+                '</div>' +
+                '</div>';
+            html += (e.hr) ? '<hr>' : '';
+        });
+        html += (btn) ? '<div class="row">' +
+            '<div class="col-12" style="text-align:center;">' +
+            '<button class="btn btn-success" onclick="Functions.PrepararSolicitud3D()">Preparar</button>' +
+            '</div>' +
+            '</div>' : '';
+        return html;
+    },
+    Imp3DDetalle: (id, list) => {
+        let D = Persistant[list].find(x => x.id == id);
+        console.log(D)
+        let Cord = $('[rowid=' + id + ']').offset();
+        $('#etiqueta').css({ top: Cord.top + 14, left: Cord.left - 130, display: 'initial' }).addClass('pendulo');
+        let html = '<div class="row">' +
+            '<div class="col-12">' +
+            '<label class="form-label">Cliente</label>' +
+            '<input type="text" class="form-control custom-input " value="' + (D.nombre + ' ' + D.apellido_paterno + ' ' + D.apellido_materno) + '" />' +
+            '</div>' +
+            '<div class="col-12">' +
+            '<label class="form-label">Correo</label>' +
+            '<input type="text" class="form-control custom-input " value="' + D.correo + '" />' +
+            '</div>' +
+            '<div class="col-12">' +
+            '<label class="form-label">Telefono</label>' +
+            '<input type="text" class="form-control custom-input " value="' + D.telefono + '" />' +
+            '</div>' +
+            '<div class="col-12">' +
+            '<label class="form-label">Comuna/Region</label>' +
+            '<input type="text" class="form-control custom-input " value="' + D.comuna + '/' + D.region + '" />' +
+            '</div>' +
+            '<div class="col-12">' +
+            '<label class="form-label">Codigo Postal</label>' +
+            '<input type="text" class="form-control custom-input " value="' + D.codigo_postal + '" />' +
+            '</div>' +
+            '<div class="col-12">' +
+            '<label class="form-label">Costo</label>' +
+            '<input type="text" class="form-control custom-input " value="' + D.costo + '" />' +
+            '</div>' +
+            '<div class="col-12">' +
+            '<label class="form-label">Descuento</label>' +
+            '<input type="text" class="form-control custom-input " value="' + D.descuento + '" />' +
+            '</div>' +
+            '<div class="col-12">' +
+            '<label class="form-label">Subtotal</label>' +
+            '<input type="text" class="form-control custom-input " value="' + D.subtotal + '" />' +
+            '</div>' +
+            '<div class="col-12">' +
+            '<label class="form-label">Total</label>' +
+            '<input type="text" class="form-control custom-input " value="' + D.total + '" />' +
+            '</div>' +
+            '</div>';
+        return html;
+    },
+    SADecision: (icon, title, text, time = 5000, position = 'top-end', progressbar = true) => {
+        return new Promise((res, rej) => {
+            const swalWithBootstrapButtons = Swal.mixin({
+                customClass: {
+                    confirmButton: 'btn btn-success ',
+                    cancelButton: 'btn btn-danger mg-right-5'
+                },
+                buttonsStyling: false
+            })
+
+            swalWithBootstrapButtons.fire({
+                toast: true,
+                position: position,
+                timer: time,
+                timerProgressBar: progressbar,
+                title: title,
+                text: text,
+                icon: icon,
+                showCancelButton: true,
+                confirmButtonText: '<i class="fas fa-check"></i>',
+                cancelButtonText: '<i class="fas fa-ban"></i>',
+                reverseButtons: true,
+                didOpen: (toast) => {
+                    toast.addEventListener('mouseenter', Swal.stopTimer)
+                    toast.addEventListener('mouseleave', Swal.resumeTimer)
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    res(true);
+                } else if (
+                    /* Read more about handling dismissals below */
+                    result.dismiss === Swal.DismissReason.cancel
+                ) {
+                    Template.Toast('info', 'Se cancelo la solicitud', 1500);
+                    res(false);
+                }
+            })
+        })
+    },
+    CardMask: () => {
+        let html = '<div class="page-header min-height-300 border-radius-xl" style="background-image: url(\'https://images.unsplash.com/photo-1531512073830-ba890ca4eba2?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=1920&q=80\');">' +
+        '<span class="mask  bg-gradient-primary opacity-6"></span>' +
+      '</div>';
+      return html;
+    },
+    BigCard: (user) => {
+        let html = '<div class="card card-body mx-3 mx-md-4 mt-n6">' +
+        '<div class="row gx-4 mb-2">' +
+          '<div class="col-auto">' +
+            '<div class="avatar avatar-xl position-relative">' +
+              '<img src="assets/img/bruce-mars.jpg" alt="profile_image" class="w-100 border-radius-lg shadow-sm">' +
+            '</div>' +
+          '</div>' +
+          '<div class="col-auto my-auto">' +
+            '<div class="h-100">' +
+              '<h5 class="mb-1">' +
+                'Richard Davis' +
+              '</h5>' +
+              '<p class="mb-0 font-weight-normal text-sm">' +
+                'CEO / Co-Founder' +
+              '</p>' +
+            '</div>' +
+          '</div>' +
+        '</div>' +
+        '<div class="row">' +
+          '<div class="row">' +
+            '<div class="col-12 col-xl-4">' +
+              '<div class="card card-plain h-100">' +
+                '<div class="card-header pb-0 p-3">' +
+                  '<h6 class="mb-0">Platform Settings</h6>' +
+                '</div>' +
+                '<div class="card-body p-3">' +
+                  '<h6 class="text-uppercase text-body text-xs font-weight-bolder">Account</h6>' +
+                  '<ul class="list-group">' +
+                    '<li class="list-group-item border-0 px-0">' +
+                      '<div class="form-check form-switch ps-0">' +
+                        '<input class="form-check-input ms-auto" type="checkbox" id="flexSwitchCheckDefault" checked>' +
+                        '<label class="form-check-label text-body ms-3 text-truncate w-80 mb-0" for="flexSwitchCheckDefault">Email me when someone follows me</label>' +
+                      '</div>' +
+                    '</li>' +
+                    '<li class="list-group-item border-0 px-0">' +
+                      '<div class="form-check form-switch ps-0">' +
+                        '<input class="form-check-input ms-auto" type="checkbox" id="flexSwitchCheckDefault1">' +
+                        '<label class="form-check-label text-body ms-3 text-truncate w-80 mb-0" for="flexSwitchCheckDefault1">Email me when someone answers on my post</label>' +
+                      '</div>' +
+                    '</li>' +
+                    '<li class="list-group-item border-0 px-0">' +
+                      '<div class="form-check form-switch ps-0">' +
+                        '<input class="form-check-input ms-auto" type="checkbox" id="flexSwitchCheckDefault2" checked>' +
+                        '<label class="form-check-label text-body ms-3 text-truncate w-80 mb-0" for="flexSwitchCheckDefault2">Email me when someone mentions me</label>' +
+                      '</div>' +
+                    '</li>' +
+                  '</ul>' +
+                  '<h6 class="text-uppercase text-body text-xs font-weight-bolder mt-4">Application</h6>' +
+                  '<ul class="list-group">' +
+                    '<li class="list-group-item border-0 px-0">' +
+                      '<div class="form-check form-switch ps-0">' +
+                        '<input class="form-check-input ms-auto" type="checkbox" id="flexSwitchCheckDefault3">' +
+                        '<label class="form-check-label text-body ms-3 text-truncate w-80 mb-0" for="flexSwitchCheckDefault3">New launches and projects</label>' +
+                      '</div>' +
+                    '</li>' +
+                    '<li class="list-group-item border-0 px-0">' +
+                      '<div class="form-check form-switch ps-0">' +
+                        '<input class="form-check-input ms-auto" type="checkbox" id="flexSwitchCheckDefault4" checked>' +
+                        '<label class="form-check-label text-body ms-3 text-truncate w-80 mb-0" for="flexSwitchCheckDefault4">Monthly product updates</label>' +
+                      '</div>' +
+                    '</li>' +
+                    '<li class="list-group-item border-0 px-0 pb-0">' +
+                      '<div class="form-check form-switch ps-0">' +
+                        '<input class="form-check-input ms-auto" type="checkbox" id="flexSwitchCheckDefault5">' +
+                        '<label class="form-check-label text-body ms-3 text-truncate w-80 mb-0" for="flexSwitchCheckDefault5">Subscribe to newsletter</label>' +
+                      '</div>' +
+                    '</li>' +
+                  '</ul>' +
+                '</div>' +
+              '</div>' +
+            '</div>' +
+            '<div class="col-12 col-xl-4">' +
+              '<div class="card card-plain h-100">' +
+                '<div class="card-header pb-0 p-3">' +
+                  '<div class="row">' +
+                    '<div class="col-md-8 d-flex align-items-center">' +
+                      '<h6 class="mb-0">Profile Information</h6>' +
+                    '</div>' +
+                    '<div class="col-md-4 text-end">' +
+                      '<a href="javascript:;">' +
+                        '<i class="fas fa-user-edit text-secondary text-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="Edit Profile"></i>' +
+                      '</a>' +
+                    '</div>' +
+                  '</div>' +
+                '</div>' +
+                '<div class="card-body p-3">' +
+                  '<p class="text-sm">' +
+                    'Hi, I’m Alec Thompson, Decisions: If you can’t decide, the answer is no.pain avoidance is creating an illusion of equality).' +
+                  '</p>' +
+                  '<hr class="horizontal gray-light my-4">' +
+                  '<ul class="list-group">' +
+                    '<li class="list-group-item border-0 ps-0 pt-0 text-sm"><strong class="text-dark">Full Name:</strong> &nbsp; Alec M. Thompson</li>' +
+                    '<li class="list-group-item border-0 ps-0 text-sm"><strong class="text-dark">Mobile:</strong> &nbsp; (44) 123 1234 123</li>' +
+                    '<li class="list-group-item border-0 ps-0 text-sm"><strong class="text-dark">Email:</strong> &nbsp; alecthompson@mail.com</li>' +
+                    '<li class="list-group-item border-0 ps-0 text-sm"><strong class="text-dark">Location:</strong> &nbsp; USA</li>' +
+                    '<li class="list-group-item border-0 ps-0 pb-0">' +
+                      '<strong class="text-dark text-sm">Social:</strong> &nbsp;' +
+                      '<a class="btn btn-facebook btn-simple mb-0 ps-1 pe-2 py-0" href="javascript:;">' +
+                        '<i class="fab fa-facebook fa-lg"></i>' +
+                      '</a>' +
+                      '<a class="btn btn-twitter btn-simple mb-0 ps-1 pe-2 py-0" href="javascript:;">' +
+                        '<i class="fab fa-twitter fa-lg"></i>' +
+                      '</a>' +
+                      '<a class="btn btn-instagram btn-simple mb-0 ps-1 pe-2 py-0" href="javascript:;">' +
+                        '<i class="fab fa-instagram fa-lg"></i>' +
+                      '</a>' +
+                    '</li>' +
+                  '</ul>' +
+                '</div>' +
+              '</div>' +
+            '</div>' +
+            '<div class="col-12 col-xl-4">' +
+              '<div class="card card-plain h-100">' +
+                '<div class="card-header pb-0 p-3">' +
+                  '<h6 class="mb-0">Conversations</h6>' +
+                '</div>' +
+                '<div class="card-body p-3">' +
+                  '<ul class="list-group">' +
+                    '<li class="list-group-item border-0 d-flex align-items-center px-0 mb-2 pt-0">' +
+                      '<div class="avatar me-3">' +
+                        '<img src="assets/img/kal-visuals-square.jpg" alt="kal" class="border-radius-lg shadow">' +
+                      '</div>' +
+                      '<div class="d-flex align-items-start flex-column justify-content-center">' +
+                        '<h6 class="mb-0 text-sm">Sophie B.</h6>' +
+                        '<p class="mb-0 text-xs">Hi! I need more information..</p>' +
+                      '</div>' +
+                      '<a class="btn btn-link pe-3 ps-0 mb-0 ms-auto w-25 w-md-auto" href="javascript:;">Reply</a>' +
+                    '</li>' +
+                    '<li class="list-group-item border-0 d-flex align-items-center px-0 mb-2">' +
+                      '<div class="avatar me-3">' +
+                        '<img src="assets/img/marie.jpg" alt="kal" class="border-radius-lg shadow">' +
+                      '</div>' +
+                      '<div class="d-flex align-items-start flex-column justify-content-center">' +
+                        '<h6 class="mb-0 text-sm">Anne Marie</h6>' +
+                        '<p class="mb-0 text-xs">Awesome work, can you..</p>' +
+                      '</div>' +
+                      '<a class="btn btn-link pe-3 ps-0 mb-0 ms-auto w-25 w-md-auto" href="javascript:;">Reply</a>' +
+                    '</li>' +
+                    '<li class="list-group-item border-0 d-flex align-items-center px-0 mb-2">' +
+                      '<div class="avatar me-3">' +
+                        '<img src="assets/img/ivana-square.jpg" alt="kal" class="border-radius-lg shadow">' +
+                      '</div>' +
+                      '<div class="d-flex align-items-start flex-column justify-content-center">' +
+                        '<h6 class="mb-0 text-sm">Ivanna</h6>' +
+                        '<p class="mb-0 text-xs">About files I can..</p>' +
+                      '</div>' +
+                      '<a class="btn btn-link pe-3 ps-0 mb-0 ms-auto w-25 w-md-auto" href="javascript:;">Reply</a>' +
+                    '</li>' +
+                    '<li class="list-group-item border-0 d-flex align-items-center px-0 mb-2">' +
+                      '<div class="avatar me-3">' +
+                        '<img src="assets/img/team-4.jpg" alt="kal" class="border-radius-lg shadow">' +
+                      '</div>' +
+                      '<div class="d-flex align-items-start flex-column justify-content-center">' +
+                        '<h6 class="mb-0 text-sm">Peterson</h6>' +
+                        '<p class="mb-0 text-xs">Have a great afternoon..</p>' +
+                      '</div>' +
+                      '<a class="btn btn-link pe-3 ps-0 mb-0 ms-auto w-25 w-md-auto" href="javascript:;">Reply</a>' +
+                    '</li>' +
+                    '<li class="list-group-item border-0 d-flex align-items-center px-0">' +
+                      '<div class="avatar me-3">' +
+                        '<img src="assets/img/team-3.jpg" alt="kal" class="border-radius-lg shadow">' +
+                      '</div>' +
+                      '<div class="d-flex align-items-start flex-column justify-content-center">' +
+                        '<h6 class="mb-0 text-sm">Nick Daniel</h6>' +
+                        '<p class="mb-0 text-xs">Hi! I need more information..</p>' +
+                      '</div>' +
+                      '<a class="btn btn-link pe-3 ps-0 mb-0 ms-auto w-25 w-md-auto" href="javascript:;">Reply</a>' +
+                    '</li>' +
+                  '</ul>' +
+                '</div>' +
+              '</div>' +
+            '</div>' +
+          '</div>' +
+        '</div>' +
+      '</div>';
+      return html;
     }
 };
 
@@ -775,9 +1122,7 @@ var Formulario = {
                 { type: 'email', col: 6, disabled: '', def: (filled) ? def.correo : "", label: "correo", ref: 'correo' },
                 { type: 'number', col: 6, disabled: '', def: (filled) ? def.telefono : "", label: "telefono", ref: 'telefono' },
             ]));
-            $('select').select2({
-                dropdownParent: $('#modal')
-            });
+            $('select').select2({ dropdownParent: $('#modal') });
         })
     },
     Marca: (id, filled) => {
@@ -848,53 +1193,10 @@ var Formulario = {
             ]));
         })
     },
-    ListClientes: (name, Data) => {
-        let html = "";
-        Data.forEach(e => {
-            html += '<div class="row">' +
-                '<div class="col-4" data-bs-toggle="tooltip" data-bs-placement="top" title="' + e.nombre + ' ' + e.apellido_paterno + ' ' + e.apellido_materno + '">' +
-                e.rut +
-                '</div>' +
-                '<div class="col-4" data-bs-toggle="tooltip" data-bs-placement="top" title="' + e.region + '">' +
-                e.comuna +
-                '</div>' +
-                '<div class="col-4">' +
-                '<div class="pretty p-switch p-fill">' +
-                '<input type="radio" name="' + name + '" value="' + e.id + '" />' +
-                '<div class="state p-success">' +
-                '<label></label>' +
-                '</div>' +
-                '</div>' +
-                '</div>' +
-                '</div>' +
-                '<hr>';
-        });
-        return html;
-    },
-    Detalle: (Data) => {
-        let html = "";
-        Data.forEach(e => {
-            html += '<div class="row">' +
-                '<div class="col-6" style="text-align:center">' +
-                e.nombre +
-                '</div>' +
-                '<div class="col-6" style="text-align:center;" id="' + e.nombre + '">' +
-                '0' +
-                '</div>' +
-                '</div>';
-            html += (e.hr) ? '<hr>' : '';
-        });
-        html += '<div class="row">' +
-            '<div class="col-12" style="text-align:center;">' +
-            '<button class="btn btn-success" onclick="Functions.PrepararSolicitud3D()">Preparar</button>' +
-            '</div>' +
-            '</div>';
-        return html;
-    },
     Solicitud: () => {
         $("#Solicitud > .card > .card-header > .card-body").empty().append(Template.Formulario('Solicitud', 'Solicitud', [
             { type: 'text', col: 3, disabled: '', label: "nombre*", ref: 'nombre', required: 'required' },
-            { type: 'number', col: 3, disabled: '', label: "descuento (Opcional)", ref: 'descuento', fn: 'oninput="Functions.CalcularDetalle()"', required: 'required' },
+            { type: 'number', col: 3, disabled: '', label: "descuento (Opcional)", ref: 'descuento', fn: 'oninput="Functions.CalcularDetalle()"', required: 'required', min: 0 },
         ]));
     },
     Parte: () => {
@@ -906,6 +1208,73 @@ var Formulario = {
             { type: 'select', col: 3, disabled: '', label: "color", ref: 'color' },
             { type: 'number', col: 3, disabled: '', label: "gramos", ref: 'gramos', fn: 'oninput="Functions.CalcularDetalle()"' },
         ]);
+    },
+    Impresion: (id, filled) => {
+        Formulario.Modal("Impresion", id, filled).then((def) => {
+            $(".modal-body").empty().append(Template.Formulario('Impresion', 'Impresion', [
+                { type: 'number', col: 6, disabled: '', def: (filled) ? def.cantidad : "", label: "cantidad", ref: 'cantidad' },
+                { type: 'select', col: 6, disabled: '', def: (filled) ? def.color : "", label: "color", ref: 'color' },
+                { type: 'number', col: 6, disabled: '', def: (filled) ? def.gramos : "", label: "gramos", ref: 'gramos' },
+                { type: 'number', col: 6, disabled: '', def: (filled) ? def.minutos : "", label: "minutos", ref: 'minutos' },
+                { type: 'select', col: 6, disabled: '', def: (filled) ? def.impresora : "", label: "impresora", ref: 'impresora' },
+                { type: 'select', col: 6, disabled: '', def: (filled) ? def.estado : "", label: "estado", ref: 'estado' },
+                { type: 'number', col: 6, disabled: '', def: (filled) ? def.descuento : "", label: "descuento", ref: 'descuento' },
+                { type: 'number', col: 6, disabled: '', def: (filled) ? def.costo : "", label: "costo", ref: 'costo' },
+                { type: 'number', col: 6, disabled: '', def: (filled) ? def.costo : "", label: "costo", ref: 'costo' },
+                { type: 'number', col: 6, disabled: '', def: (filled) ? def.subtotal : "", label: "subtotal", ref: 'subtotal' },
+                { type: 'number', col: 6, disabled: '', def: (filled) ? def.total : "", label: "total", ref: 'total' },
+            ]));
+        })
+    },
+    Papeleria: (id, filled) => {
+        Formulario.Modal("Papeleria", id, filled).then((def) => {
+            $(".modal-body").empty().append(Template.Formulario('Papeleria', 'Papeleria', [
+                { type: 'text', col: 6, disabled: '', def: (filled) ? def.nombre : "", label: "nombre", ref: 'nombre' },
+                { type: 'select', col: 6, disabled: '', def: (filled) ? def.marca : "", label: "marca", ref: 'marca' },
+                { type: 'number', col: 6, disabled: '', def: (filled) ? def.cantidad : "", label: "cantidad", ref: 'cantidad' },
+                { type: 'select', col: 6, disabled: '', def: (filled) ? def.formato : "", label: "formato", ref: 'formato_papel' },
+                { type: 'number', col: 6, disabled: '', def: (filled) ? def.precio : "", label: "precio", ref: 'precio' },
+                { type: 'number', col: 6, disabled: '', def: (filled) ? def.gramaje : "", label: "gramaje", ref: 'gramaje' },
+                { type: 'select', col: 6, disabled: '', def: (filled) ? def.color : "", label: "color", ref: 'color' },
+                { type: 'select', col: 6, disabled: '', def: (filled) ? def.textura : "", label: "textura", ref: 'textura' },
+            ]));
+        })
+    },
+    Formato_Papel: (id, filled) => {
+        Formulario.Modal("Formato Papel", id, filled).then((def) => {
+            $(".modal-body").empty().append(Template.Formulario('FormatoPapel', 'FormatoPapel', [
+                { type: 'text', col: 6, disabled: '', def: (filled) ? def.nombre : "", label: "nombre", ref: 'nombre' },
+                { type: 'text', col: 6, disabled: '', def: (filled) ? def.medida : "", label: "medida", ref: 'medida' },
+                { type: 'select', col: 6, disabled: '', def: (filled) ? def.medicion : "", label: "medicion", ref: 'medicion' },
+            ]));
+        })
+    },
+    Textura: (id, filled) => {
+        Formulario.Modal("Textura", id, filled).then((def) => {
+            $(".modal-body").empty().append(Template.Formulario('Textura', 'Medicion', [
+                { type: 'text', col: 12, disabled: '', def: (filled) ? def.nombre : "", label: "nombre", ref: 'nombre' },
+            ]));
+        })
+    },
+    Medicion: (id, filled) => {
+        Formulario.Modal("Medicion", id, filled).then((def) => {
+            $(".modal-body").empty().append(Template.Formulario('Medicion', 'Medicion', [
+                { type: 'text', col: 6, disabled: '', def: (filled) ? def.nombre : "", label: "nombre", ref: 'nombre' },
+                { type: 'text', col: 6, disabled: '', def: (filled) ? def.abreviacion : "", label: "abreviacion", ref: 'abreviacion' },
+            ]));
+        })
+    },
+    Tienda: (id, filled) => {
+        Formulario.Modal("Tienda", id, filled).then((def) => {
+            $(".modal-body").empty().append(Template.Formulario('Tienda', 'Tienda', [
+                { type: 'text', col: 6, disabled: '', def: (filled) ? def.nombre : "", label: "nombre", ref: 'nombre' },
+                { type: 'text', col: 6, disabled: '', def: (filled) ? def.direccion : "", label: "direccion", ref: 'direccion' },
+                { type: 'select', col: 6, disabled: '', def: (filled) ? def.comuna : "", label: "comuna", ref: 'comuna' },
+                { type: 'select', col: 6, disabled: '', def: (filled) ? def.region : "", label: "region", ref: 'region' },
+                { type: 'number', col: 6, disabled: '', def: (filled) ? def.telefono : "", label: "telefono", ref: 'telefono' },
+                { type: 'email', col: 6, disabled: '', def: (filled) ? def.correo : "", label: "correo", ref: 'correo' },
+            ]));
+        })
     }
 }
 
@@ -944,17 +1313,6 @@ var Functions = {
                 });
         })
     },
-    // delData: (funcion, id) => {
-    //     return new Promise((res, rej) => {
-    //         $.post("connection/model.php", { Funcion: funcion, Accion: "Delete", Id: id })
-    //             .done(function (data) {
-    //                 res(JSON.parse(data));
-    //             })
-    //             .fail(() => {
-    //                 rej({ Error: 'No se pude procesar los datos solicitados' })
-    //             });
-    //     })
-    // },
     addParte: () => {
         let version = Persistant.Incremental++;
         $("#Solicitud").append(Template.CardTable('Parte' + version, false, 12, true, 'Parte', false, false, 'margin-top:50px'));
@@ -969,54 +1327,53 @@ var Functions = {
         // $("#KW").empty().html(Persistant.KW);
     },
     CalcularDetalle: () => {
-        Persistant.Detalle = { Costo: 0, Subtotal: 0, Horas: 0, Kw: 0, Descuento: 0, Total: 0, Ganancia: 0 };
+        let Calc = Persistant.Detalle = { Costo: 0, Subtotal: 0, Horas: 0, Kw: 0, Descuento: 0, Total: 0, Ganancia: 0, Cantidad: 0 };
 
-        Persistant.Detalle.Descuento = $('#descuento').val();
+        Calc.Descuento = $('#descuento').val();
         $("form").each(function (i, e) {
             if (i != 0) {
-                Persistant.Cantidad = ($(this).find("#cantidad").val() != undefined) ? $(this).find("#cantidad").val() : 0;
-                Functions.CalcularHoras($(this).find("#minutos").val() * Persistant.Cantidad);
-                Functions.CalcularUso(($(this).find("#impresora option:selected").attr('kwh') != undefined) ? $(this).find("#impresora option:selected").attr('kwh') * Persistant.Cantidad : 0);
+                Calc.Cantidad = ($(this).find("#cantidad").val() != undefined) ? $(this).find("#cantidad").val() : 0;
+                Functions.CalcularHoras($(this).find("#minutos").val() * Calc.Cantidad);
+                Functions.CalcularUso(($(this).find("#impresora option:selected").attr('kwh') != undefined) ? $(this).find("#impresora option:selected").attr('kwh') : 0);
 
-                Persistant.Detalle.Horas += Persistant.Horas;
-                Persistant.Detalle.Kw += parseFloat(Persistant.KW);
-                Persistant.Detalle.Costo += Math.round((Persistant.Valorizacion[0].costo * $(this).find("#gramos").val()) + (Persistant.Valorizacion[1].costo * Persistant.KW) + (Persistant.Valorizacion[2].costo * Persistant.Horas));
-                Persistant.Detalle.Subtotal += Math.round((Persistant.Valorizacion[0].venta * $(this).find("#gramos").val()) + (Persistant.Valorizacion[1].venta * Persistant.KW) + (Persistant.Valorizacion[2].venta * Persistant.Horas));
+                Calc.Horas += Persistant.Horas;
+                Calc.Kw += parseFloat(Persistant.KW);
+                Calc.Costo += Math.round(((Persistant.Valorizacion[0].costo * $(this).find("#gramos").val()) * Calc.Cantidad) + (Persistant.Valorizacion[1].costo * Persistant.KW) + (Persistant.Valorizacion[2].costo * Persistant.Horas));
+                Calc.Subtotal += Math.round(((Persistant.Valorizacion[0].venta * $(this).find("#gramos").val()) * Calc.Cantidad) + (Persistant.Valorizacion[1].venta * Persistant.KW) + (Persistant.Valorizacion[2].venta * Persistant.Horas));
             }
         });
 
-        Persistant.Detalle.Total = Persistant.Detalle.Subtotal - Persistant.Detalle.Descuento;
-        Persistant.Detalle.Ganancia = ((Persistant.Detalle.Subtotal - Persistant.Detalle.Descuento) - Persistant.Detalle.Costo);
+        Calc.Total = Calc.Subtotal - Calc.Descuento;
+        Calc.Ganancia = ((Calc.Subtotal - Calc.Descuento) - Calc.Costo);
 
-        $("#Horas").empty().html(Functions.FloatToTime(Persistant.Detalle.Horas));
-        $("#KW").empty().html(Persistant.Detalle.Kw);
-        $("#Costo").html(Persistant.Detalle.Costo);
-        $("#Subtotal").html(Persistant.Detalle.Subtotal);
-        $("#Descuento").html(Persistant.Detalle.Descuento + '(' + ((Persistant.Detalle.Descuento * 100) / Persistant.Detalle.Subtotal).toFixed(1) + '%)');
-        $("#Total\\ a\\ Pagar").html(Persistant.Detalle.Total);
-        $("#Ganancia").html(Persistant.Detalle.Ganancia);
+        $("#Horas").empty().html(Functions.FloatToTime(Calc.Horas));
+        $("#KW").empty().html(Calc.Kw);
+        $("#Costo").html(Calc.Costo);
+        $("#Subtotal").html(Calc.Subtotal);
+        $("#Descuento").html(Calc.Descuento + '(' + ((Calc.Descuento * 100) / Calc.Subtotal).toFixed(1) + '%)');
+        $("#Total\\ a\\ Pagar").html(Calc.Total);
+        $("#Ganancia").html(Calc.Ganancia);
     },
     PrepararSolicitud3D: () => {
-        let modelo = [{ name: 'nombre', value: $("form#Solicitud").find("#nombre").val() }];
-        Functions.setData('Modelo', 'Create', 0, modelo).then((mod) => {
-            let impresion = [
-                { name: 'modelo', value: mod.returning },
-                { name: 'costo', value: Persistant.Detalle.Costo },
-                { name: 'subtotal', value: Persistant.Detalle.Subtotal },
-                { name: 'descuento', value: Persistant.Detalle.Descuento },
-                { name: 'total', value: Persistant.Detalle.Total },
-                { name: 'cliente', value: $("[name='Cliente']:checked").val() },
-            ]
-            Functions.setData('Impresion', 'Create', 0, impresion);
-
+        let impresion = [
+            { name: 'modelo', value: $("form#Solicitud").find("#nombre").val() },
+            { name: 'costo', value: Persistant.Detalle.Costo },
+            { name: 'subtotal', value: Persistant.Detalle.Subtotal },
+            { name: 'descuento', value: Persistant.Detalle.Descuento },
+            { name: 'total', value: Persistant.Detalle.Total },
+            { name: 'cliente', value: $("[name='Cliente']:checked").val() },
+        ]
+        if (Functions.ValidateForm("form")) return;
+        Functions.setData('Impresion', 'Create', 0, impresion).then((imp) => {
             $("form[ref='Parte']").each(function (i, e) {
                 let parte = $(this).serializeArray();
-                parte = parte.concat({ name: 'modelo', value: mod.returning });
+                parte = parte.concat({ name: 'impresion', value: imp.returning });
                 Functions.setData('Parte', 'Create', 0, parte);
             })
+            $("form").trigger("reset");
         })
     },
-    FloatToTime: (number) => {
+    FloatToTime: number => {
         var sign = (number >= 0) ? 1 : -1;
         number = number * sign;
         var hour = Math.floor(number);
@@ -1034,6 +1391,299 @@ var Functions = {
         time = sign + hour + ':' + minute;
 
         return (!time.includes('NaN')) ? time : 0;
+    },
+    ValidateForm: form => {
+        let datos = $(form).serializeArray();
+        let Er = Persistant.Error = {};
+        Er.Count = 0;
+        Er.Lista = '<h5>Campos faltantes</h5>' +
+            '<ul>';
+        $(form + ' :input').each((i, e) => {
+            if (e.value == "" || e.value == undefined || e.value == null || e.value == -1) {
+                Er.Lista += '<li>' + e.name + '</li>';
+                Er.Count++;
+                $(e).addClass("voidfocus animate__animated animate__bounce animate__repeat-3");
+                setTimeout(() => { $(e).removeClass("voidfocus animate__animated animate__bounce animate__repeat-3") }, 3000);
+            }
+        });
+        Er.Lista += "</ul>";
+        Template.Toast('error', Er.Lista)
+        return (Er.Count == 0) ? false : true
+    },
+    Graphics: () => {
+        var ctx = document.getElementById("chart-bars").getContext("2d");
+
+        new Chart(ctx, {
+            type: "bar",
+            data: {
+                labels: ["M", "T", "W", "T", "F", "S", "S"],
+                datasets: [{
+                    label: "Sales",
+                    tension: 0.4,
+                    borderWidth: 0,
+                    borderRadius: 4,
+                    borderSkipped: false,
+                    backgroundColor: "rgba(255, 255, 255, .8)",
+                    data: [50, 20, 10, 22, 50, 10, 40],
+                    maxBarThickness: 6
+                },],
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false,
+                    }
+                },
+                interaction: {
+                    intersect: false,
+                    mode: 'index',
+                },
+                scales: {
+                    y: {
+                        grid: {
+                            drawBorder: false,
+                            display: true,
+                            drawOnChartArea: true,
+                            drawTicks: false,
+                            borderDash: [5, 5],
+                            color: 'rgba(255, 255, 255, .2)'
+                        },
+                        ticks: {
+                            suggestedMin: 0,
+                            suggestedMax: 500,
+                            beginAtZero: true,
+                            padding: 10,
+                            font: {
+                                size: 14,
+                                weight: 300,
+                                family: "Roboto",
+                                style: 'normal',
+                                lineHeight: 2
+                            },
+                            color: "#fff"
+                        },
+                    },
+                    x: {
+                        grid: {
+                            drawBorder: false,
+                            display: true,
+                            drawOnChartArea: true,
+                            drawTicks: false,
+                            borderDash: [5, 5],
+                            color: 'rgba(255, 255, 255, .2)'
+                        },
+                        ticks: {
+                            display: true,
+                            color: '#f8f9fa',
+                            padding: 10,
+                            font: {
+                                size: 14,
+                                weight: 300,
+                                family: "Roboto",
+                                style: 'normal',
+                                lineHeight: 2
+                            },
+                        }
+                    },
+                },
+            },
+        });
+
+
+        var ctx2 = document.getElementById("chart-line").getContext("2d");
+
+        new Chart(ctx2, {
+            type: "line",
+            data: {
+                labels: ["Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+                datasets: [{
+                    label: "Mobile apps",
+                    tension: 0,
+                    borderWidth: 0,
+                    pointRadius: 5,
+                    pointBackgroundColor: "rgba(255, 255, 255, .8)",
+                    pointBorderColor: "transparent",
+                    borderColor: "rgba(255, 255, 255, .8)",
+                    borderColor: "rgba(255, 255, 255, .8)",
+                    borderWidth: 4,
+                    backgroundColor: "transparent",
+                    fill: true,
+                    data: [50, 40, 300, 320, 500, 350, 200, 230, 500],
+                    maxBarThickness: 6
+
+                }],
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false,
+                    }
+                },
+                interaction: {
+                    intersect: false,
+                    mode: 'index',
+                },
+                scales: {
+                    y: {
+                        grid: {
+                            drawBorder: false,
+                            display: true,
+                            drawOnChartArea: true,
+                            drawTicks: false,
+                            borderDash: [5, 5],
+                            color: 'rgba(255, 255, 255, .2)'
+                        },
+                        ticks: {
+                            display: true,
+                            color: '#f8f9fa',
+                            padding: 10,
+                            font: {
+                                size: 14,
+                                weight: 300,
+                                family: "Roboto",
+                                style: 'normal',
+                                lineHeight: 2
+                            },
+                        }
+                    },
+                    x: {
+                        grid: {
+                            drawBorder: false,
+                            display: false,
+                            drawOnChartArea: false,
+                            drawTicks: false,
+                            borderDash: [5, 5]
+                        },
+                        ticks: {
+                            display: true,
+                            color: '#f8f9fa',
+                            padding: 10,
+                            font: {
+                                size: 14,
+                                weight: 300,
+                                family: "Roboto",
+                                style: 'normal',
+                                lineHeight: 2
+                            },
+                        }
+                    },
+                },
+            },
+        });
+
+        var ctx3 = document.getElementById("chart-line-tasks").getContext("2d");
+
+        new Chart(ctx3, {
+            type: "line",
+            data: {
+                labels: ["Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+                datasets: [{
+                    label: "Mobile apps",
+                    tension: 0,
+                    borderWidth: 0,
+                    pointRadius: 5,
+                    pointBackgroundColor: "rgba(255, 255, 255, .8)",
+                    pointBorderColor: "transparent",
+                    borderColor: "rgba(255, 255, 255, .8)",
+                    borderWidth: 4,
+                    backgroundColor: "transparent",
+                    fill: true,
+                    data: [50, 40, 300, 220, 500, 250, 400, 230, 500],
+                    maxBarThickness: 6
+
+                }],
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false,
+                    }
+                },
+                interaction: {
+                    intersect: false,
+                    mode: 'index',
+                },
+                scales: {
+                    y: {
+                        grid: {
+                            drawBorder: false,
+                            display: true,
+                            drawOnChartArea: true,
+                            drawTicks: false,
+                            borderDash: [5, 5],
+                            color: 'rgba(255, 255, 255, .2)'
+                        },
+                        ticks: {
+                            display: true,
+                            padding: 10,
+                            color: '#f8f9fa',
+                            font: {
+                                size: 14,
+                                weight: 300,
+                                family: "Roboto",
+                                style: 'normal',
+                                lineHeight: 2
+                            },
+                        }
+                    },
+                    x: {
+                        grid: {
+                            drawBorder: false,
+                            display: false,
+                            drawOnChartArea: false,
+                            drawTicks: false,
+                            borderDash: [5, 5]
+                        },
+                        ticks: {
+                            display: true,
+                            color: '#f8f9fa',
+                            padding: 10,
+                            font: {
+                                size: 14,
+                                weight: 300,
+                                family: "Roboto",
+                                style: 'normal',
+                                lineHeight: 2
+                            },
+                        }
+                    },
+                },
+            },
+        });
+    },
+    TabsInit: () => {
+        var tabss = $('.tabs');
+        var selector = $('.tabs').find('a').length;
+        //var selector = $(".tabs").find(".selector");
+        var activeItem = tabss.find('.active');
+        var activeWidth = activeItem.innerWidth();
+        $(".selector").css({
+            "left": activeItem.position.left + "px",
+            "width": activeWidth + 13 + "px"
+        });
+
+        $(".tabs").on("click", "a", function (e) {
+            e.preventDefault();
+            $('.tabs a').removeClass("active");
+            $(this).addClass('active');
+            var activeWidth = $(this).innerWidth();
+            var itemPos = $(this).position();
+            $(".selector").css({
+                "left": itemPos.left + "px",
+                "width": activeWidth + "px"
+            });
+        });
+    },
+    MenuSelection: (page, color, animation) => {
+        $("a[page]").removeClass("active " + color);
+        $("a[page=" + page + "]").addClass("active " + color + ' ' + animation);
+        setTimeout(() => { $("a[page=" + page + "]").removeClass(animation) }, 1000);
     }
 }
 

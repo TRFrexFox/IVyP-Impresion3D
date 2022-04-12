@@ -1,9 +1,10 @@
 /*Common*/
-label {
+label,
+li {
     text-transform: capitalize;
 }
 
-.btn-Card-Title{
+.btn-Card-Title {
     float: right;
     margin: -2.95% 10px 0 0;
     padding: 5px 12px !important;
@@ -15,7 +16,80 @@ label {
     margin-bottom: 15px;
 }
 
+.voidfocus {
+    border: 1px solid red !important;
+}
+
+.mg-left-10{
+    margin-left: 10px;
+}
+
+.mg-right-10{
+    margin-right: 10px;
+}
+
+.mg-right-5{
+    margin-right: 5px;
+}
+
+.etiqueta-detalle {
+    display: none;
+    width: 300px;
+    height: 500px;
+    overflow: scroll;
+    background-color: white;
+    border-top-left-radius: 150px;
+    border-top-right-radius: 150px;
+    border-bottom-left-radius: 15px;
+    border-bottom-right-radius: 15px;
+    position: fixed;
+    z-index: 1000;
+    box-shadow: 0 12px 8px -1px rgb(0 0 0 / 10%), 10px 8px 6px -1px rgb(0 0 0 / 8%);
+    border: darkgoldenrod 2px dashed;
+}
+
+.etiqueta-detalle-agujero{
+    width: 20px;
+    height: 20px;
+    background-color: #8cdbffba;
+    border-radius: 110px;
+    margin-left: 44% !important;
+    margin-top: 12px !important;
+    position: absolute;
+}
+
+.btn-etiqueta {
+    width: 20px;
+    height: 20px;
+    padding: 0px !important;
+    border-radius: 110px !important;
+}
+
+/*Animation*/
+.pendulo {
+    transform-origin: 50% 0;
+    animation: moveIt 1.25s ease-in-out;
+}
+
+@keyframes moveIt {
+    0% {
+        transform: rotate(40deg);
+    }
+
+    50% {
+        transform: rotate(-40deg);
+    }
+
+    100% {
+        transform: rotate(0deg);
+    }
+}
+
 /*Override Select2 Styles*/
+.select2-container {
+    margin-bottom: 15px !important;
+}
+
 .select2-selection__rendered {
     color: #495057 !important;
     font-size: 0.875rem;
@@ -25,9 +99,9 @@ label {
 }
 
 .select2-container .select2-selection--single {
-    height: 40px !important;
+    height: 41.5px !important;
     border: 1px solid #d2d6da !important;
-    margin-bottom: 15px;
+    /* margin-bottom: 15px; */
     font-size: 0.875rem;
     font-weight: 400;
 }
@@ -59,17 +133,18 @@ label {
 }
 
 .contenedor-tabbar {
-    margin-top: 30px;
+    margin-bottom: 30px;
 }
 
 .tabs {
-    font-size: 15px;
+    font-size: 16px;
     padding: 0px;
     list-style: none;
     background: #fff;
     box-shadow: 0px 5px 20px rgba(0, 0, 0, 0.1);
     display: inline-block;
-    border-radius: 50px;
+    /* border-radius: 50px; */
+    border-radius: 10px;
     position: relative;
     cursor: pointer;
 }
@@ -78,7 +153,8 @@ label {
     text-decoration: none;
     color: #777;
     text-transform: uppercase;
-    padding: 10px 20px;
+    /* padding: 10px 20px; */
+    padding: 5px 20px;
     display: inline-block;
     position: relative;
     z-index: 1;
@@ -100,7 +176,8 @@ label {
     left: 0px;
     top: 0px;
     z-index: 1;
-    border-radius: 50px;
+    /* border-radius: 50px; */
+    border-radius: 10px;
     transition-duration: 0.6s;
     transition-timing-function: cubic-bezier(0.68, -0.55, 0.265, 1.55);
 
@@ -112,13 +189,14 @@ label {
 }
 
 /*Override*/
-.custom-pad-title-car{
+.custom-pad-title-car {
     padding: 10px 0 5px 0;
 }
+
 .btn-accion {
     margin-bottom: unset !important;
-    padding: 6px 11px;
-    margin-right: 4px;
+    padding: 6px 11px !important;
+    margin-right: 4px !important;
 }
 
 .table> :not(caption)>*>* {
