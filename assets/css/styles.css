@@ -1,13 +1,23 @@
 /*Common*/
+body {
+    overflow-x: hidden;
+}
+
+.dib {
+    display: inline-block;
+}
+
 label,
 li {
     text-transform: capitalize;
 }
 
 .btn-Card-Title {
-    float: right;
-    margin: -2.95% 10px 0 0;
     padding: 5px 12px !important;
+    float: right;
+    border-radius: 4px !important;
+    margin-right: 5px;
+    margin-top: -1px;
 }
 
 .custom-input {
@@ -20,16 +30,20 @@ li {
     border: 1px solid red !important;
 }
 
-.mg-left-10{
+.mg-left-10 {
     margin-left: 10px;
 }
 
-.mg-right-10{
+.mg-right-10 {
     margin-right: 10px;
 }
 
-.mg-right-5{
+.mg-right-5 {
     margin-right: 5px;
+}
+
+.ph-50 {
+    height: 50rem;
 }
 
 .etiqueta-detalle {
@@ -48,7 +62,7 @@ li {
     border: darkgoldenrod 2px dashed;
 }
 
-.etiqueta-detalle-agujero{
+.etiqueta-detalle-agujero {
     width: 20px;
     height: 20px;
     background-color: #8cdbffba;
@@ -137,7 +151,7 @@ li {
 }
 
 .tabs {
-    font-size: 16px;
+    font-size: 25px;
     padding: 0px;
     list-style: none;
     background: #fff;
@@ -190,7 +204,7 @@ li {
 
 /*Override*/
 .custom-pad-title-car {
-    padding: 10px 0 5px 0;
+    padding: 10px 5px 5px 0;
 }
 
 .btn-accion {

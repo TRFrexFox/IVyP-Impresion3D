@@ -1,147 +1,166 @@
 var Init = {
     Index: () => {
-        $("body").prepend(Template.SideNav());
-        $("main").prepend(Template.NavBar());
+        return new Promise((res, rej) => {
+            if (Cookies.get('user') == undefined) {
+                Functions.CerrarSession();
+                rej(true)
+            }
+            $("body").prepend(Template.SideNav());
+            $("main").prepend(Template.NavBar());
+            res(true);
+        })
     },
     Home: () => {
-        $("#Contenedor").empty();
         Functions.MenuSelection("Dashboard", "bg-gradient-primary", 'animate__animated animate__headShake');
-        //Cards
-        let datos = Functions.ChargeData('Dashboard', 'Card-Data', true);
-        let Datos = [
-            { xl: 3, sm: 6, icon: 'weekend', title: 'today Money', value: 50, footer: '50 than last week', color: 'bg-gradient-dark' },
-            { xl: 3, sm: 6, icon: 'person', title: 'today Users', value: 2300, footer: '5 than lask month', color: 'bg-gradient-primary' },
-            { xl: 3, sm: 6, icon: 'person', title: 'today Clients', value: 3462, footer: '5 than yesterday', color: 'bg-gradient-success' },
-            { xl: 3, sm: 6, icon: 'weekend', title: 'Sales', value: 103430, footer: '4 than yesterday', color: 'bg-gradient-info' }
-        ]
-        $("#Contenedor").append('<div id="DCard" class="row"></div><div id="DGraph" class="row mt-4"></div><div id="DTask" class="row mb-4"></div>')
-        Datos.forEach((e, i) => {
-            $("#DCard").append(Template.Card(e.xl, e.sm, e.icon, e.title, e.value, e.footer, e.color));
-        });
+        Functions.Transition('main', '#Contenedor').then(() => {
+            //Cards
+            let datos = Functions.ChargeData('Dashboard', 'Card-Data', true);
+            let Datos = [
+                { xl: 3, sm: 6, icon: 'weekend', title: 'today Money', value: 50, footer: '50 than last week', color: 'bg-gradient-dark' },
+                { xl: 3, sm: 6, icon: 'person', title: 'today Users', value: 2300, footer: '5 than lask month', color: 'bg-gradient-primary' },
+                { xl: 3, sm: 6, icon: 'person', title: 'today Clients', value: 3462, footer: '5 than yesterday', color: 'bg-gradient-success' },
+                { xl: 3, sm: 6, icon: 'weekend', title: 'Sales', value: 103430, footer: '4 than yesterday', color: 'bg-gradient-info' }
+            ]
+            $("#Contenedor").append('<div id="DCard" class="row"></div><div id="DGraph" class="row mt-4"></div><div id="DTask" class="row mb-4"></div>')
+            Datos.forEach((e, i) => {
+                $("#DCard").append(Template.Card(e.xl, e.sm, e.icon, e.title, e.value, e.footer, e.color));
+            });
 
-        //Graphs
-        let Datos2 = [
-            { lg: 4, md: 6, chid: 'chart-bars', chheight: 170, title: 'Website Views', subtitle: '50 than last week', icon: 'schedule', footer: 'test', color: 'bg-gradient-primary' },
-            { lg: 4, md: 6, chid: 'chart-line', chheight: 170, title: 'Daily Sales', subtitle: '5 than lask month', icon: 'schedule', footer: 'test', color: 'bg-gradient-success' },
-            { lg: 4, md: 6, chid: 'chart-line-tasks', chheight: 170, title: 'Completed Tasks', subtitle: '5 than yesterday', icon: 'schedule', footer: 'test', color: 'bg-gradient-dark' }
-        ]
-        Datos2.forEach((e, i) => {
-            $("#DGraph").append(Template.Graph(e.lg, e.md, e.chid, e.chheight, e.title, e.subtitle, e.icon, e.footer, e.color));
-        });
+            //Graphs
+            let Datos2 = [
+                { lg: 4, md: 6, chid: 'chart-bars', chheight: 170, title: 'Website Views', subtitle: '50 than last week', icon: 'schedule', footer: 'test', color: 'bg-gradient-primary' },
+                { lg: 4, md: 6, chid: 'chart-line', chheight: 170, title: 'Daily Sales', subtitle: '5 than lask month', icon: 'schedule', footer: 'test', color: 'bg-gradient-success' },
+                { lg: 4, md: 6, chid: 'chart-line-tasks', chheight: 170, title: 'Completed Tasks', subtitle: '5 than yesterday', icon: 'schedule', footer: 'test', color: 'bg-gradient-dark' }
+            ]
+            Datos2.forEach((e, i) => {
+                $("#DGraph").append(Template.Graph(e.lg, e.md, e.chid, e.chheight, e.title, e.subtitle, e.icon, e.footer, e.color));
+            });
 
-        //DTask
-        $("#DTask").append(Template.Project(8, 6, 'Projects', 'fa fa-check', 30, 'this month'));
-        $("#DTask").append(Template.Order());
+            //DTask
+            $("#DTask").append(Template.Project(8, 6, 'Projects', 'fa fa-check', 30, 'this month'));
+            $("#DTask").append(Template.Order());
 
-        Functions.Graphics();
+            Functions.Graphics();
+        })
     },
     Mantenedor: () => {
-        $("#Contenedor").empty();
         Functions.MenuSelection("Mantenedor", "bg-gradient-primary", 'animate__animated animate__headShake');
-        let tabs = [
-            { tab: 'Cliente', icon: 'fa fa-user' },
-            { tab: 'Marca', icon: 'fas fa-copyright' },
-            { tab: 'Estado', icon: 'fas fa-hourglass-half' },
-            { tab: 'Color', icon: 'fas fa-eye-dropper' },
-            { tab: 'Comuna', icon: 'fas fa-flag-checkered' },
-            { tab: 'Region', icon: 'fas fa-align-justify' },
-            { tab: 'Pla', icon: 'fas fa-wave-square' },
-            { tab: 'Categoria', icon: 'far fa-list-alt' },
-            { tab: 'Valorizacion', icon: 'fas fa-dollar-sign' },
-            { tab: 'Papeleria', icon: 'fas fa-scroll' },
-            { tab: 'Formato_Papel', icon: 'fas fa-ruler-combined' },
-            { tab: 'Textura', icon: 'fas fa-hand-sparkles' },
-            { tab: 'Medicion', icon: 'fas fa-ruler' },
-            { tab: 'Tienda', icon: 'fas fa-store' },
-        ];
-        $("#Contenedor").eq(0).prepend(Template.TabBar(tabs))
+        Functions.Transition('main', '#Contenedor').then(() => {
+            let tabs = [
+                { tab: 'Cliente', icon: 'fa fa-user' },
+                { tab: 'Marca', icon: 'fas fa-copyright' },
+                { tab: 'Estado', icon: 'fas fa-hourglass-half' },
+                { tab: 'Color', icon: 'fas fa-eye-dropper' },
+                { tab: 'Comuna', icon: 'fas fa-flag-checkered' },
+                { tab: 'Region', icon: 'fas fa-align-justify' },
+                { tab: 'Pla', icon: 'fas fa-wave-square' },
+                { tab: 'Categoria', icon: 'far fa-list-alt' },
+                { tab: 'Valorizacion', icon: 'fas fa-dollar-sign' },
+                { tab: 'Papeleria', icon: 'fas fa-scroll' },
+                { tab: 'Formato_Papel', icon: 'fas fa-ruler-combined' },
+                { tab: 'Textura', icon: 'fas fa-hand-sparkles' },
+                { tab: 'Medicion', icon: 'fas fa-ruler' },
+                { tab: 'Tienda', icon: 'fas fa-store' },
+            ];
+            $("#Contenedor").eq(0).prepend(Template.TabBar(tabs))
 
-        $(".tabs a").click((obj) => {
-            $("#Contenedor .row").empty();
-            let atr = obj.currentTarget.attributes.tab.value;
-            $("#Contenedor").append(Template.CardTable(atr, true, 12, true, atr, false, { fn: 'Formulario.' + atr + '()' }));
+            $(".tabs a").click((obj) => {
+                $("#Contenedor .row").empty();
+                let atr = obj.currentTarget.attributes.tab.value;
+                $("#Contenedor").append(Template.CardTable(atr, true, 12, true, atr, false, { fn: 'Formulario.' + atr + '()' }));
 
-            let datos = Functions.ChargeData(atr, 'Read', true);
-            $("#" + atr + " .card-body").append(Template.Table(atr, datos,
-                false,
-                { fn: 'Formulario.' + atr + '(this.attributes.rowid.value, true)' },
-                { fn: 'Template.SADecision(\'question\',\'¿Elimnar registro?\', \'Se eliminar el registro \'+ this.attributes.rowid.value).then((d)=>{if(d)Functions.setData(\'' + atr + '\', \'Delete\', this.attributes.rowid.value).then(()=>{$(\'[tab=' + atr + ']\').click()})})' }
-            ));
+                let datos = Functions.ChargeData(atr, 'Read', true);
+                $("#" + atr + " .card-body").append(Template.Table(atr, datos,
+                    false,
+                    { fn: 'Formulario.' + atr + '(this.attributes.rowid.value, true)' },
+                    { fn: 'Template.SADecision(\'question\',\'¿Elimnar registro?\', \'Se eliminar el registro \'+ this.attributes.rowid.value).then((d)=>{if(d)Functions.setData(\'' + atr + '\', \'Delete\', this.attributes.rowid.value).then(()=>{$(\'[tab=' + atr + ']\').click()})})' }
+                ));
+                $("table").DataTable();
+            })
+
+            $("a[tab]:eq(0)").click()
             $("table").DataTable();
+
+            Functions.TabsInit();
+            Functions.TooltipInit();
         })
-
-        $("a[tab]:eq(0)").click()
-        $("table").DataTable();
-
-        Functions.TabsInit();
     },
     Formulario: () => {
-        $("#Contenedor").empty();
         Functions.MenuSelection("Solicitud3D", "bg-gradient-primary", 'animate__animated animate__headShake');
-        Persistant.Incremental = 0;
-        $("#Contenedor")
-            .append(Template.CardTable('Detalle', false, 3, true, 'Detalle', false, false))
-            .append(Template.CardTable('Solicitud', false, 9, true, 'Solicitud', false, { fn: "Functions.addParte()" }));
-        $("#Solicitud .card-body").append(Formulario.Solicitud());
-        $("#Solicitud").append(Template.CardTable('Parte', false, 12, true, 'Parte', false, false, 'margin-top:50px'));
-        $("#Parte > .card > .card-header > .card-body").append(Formulario.Parte());
+        Functions.Transition('main', '#Contenedor').then(() => {
+            Persistant.Incremental = 0;
+            $("#Contenedor")
+                .append(Template.CardTable('Detalle', false, 3, true, 'Detalle', false, false, false))
+                .append(Template.CardTable('Solicitud', false, 9, true, 'Solicitud', false, { fn: "Functions.addParte()" }, true));
+            $("#Solicitud .card-body").append(Formulario.Solicitud());
+            $("#Solicitud").append(Template.CardTable('Parte', false, 12, true, 'Parte', false, false, true, 'margin-top:50px'));
+            $("#Parte > .card > .card-body").append(Formulario.Parte());
 
-        $("#Detalle").append(Template.CardTable('Clientes', false, 12, true, 'Clientes', false, false, 'margin-top:50px'));
-        $("#Detalle > .card > .card-header > .card-body").append(Template.Detalle([
-            { nombre: 'Horas', hr: false, iconn: '<i class="far fa-clock"></i>' },
-            { nombre: 'KW', hr: false, iconn: '<i class="fas fa-bolt"></i>' },
-            { nombre: 'Costo', hr: true, iconn: '<i class="fas fa-dollar-sign"></i>' },
-            { nombre: 'Subtotal', hr: false },
-            { nombre: 'Descuento', hr: false },
-            { nombre: 'Total a Pagar', hr: true },
-            { nombre: 'Ganancia', hr: true },
-        ], true));
-        $("#Clientes > .card > .card-header > .card-body").append(Template.ListClientes('Cliente', Functions.ChargeData("Cliente", "Read", false)));
-        Functions.ChargeData("Valorizacion", "Read", true);
+            $("#Detalle").append(Template.CardTable('Clientes', false, 12, true, 'Clientes', false, false, false, 'margin-top:50px'));
+            $("#Detalle > .card > .card-body").append(Template.Detalle([
+                { nombre: 'Horas', hr: false, iconn: '<i class="far fa-clock"></i>' },
+                { nombre: 'KW', hr: false, iconn: '<i class="fas fa-bolt"></i>' },
+                { nombre: 'Costo', hr: true, iconn: '<i class="fas fa-dollar-sign"></i>' },
+                { nombre: 'Subtotal', hr: false },
+                { nombre: 'Descuento', hr: false },
+                { nombre: 'Total a Pagar', hr: true },
+                { nombre: 'Ganancia', hr: true },
+            ], true));
+            $("#Clientes > .card > .card-body").append(Template.ListClientes('Cliente', Functions.ChargeData("Cliente", "Read", false)));
+            Functions.ChargeData("Valorizacion", "Read", true);
+
+            Functions.TooltipInit();
+        })
     },
     Impresiones: () => {
-        $("#Contenedor").empty();
         Functions.MenuSelection("Impresiones", "bg-gradient-primary", 'animate__animated animate__headShake');
-        $("#Contenedor").append(Template.CardTable('ListImpresiones', true, 12, true, 'Impresion - Partes', false, false));
-        $("#ListImpresiones .card-body").append(Template.Table("ListImpresiones", Functions.ChargeData('Impresion', 'Listar', true),
-            { fn: " $('#etiqueta-content').empty().append(Template.Imp3DDetalle(this.attributes.rowid.value,'Impresion'));const ps = new PerfectScrollbar('#etiqueta', {wheelSpeed: 2,wheelPropagation: true,minScrollbarLength: 20});$('#etiqueta').removeClass('animate__animated animate__fadeOutBottomRight')" },
-            { fn: 'Formulario.Impresion(this.attributes.rowid.value, true)' },
-            false,
-            [1, 2, 3, 4, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 22, 23]
-        ));
-        $("body").append(Template.Modal([{}]))
-        $("table").DataTable();
+        Functions.Transition('main', '#Contenedor').then(() => {
+            $("#Contenedor").append(Template.CardTable('ListImpresiones', true, 12, true, 'Impresion - Partes', false, false));
+            $("#ListImpresiones .card-body").append(Template.Table("ListImpresiones", Functions.ChargeData('Impresion', 'Listar', true),
+                // { fn: "$(\'main > .container-fluid\').prepend(Template.Etiqueta());$('#etiqueta-content').empty().append(Template.Imp3DDetalle(this.attributes.rowid.value,'Impresion'));const ps = new PerfectScrollbar('#etiqueta', {wheelSpeed: 2,wheelPropagation: true,minScrollbarLength: 20});$('#etiqueta').removeClass('animate__animated animate__fadeOutBottomRight')" },
+                { fn: "$(\'.modal-body\').empty().append(Template.Imp3DDetalle(this.attributes.rowid.value,'Impresion'));$(\'.modal-footer\').empty();$(\'.modal-title\').empty().append(\'Detalle de Impresion\');$(\'#modal\').modal(\'show\')" },
+                { fn: 'Formulario.Impresion(this.attributes.rowid.value, true)' },
+                false,
+                [1, 2, 3, 4, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 22, 23]
+            ));
+            $("body").append(Template.Modal([{}]))
+            $("table").DataTable();
+        })
     },
     FormularioPapel: () => {
-        $("#Contenedor").empty();
         Functions.MenuSelection("SolicitudPapel", "bg-gradient-primary", 'animate__animated animate__headShake');
-        Persistant.Incremental = 0;
-        $("#Contenedor")
-            .append(Template.CardTable('Detalle', false, 3, true, 'Detalle', false, false))
-            .append(Template.CardTable('Solicitud', false, 9, true, 'Solicitud', false, { fn: "Functions.addParte()" }));
-        $("#Solicitud .card-body").append(Formulario.Solicitud());
-        $("#Solicitud").append(Template.CardTable('Parte', false, 12, true, 'Parte', false, false, 'margin-top:50px'));
-        $("#Parte > .card > .card-header > .card-body").append(Formulario.Parte());
+        Functions.Transition('main', '#Contenedor').then(() => {
+            Persistant.Incremental = 0;
+            $("#Contenedor")
+                .append(Template.CardTable('Detalle', false, 3, true, 'Detalle', false, false))
+                .append(Template.CardTable('Solicitud', false, 9, true, 'Solicitud', false, { fn: "Functions.addParte()" }));
+            $("#Solicitud .card-body").append(Formulario.Solicitud());
+            $("#Solicitud").append(Template.CardTable('Parte', false, 12, true, 'Parte', false, false, false, 'margin-top:50px'));
+            $("#Parte > .card > .card-body").append(Formulario.Parte());
 
-        $("#Detalle").append(Template.CardTable('Clientes', false, 12, true, 'Clientes', false, false, 'margin-top:50px'));
-        $("#Detalle > .card > .card-header > .card-body").append(Template.Detalle([
-            { nombre: 'Horas', hr: false, iconn: '<i class="far fa-clock"></i>' },
-            { nombre: 'KW', hr: false, iconn: '<i class="fas fa-bolt"></i>' },
-            { nombre: 'Costo', hr: true, iconn: '<i class="fas fa-dollar-sign"></i>' },
-            { nombre: 'Subtotal', hr: false },
-            { nombre: 'Descuento', hr: false },
-            { nombre: 'Total a Pagar', hr: true },
-            { nombre: 'Ganancia', hr: true },
-        ], true));
-        $("#Clientes > .card > .card-header > .card-body").append(Template.ListClientes('Cliente', Functions.ChargeData("Cliente", "Read", false)));
-        Functions.ChargeData("Valorizacion", "Read", true);
+            $("#Detalle").append(Template.CardTable('Clientes', false, 12, true, 'Clientes', false, false, false, 'margin-top:50px'));
+            $("#Detalle > .card > .card-body").append(Template.Detalle([
+                { nombre: 'Horas', hr: false, iconn: '<i class="far fa-clock"></i>' },
+                { nombre: 'KW', hr: false, iconn: '<i class="fas fa-bolt"></i>' },
+                { nombre: 'Costo', hr: true, iconn: '<i class="fas fa-dollar-sign"></i>' },
+                { nombre: 'Subtotal', hr: false },
+                { nombre: 'Descuento', hr: false },
+                { nombre: 'Total a Pagar', hr: true },
+                { nombre: 'Ganancia', hr: true },
+            ], true));
+            $("#Clientes > .card > .card-body").append(Template.ListClientes('Cliente', Functions.ChargeData("Cliente", "Read", false)));
+            Functions.ChargeData("Valorizacion", "Read", true);
+
+            Functions.TooltipInit();
+        })
     },
     Perfil: () => {
-        $("#Contenedor").empty();
         Functions.MenuSelection("Perfil", "bg-gradient-primary", 'animate__animated animate__headShake');
-        $("#Contenedor")
-            .append(Template.CardMask())
-            .append(Template.BigCard())
+        Functions.Transition('main', '#Contenedor').then(() => {
+            $("#Contenedor")
+                .append(Template.CardMask())
+                .append(Template.BigCard())
+        })
     }
 }
 
@@ -444,7 +463,7 @@ var Template = {
             '<nav class="tabs">' +
             '<div class="selector"></div>';
         tabs.forEach(e => {
-            html += '<a tab="' + e.tab + '" class="' + ((active) ? 'active' : '') + '"><i class="' + e.icon + '"></i>' + e.tab.replace("_", " ") + '</a>';
+            html += '<a tab="' + e.tab + '" class="' + ((active) ? 'active' : '') + '"  data-bs-toggle="tooltip" data-bs-placement="top" title="' + e.tab.replace("_", " ") + '"><i class="' + e.icon + '"></i></a>';
             active = false;
         });
         html += '</nav>' +
@@ -628,18 +647,17 @@ var Template = {
             '</div>' +
             '</nav>';
     },
-    CardTable: (id, row, col, header, headerTitle, footer, addBtn, customStyle = '') => {
+    CardTable: (id, row, col, header, headerTitle, footer, addBtn, collapse = false, customStyle = '') => {
         let html = (row) ? '<div class="row">' : '';
         html += '<div id="' + id + '" class="col-' + col + '" style="' + customStyle + '">' +
             '<div class="card my-4">';
         html += (header) ? '<div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">' +
-            // '<div class="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3">' +
             '<div class="bg-gradient-primary shadow-primary border-radius-lg custom-pad-title-car">' +
-            '<h6 class="text-white text-capitalize ps-3">' + headerTitle.replace("_", " ") + '</h6>' : '';
-        // html += (addBtn) ? '<button class="btn btn-success btn-accion btn-Card-Title" onclick="Formulario.' + id + '()"><i class="fa fa-plus"></i></button>':'';
+            '<h6 class="text-white text-capitalize ps-3 dib">' + headerTitle.replace("_", " ") + '</h6>' : '';
+        html += (collapse) ? '<button class="btn btn-info btn-Card-Title" onclick="$(\'#' + id + ' > .card > .card-body\').slideToggle()"><i class="fas fa-chevron-up"></i></button>' : '';
         html += (addBtn != false) ? '<button class="btn btn-success btn-Card-Title" onclick="' + addBtn.fn + '"><i class="fa fa-plus"></i></button>' : '';
-        html += '</div>' +
-            '<div class="card-body px-0 pb-2">' +
+        html += (header) ? '</div></div>' : '';
+        html += '<div class="card-body px-3 pb-2">' +
             '</div>';
         html += (footer) ? '<div class="card-footer p-3"></div>' : '';
         html += '</div>' +
@@ -819,45 +837,44 @@ var Template = {
             '</div>' : '';
         return html;
     },
-    Imp3DDetalle: (id, list) => {
+    Imp3DDetalle: (id, list, etiqueta = false) => {
         let D = Persistant[list].find(x => x.id == id);
-        console.log(D)
         let Cord = $('[rowid=' + id + ']').offset();
-        $('#etiqueta').css({ top: Cord.top + 14, left: Cord.left - 130, display: 'initial' }).addClass('pendulo');
+        (etiqueta) ? $('#etiqueta').css({ top: Cord.top + 14, left: Cord.left - 399, display: 'initial' }).addClass('pendulo') : '';
         let html = '<div class="row">' +
-            '<div class="col-12">' +
+            '<div class="col-6">' +
             '<label class="form-label">Cliente</label>' +
             '<input type="text" class="form-control custom-input " value="' + (D.nombre + ' ' + D.apellido_paterno + ' ' + D.apellido_materno) + '" />' +
             '</div>' +
-            '<div class="col-12">' +
+            '<div class="col-6">' +
             '<label class="form-label">Correo</label>' +
             '<input type="text" class="form-control custom-input " value="' + D.correo + '" />' +
             '</div>' +
-            '<div class="col-12">' +
+            '<div class="col-6">' +
             '<label class="form-label">Telefono</label>' +
             '<input type="text" class="form-control custom-input " value="' + D.telefono + '" />' +
             '</div>' +
-            '<div class="col-12">' +
+            '<div class="col-6">' +
             '<label class="form-label">Comuna/Region</label>' +
             '<input type="text" class="form-control custom-input " value="' + D.comuna + '/' + D.region + '" />' +
             '</div>' +
-            '<div class="col-12">' +
+            '<div class="col-6">' +
             '<label class="form-label">Codigo Postal</label>' +
             '<input type="text" class="form-control custom-input " value="' + D.codigo_postal + '" />' +
             '</div>' +
-            '<div class="col-12">' +
+            '<div class="col-6">' +
             '<label class="form-label">Costo</label>' +
             '<input type="text" class="form-control custom-input " value="' + D.costo + '" />' +
             '</div>' +
-            '<div class="col-12">' +
+            '<div class="col-6">' +
             '<label class="form-label">Descuento</label>' +
             '<input type="text" class="form-control custom-input " value="' + D.descuento + '" />' +
             '</div>' +
-            '<div class="col-12">' +
+            '<div class="col-6">' +
             '<label class="form-label">Subtotal</label>' +
             '<input type="text" class="form-control custom-input " value="' + D.subtotal + '" />' +
             '</div>' +
-            '<div class="col-12">' +
+            '<div class="col-6">' +
             '<label class="form-label">Total</label>' +
             '<input type="text" class="form-control custom-input " value="' + D.total + '" />' +
             '</div>' +
@@ -905,187 +922,206 @@ var Template = {
     },
     CardMask: () => {
         let html = '<div class="page-header min-height-300 border-radius-xl" style="background-image: url(\'https://images.unsplash.com/photo-1531512073830-ba890ca4eba2?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=1920&q=80\');">' +
-        '<span class="mask  bg-gradient-primary opacity-6"></span>' +
-      '</div>';
-      return html;
+            '<span class="mask  bg-gradient-primary opacity-6"></span>' +
+            '</div>';
+        return html;
     },
     BigCard: (user) => {
         let html = '<div class="card card-body mx-3 mx-md-4 mt-n6">' +
-        '<div class="row gx-4 mb-2">' +
-          '<div class="col-auto">' +
+            '<div class="row gx-4 mb-2">' +
+            '<div class="col-auto">' +
             '<div class="avatar avatar-xl position-relative">' +
-              '<img src="assets/img/bruce-mars.jpg" alt="profile_image" class="w-100 border-radius-lg shadow-sm">' +
+            '<img src="assets/img/bruce-mars.jpg" alt="profile_image" class="w-100 border-radius-lg shadow-sm">' +
             '</div>' +
-          '</div>' +
-          '<div class="col-auto my-auto">' +
+            '</div>' +
+            '<div class="col-auto my-auto">' +
             '<div class="h-100">' +
-              '<h5 class="mb-1">' +
-                'Richard Davis' +
-              '</h5>' +
-              '<p class="mb-0 font-weight-normal text-sm">' +
-                'CEO / Co-Founder' +
-              '</p>' +
+            '<h5 class="mb-1">' +
+            'Richard Davis' +
+            '</h5>' +
+            '<p class="mb-0 font-weight-normal text-sm">' +
+            'CEO / Co-Founder' +
+            '</p>' +
             '</div>' +
-          '</div>' +
-        '</div>' +
-        '<div class="row">' +
-          '<div class="row">' +
-            '<div class="col-12 col-xl-4">' +
-              '<div class="card card-plain h-100">' +
-                '<div class="card-header pb-0 p-3">' +
-                  '<h6 class="mb-0">Platform Settings</h6>' +
-                '</div>' +
-                '<div class="card-body p-3">' +
-                  '<h6 class="text-uppercase text-body text-xs font-weight-bolder">Account</h6>' +
-                  '<ul class="list-group">' +
-                    '<li class="list-group-item border-0 px-0">' +
-                      '<div class="form-check form-switch ps-0">' +
-                        '<input class="form-check-input ms-auto" type="checkbox" id="flexSwitchCheckDefault" checked>' +
-                        '<label class="form-check-label text-body ms-3 text-truncate w-80 mb-0" for="flexSwitchCheckDefault">Email me when someone follows me</label>' +
-                      '</div>' +
-                    '</li>' +
-                    '<li class="list-group-item border-0 px-0">' +
-                      '<div class="form-check form-switch ps-0">' +
-                        '<input class="form-check-input ms-auto" type="checkbox" id="flexSwitchCheckDefault1">' +
-                        '<label class="form-check-label text-body ms-3 text-truncate w-80 mb-0" for="flexSwitchCheckDefault1">Email me when someone answers on my post</label>' +
-                      '</div>' +
-                    '</li>' +
-                    '<li class="list-group-item border-0 px-0">' +
-                      '<div class="form-check form-switch ps-0">' +
-                        '<input class="form-check-input ms-auto" type="checkbox" id="flexSwitchCheckDefault2" checked>' +
-                        '<label class="form-check-label text-body ms-3 text-truncate w-80 mb-0" for="flexSwitchCheckDefault2">Email me when someone mentions me</label>' +
-                      '</div>' +
-                    '</li>' +
-                  '</ul>' +
-                  '<h6 class="text-uppercase text-body text-xs font-weight-bolder mt-4">Application</h6>' +
-                  '<ul class="list-group">' +
-                    '<li class="list-group-item border-0 px-0">' +
-                      '<div class="form-check form-switch ps-0">' +
-                        '<input class="form-check-input ms-auto" type="checkbox" id="flexSwitchCheckDefault3">' +
-                        '<label class="form-check-label text-body ms-3 text-truncate w-80 mb-0" for="flexSwitchCheckDefault3">New launches and projects</label>' +
-                      '</div>' +
-                    '</li>' +
-                    '<li class="list-group-item border-0 px-0">' +
-                      '<div class="form-check form-switch ps-0">' +
-                        '<input class="form-check-input ms-auto" type="checkbox" id="flexSwitchCheckDefault4" checked>' +
-                        '<label class="form-check-label text-body ms-3 text-truncate w-80 mb-0" for="flexSwitchCheckDefault4">Monthly product updates</label>' +
-                      '</div>' +
-                    '</li>' +
-                    '<li class="list-group-item border-0 px-0 pb-0">' +
-                      '<div class="form-check form-switch ps-0">' +
-                        '<input class="form-check-input ms-auto" type="checkbox" id="flexSwitchCheckDefault5">' +
-                        '<label class="form-check-label text-body ms-3 text-truncate w-80 mb-0" for="flexSwitchCheckDefault5">Subscribe to newsletter</label>' +
-                      '</div>' +
-                    '</li>' +
-                  '</ul>' +
-                '</div>' +
-              '</div>' +
             '</div>' +
-            '<div class="col-12 col-xl-4">' +
-              '<div class="card card-plain h-100">' +
-                '<div class="card-header pb-0 p-3">' +
-                  '<div class="row">' +
-                    '<div class="col-md-8 d-flex align-items-center">' +
-                      '<h6 class="mb-0">Profile Information</h6>' +
-                    '</div>' +
-                    '<div class="col-md-4 text-end">' +
-                      '<a href="javascript:;">' +
-                        '<i class="fas fa-user-edit text-secondary text-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="Edit Profile"></i>' +
-                      '</a>' +
-                    '</div>' +
-                  '</div>' +
-                '</div>' +
-                '<div class="card-body p-3">' +
-                  '<p class="text-sm">' +
-                    'Hi, I’m Alec Thompson, Decisions: If you can’t decide, the answer is no.pain avoidance is creating an illusion of equality).' +
-                  '</p>' +
-                  '<hr class="horizontal gray-light my-4">' +
-                  '<ul class="list-group">' +
-                    '<li class="list-group-item border-0 ps-0 pt-0 text-sm"><strong class="text-dark">Full Name:</strong> &nbsp; Alec M. Thompson</li>' +
-                    '<li class="list-group-item border-0 ps-0 text-sm"><strong class="text-dark">Mobile:</strong> &nbsp; (44) 123 1234 123</li>' +
-                    '<li class="list-group-item border-0 ps-0 text-sm"><strong class="text-dark">Email:</strong> &nbsp; alecthompson@mail.com</li>' +
-                    '<li class="list-group-item border-0 ps-0 text-sm"><strong class="text-dark">Location:</strong> &nbsp; USA</li>' +
-                    '<li class="list-group-item border-0 ps-0 pb-0">' +
-                      '<strong class="text-dark text-sm">Social:</strong> &nbsp;' +
-                      '<a class="btn btn-facebook btn-simple mb-0 ps-1 pe-2 py-0" href="javascript:;">' +
-                        '<i class="fab fa-facebook fa-lg"></i>' +
-                      '</a>' +
-                      '<a class="btn btn-twitter btn-simple mb-0 ps-1 pe-2 py-0" href="javascript:;">' +
-                        '<i class="fab fa-twitter fa-lg"></i>' +
-                      '</a>' +
-                      '<a class="btn btn-instagram btn-simple mb-0 ps-1 pe-2 py-0" href="javascript:;">' +
-                        '<i class="fab fa-instagram fa-lg"></i>' +
-                      '</a>' +
-                    '</li>' +
-                  '</ul>' +
-                '</div>' +
-              '</div>' +
             '</div>' +
-            '<div class="col-12 col-xl-4">' +
-              '<div class="card card-plain h-100">' +
-                '<div class="card-header pb-0 p-3">' +
-                  '<h6 class="mb-0">Conversations</h6>' +
-                '</div>' +
-                '<div class="card-body p-3">' +
-                  '<ul class="list-group">' +
-                    '<li class="list-group-item border-0 d-flex align-items-center px-0 mb-2 pt-0">' +
-                      '<div class="avatar me-3">' +
-                        '<img src="assets/img/kal-visuals-square.jpg" alt="kal" class="border-radius-lg shadow">' +
-                      '</div>' +
-                      '<div class="d-flex align-items-start flex-column justify-content-center">' +
-                        '<h6 class="mb-0 text-sm">Sophie B.</h6>' +
-                        '<p class="mb-0 text-xs">Hi! I need more information..</p>' +
-                      '</div>' +
-                      '<a class="btn btn-link pe-3 ps-0 mb-0 ms-auto w-25 w-md-auto" href="javascript:;">Reply</a>' +
-                    '</li>' +
-                    '<li class="list-group-item border-0 d-flex align-items-center px-0 mb-2">' +
-                      '<div class="avatar me-3">' +
-                        '<img src="assets/img/marie.jpg" alt="kal" class="border-radius-lg shadow">' +
-                      '</div>' +
-                      '<div class="d-flex align-items-start flex-column justify-content-center">' +
-                        '<h6 class="mb-0 text-sm">Anne Marie</h6>' +
-                        '<p class="mb-0 text-xs">Awesome work, can you..</p>' +
-                      '</div>' +
-                      '<a class="btn btn-link pe-3 ps-0 mb-0 ms-auto w-25 w-md-auto" href="javascript:;">Reply</a>' +
-                    '</li>' +
-                    '<li class="list-group-item border-0 d-flex align-items-center px-0 mb-2">' +
-                      '<div class="avatar me-3">' +
-                        '<img src="assets/img/ivana-square.jpg" alt="kal" class="border-radius-lg shadow">' +
-                      '</div>' +
-                      '<div class="d-flex align-items-start flex-column justify-content-center">' +
-                        '<h6 class="mb-0 text-sm">Ivanna</h6>' +
-                        '<p class="mb-0 text-xs">About files I can..</p>' +
-                      '</div>' +
-                      '<a class="btn btn-link pe-3 ps-0 mb-0 ms-auto w-25 w-md-auto" href="javascript:;">Reply</a>' +
-                    '</li>' +
-                    '<li class="list-group-item border-0 d-flex align-items-center px-0 mb-2">' +
-                      '<div class="avatar me-3">' +
-                        '<img src="assets/img/team-4.jpg" alt="kal" class="border-radius-lg shadow">' +
-                      '</div>' +
-                      '<div class="d-flex align-items-start flex-column justify-content-center">' +
-                        '<h6 class="mb-0 text-sm">Peterson</h6>' +
-                        '<p class="mb-0 text-xs">Have a great afternoon..</p>' +
-                      '</div>' +
-                      '<a class="btn btn-link pe-3 ps-0 mb-0 ms-auto w-25 w-md-auto" href="javascript:;">Reply</a>' +
-                    '</li>' +
-                    '<li class="list-group-item border-0 d-flex align-items-center px-0">' +
-                      '<div class="avatar me-3">' +
-                        '<img src="assets/img/team-3.jpg" alt="kal" class="border-radius-lg shadow">' +
-                      '</div>' +
-                      '<div class="d-flex align-items-start flex-column justify-content-center">' +
-                        '<h6 class="mb-0 text-sm">Nick Daniel</h6>' +
-                        '<p class="mb-0 text-xs">Hi! I need more information..</p>' +
-                      '</div>' +
-                      '<a class="btn btn-link pe-3 ps-0 mb-0 ms-auto w-25 w-md-auto" href="javascript:;">Reply</a>' +
-                    '</li>' +
-                  '</ul>' +
-                '</div>' +
-              '</div>' +
+            '<div class="row">' +
+            '<div class="row">' +
             '</div>' +
-          '</div>' +
-        '</div>' +
-      '</div>';
-      return html;
+            '</div>';
+        return html;
+    },
+    CardPlatformSetting: () => {
+        let html = '<div class="col-12 col-xl-4">' +
+            '<div class="card card-plain h-100">' +
+            '<div class="card-header pb-0 p-3">' +
+            '<h6 class="mb-0">Platform Settings</h6>' +
+            '</div>' +
+            '<div class="card-body p-3">' +
+            '<h6 class="text-uppercase text-body text-xs font-weight-bolder">Account</h6>' +
+            '<ul class="list-group">' +
+            '<li class="list-group-item border-0 px-0">' +
+            '<div class="form-check form-switch ps-0">' +
+            '<input class="form-check-input ms-auto" type="checkbox" id="flexSwitchCheckDefault" checked>' +
+            '<label class="form-check-label text-body ms-3 text-truncate w-80 mb-0" for="flexSwitchCheckDefault">Email me when someone follows me</label>' +
+            '</div>' +
+            '</li>' +
+            '<li class="list-group-item border-0 px-0">' +
+            '<div class="form-check form-switch ps-0">' +
+            '<input class="form-check-input ms-auto" type="checkbox" id="flexSwitchCheckDefault1">' +
+            '<label class="form-check-label text-body ms-3 text-truncate w-80 mb-0" for="flexSwitchCheckDefault1">Email me when someone answers on my post</label>' +
+            '</div>' +
+            '</li>' +
+            '<li class="list-group-item border-0 px-0">' +
+            '<div class="form-check form-switch ps-0">' +
+            '<input class="form-check-input ms-auto" type="checkbox" id="flexSwitchCheckDefault2" checked>' +
+            '<label class="form-check-label text-body ms-3 text-truncate w-80 mb-0" for="flexSwitchCheckDefault2">Email me when someone mentions me</label>' +
+            '</div>' +
+            '</li>' +
+            '</ul>' +
+            '<h6 class="text-uppercase text-body text-xs font-weight-bolder mt-4">Application</h6>' +
+            '<ul class="list-group">' +
+            '<li class="list-group-item border-0 px-0">' +
+            '<div class="form-check form-switch ps-0">' +
+            '<input class="form-check-input ms-auto" type="checkbox" id="flexSwitchCheckDefault3">' +
+            '<label class="form-check-label text-body ms-3 text-truncate w-80 mb-0" for="flexSwitchCheckDefault3">New launches and projects</label>' +
+            '</div>' +
+            '</li>' +
+            '<li class="list-group-item border-0 px-0">' +
+            '<div class="form-check form-switch ps-0">' +
+            '<input class="form-check-input ms-auto" type="checkbox" id="flexSwitchCheckDefault4" checked>' +
+            '<label class="form-check-label text-body ms-3 text-truncate w-80 mb-0" for="flexSwitchCheckDefault4">Monthly product updates</label>' +
+            '</div>' +
+            '</li>' +
+            '<li class="list-group-item border-0 px-0 pb-0">' +
+            '<div class="form-check form-switch ps-0">' +
+            '<input class="form-check-input ms-auto" type="checkbox" id="flexSwitchCheckDefault5">' +
+            '<label class="form-check-label text-body ms-3 text-truncate w-80 mb-0" for="flexSwitchCheckDefault5">Subscribe to newsletter</label>' +
+            '</div>' +
+            '</li>' +
+            '</ul>' +
+            '</div>' +
+            '</div>' +
+            '</div>';
+        return html;
+    },
+    CardProfileInfo: () => {
+        let html = '<div class="col-12 col-xl-4">' +
+            '<div class="card card-plain h-100">' +
+            '<div class="card-header pb-0 p-3">' +
+            '<div class="row">' +
+            '<div class="col-md-8 d-flex align-items-center">' +
+            '<h6 class="mb-0">Profile Information</h6>' +
+            '</div>' +
+            '<div class="col-md-4 text-end">' +
+            '<a href="javascript:;">' +
+            '<i class="fas fa-user-edit text-secondary text-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="Edit Profile"></i>' +
+            '</a>' +
+            '</div>' +
+            '</div>' +
+            '</div>' +
+            '<div class="card-body p-3">' +
+            '<p class="text-sm">' +
+            'Hi, I’m Alec Thompson, Decisions: If you can’t decide, the answer is no.pain avoidance is creating an illusion of equality).' +
+            '</p>' +
+            '<hr class="horizontal gray-light my-4">' +
+            '<ul class="list-group">' +
+            '<li class="list-group-item border-0 ps-0 pt-0 text-sm"><strong class="text-dark">Full Name:</strong> &nbsp; Alec M. Thompson</li>' +
+            '<li class="list-group-item border-0 ps-0 text-sm"><strong class="text-dark">Mobile:</strong> &nbsp; (44) 123 1234 123</li>' +
+            '<li class="list-group-item border-0 ps-0 text-sm"><strong class="text-dark">Email:</strong> &nbsp; alecthompson@mail.com</li>' +
+            '<li class="list-group-item border-0 ps-0 text-sm"><strong class="text-dark">Location:</strong> &nbsp; USA</li>' +
+            '<li class="list-group-item border-0 ps-0 pb-0">' +
+            '<strong class="text-dark text-sm">Social:</strong> &nbsp;' +
+            '<a class="btn btn-facebook btn-simple mb-0 ps-1 pe-2 py-0" href="javascript:;">' +
+            '<i class="fab fa-facebook fa-lg"></i>' +
+            '</a>' +
+            '<a class="btn btn-twitter btn-simple mb-0 ps-1 pe-2 py-0" href="javascript:;">' +
+            '<i class="fab fa-twitter fa-lg"></i>' +
+            '</a>' +
+            '<a class="btn btn-instagram btn-simple mb-0 ps-1 pe-2 py-0" href="javascript:;">' +
+            '<i class="fab fa-instagram fa-lg"></i>' +
+            '</a>' +
+            '</li>' +
+            '</ul>' +
+            '</div>' +
+            '</div>' +
+            '</div>';
+        return html;
+    },
+    CardConversation: () => {
+        let html = '<div class="col-12 col-xl-4">' +
+            '<div class="card card-plain h-100">' +
+            '<div class="card-header pb-0 p-3">' +
+            '<h6 class="mb-0">Conversations</h6>' +
+            '</div>' +
+            '<div class="card-body p-3">' +
+            '<ul class="list-group">' +
+            '<li class="list-group-item border-0 d-flex align-items-center px-0 mb-2 pt-0">' +
+            '<div class="avatar me-3">' +
+            '<img src="assets/img/kal-visuals-square.jpg" alt="kal" class="border-radius-lg shadow">' +
+            '</div>' +
+            '<div class="d-flex align-items-start flex-column justify-content-center">' +
+            '<h6 class="mb-0 text-sm">Sophie B.</h6>' +
+            '<p class="mb-0 text-xs">Hi! I need more information..</p>' +
+            '</div>' +
+            '<a class="btn btn-link pe-3 ps-0 mb-0 ms-auto w-25 w-md-auto" href="javascript:;">Reply</a>' +
+            '</li>' +
+            '<li class="list-group-item border-0 d-flex align-items-center px-0 mb-2">' +
+            '<div class="avatar me-3">' +
+            '<img src="assets/img/marie.jpg" alt="kal" class="border-radius-lg shadow">' +
+            '</div>' +
+            '<div class="d-flex align-items-start flex-column justify-content-center">' +
+            '<h6 class="mb-0 text-sm">Anne Marie</h6>' +
+            '<p class="mb-0 text-xs">Awesome work, can you..</p>' +
+            '</div>' +
+            '<a class="btn btn-link pe-3 ps-0 mb-0 ms-auto w-25 w-md-auto" href="javascript:;">Reply</a>' +
+            '</li>' +
+            '<li class="list-group-item border-0 d-flex align-items-center px-0 mb-2">' +
+            '<div class="avatar me-3">' +
+            '<img src="assets/img/ivana-square.jpg" alt="kal" class="border-radius-lg shadow">' +
+            '</div>' +
+            '<div class="d-flex align-items-start flex-column justify-content-center">' +
+            '<h6 class="mb-0 text-sm">Ivanna</h6>' +
+            '<p class="mb-0 text-xs">About files I can..</p>' +
+            '</div>' +
+            '<a class="btn btn-link pe-3 ps-0 mb-0 ms-auto w-25 w-md-auto" href="javascript:;">Reply</a>' +
+            '</li>' +
+            '<li class="list-group-item border-0 d-flex align-items-center px-0 mb-2">' +
+            '<div class="avatar me-3">' +
+            '<img src="assets/img/team-4.jpg" alt="kal" class="border-radius-lg shadow">' +
+            '</div>' +
+            '<div class="d-flex align-items-start flex-column justify-content-center">' +
+            '<h6 class="mb-0 text-sm">Peterson</h6>' +
+            '<p class="mb-0 text-xs">Have a great afternoon..</p>' +
+            '</div>' +
+            '<a class="btn btn-link pe-3 ps-0 mb-0 ms-auto w-25 w-md-auto" href="javascript:;">Reply</a>' +
+            '</li>' +
+            '<li class="list-group-item border-0 d-flex align-items-center px-0">' +
+            '<div class="avatar me-3">' +
+            '<img src="assets/img/team-3.jpg" alt="kal" class="border-radius-lg shadow">' +
+            '</div>' +
+            '<div class="d-flex align-items-start flex-column justify-content-center">' +
+            '<h6 class="mb-0 text-sm">Nick Daniel</h6>' +
+            '<p class="mb-0 text-xs">Hi! I need more information..</p>' +
+            '</div>' +
+            '<a class="btn btn-link pe-3 ps-0 mb-0 ms-auto w-25 w-md-auto" href="javascript:;">Reply</a>' +
+            '</li>' +
+            '</ul>' +
+            '</div>' +
+            '</div>' +
+            '</div>' +
+            '</div>';
+        return html;
+    },
+    Etiqueta: () => {
+        let html = '<div id="etiqueta" class="etiqueta-detalle">' +
+            '<div id="agujero-etiqueta" class="row etiqueta-detalle-agujero">' +
+            '<button class="btn btn-info btn-etiqueta" onclick="$(\'#etiqueta\').addClass(\'animate__animated animate__fadeOutBottomRight\')">X</button>' +
+            '</div>' +
+            '<div id="etiqueta-content" style="padding: 15px;margin-top: 25%;">' +
+            '</div>' +
+            '</div>';
+        return html;
     }
 };
 
@@ -1194,14 +1230,14 @@ var Formulario = {
         })
     },
     Solicitud: () => {
-        $("#Solicitud > .card > .card-header > .card-body").empty().append(Template.Formulario('Solicitud', 'Solicitud', [
+        $("#Solicitud > .card > .card-body").empty().append(Template.Formulario('Solicitud', 'Solicitud', [
             { type: 'text', col: 3, disabled: '', label: "nombre*", ref: 'nombre', required: 'required' },
             { type: 'number', col: 3, disabled: '', label: "descuento (Opcional)", ref: 'descuento', fn: 'oninput="Functions.CalcularDetalle()"', required: 'required', min: 0 },
         ]));
     },
     Parte: () => {
         return Template.Formulario('Parte', 'Parte', [
-            { type: 'text', col: 3, disabled: '', label: "nombre", ref: 'nombre' },
+            { type: 'text', col: 3, disabled: '', label: "nombre", ref: 'nombre', fn: 'oninput=""' },
             { type: 'number', col: 3, disabled: '', label: "cantidad", ref: 'cantidad', fn: 'oninput="Functions.CalcularDetalle()"' },
             { type: 'number', col: 3, disabled: '', label: "minutos", ref: 'minutos', fn: 'oninput="Functions.CalcularDetalle()"' },
             { type: 'select', col: 3, disabled: '', label: "impresora", ref: 'impresora', fn: 'onchange="Functions.CalcularDetalle()"' },
@@ -1315,8 +1351,8 @@ var Functions = {
     },
     addParte: () => {
         let version = Persistant.Incremental++;
-        $("#Solicitud").append(Template.CardTable('Parte' + version, false, 12, true, 'Parte', false, false, 'margin-top:50px'));
-        $("#Parte" + version + " > .card > .card-header > .card-body").append(Formulario.Parte());
+        $("#Solicitud").append(Template.CardTable('Parte' + version, false, 12, true, 'Parte', false, false, true, 'margin-top:50px'));
+        $("#Parte" + version + " > .card > .card-body").append(Formulario.Parte());
     },
     CalcularHoras: (valor) => {
         Persistant.Horas = parseInt(valor) / 60;
@@ -1371,6 +1407,8 @@ var Functions = {
                 Functions.setData('Parte', 'Create', 0, parte);
             })
             $("form").trigger("reset");
+            $("form").parent().parent().parent("[id*='Parte']").empty();
+            $("#Horas, #KW, #Costo, #Subtotal, #Descuento, #Total\\ a\\ Pagar, #Ganancia").html(0)
         })
     },
     FloatToTime: number => {
@@ -1660,7 +1698,6 @@ var Functions = {
     TabsInit: () => {
         var tabss = $('.tabs');
         var selector = $('.tabs').find('a').length;
-        //var selector = $(".tabs").find(".selector");
         var activeItem = tabss.find('.active');
         var activeWidth = activeItem.innerWidth();
         $(".selector").css({
@@ -1684,6 +1721,40 @@ var Functions = {
         $("a[page]").removeClass("active " + color);
         $("a[page=" + page + "]").addClass("active " + color + ' ' + animation);
         setTimeout(() => { $("a[page=" + page + "]").removeClass(animation) }, 1000);
+    },
+    Transition: (target, empty = false, animateOut = 'animate__fadeOut', animateIn = 'animate__fadeInRight', durationOut = '0.25s', durationIN = '0.5s', velocity = 'animate__fast') => {
+        return new Promise((res, rej) => {
+            $(target).addClass('animate__animated ' + animateOut + ' ' + velocity).css({ '--animate-duration': durationOut });
+            setTimeout(() => {
+                $(target).removeClass("animate__animated " + animateOut).css({ '--animate-duration': durationIN });
+                (empty != false) ? $(empty).empty() : '';
+                $(target).removeClass('animate__animated ' + animateOut).addClass("animate__animated " + animateIn);
+                res(true);
+            }, 390);
+        })
+    },
+    TooltipInit: () => {
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl)
+        })
+    },
+    ContextMenu: () => {
+        document.addEventListener("contextmenu", (e) => {
+            e.preventDefault();
+        }, false);
+    },
+    DisableVS: () => {
+        document.addEventListener("keydown", (e) => {
+            if (e.ctrlKey || e.keyCode == 123) {
+                e.stopPropagation();
+                e.preventDefault();
+            }
+        });
+    },
+    CerrarSession: () => {
+        Cookies.remove('user', { path: '/' });
+        window.location.href = 'index.php';
     }
 }
 
@@ -1713,3 +1784,6 @@ var Fix = {
         }
     }
 }
+
+// Functions.ContextMenu();
+// Functions.DisableVS();

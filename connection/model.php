@@ -112,16 +112,21 @@ switch (ucwords($Funcion)) {
     case 'Impresion':
         if ($Accion == 'Read') echo $process->read("*", "impresion3d", "impresion", "", "", true);
         else if ($Accion == 'Create') echo $process->create("impresion3d", "impresion", $_POST['Obj']);
-        else if ($Accion == 'Listar') echo $process->read("a.id, a.costo, a.subtotal, a.descuento, a.total, a.modelo, b.nombre parte, b.minutos, b.gramos,
-        b.cantidad, c.nombre, c.apellido_paterno, c.apellido_materno, c.fecha_nacimiento, g.nombre region, h.nombre comuna,
-        c.codigo_postal, c.rut, c.correo, c.telefono, d.nombre estado, e.nombre impresora, e.kwh, e.marca, 
-        f.nombre color", "impresion3d", "impresion a", "", "JOIN impresion3d.parte b ON a.id = b.impresion
-        JOIN cliente.cliente c ON a.cliente = c.id
-        JOIN comun.estado d ON a.estado = d.id
-        JOIN comun.impresora e ON b.impresora = e.id
-        JOIN comun.color f ON b.color = f.id
-        JOIN comun.region g ON c.region = g.id
-        JOIN comun.comuna h ON c.comuna = h.id", true);
+        else if ($Accion == 'Listar') echo $process->read(
+            "b.id, a.costo, a.subtotal, a.descuento, a.total, a.modelo, b.nombre parte, b.minutos, b.gramos, b.cantidad, c.nombre, c.apellido_paterno, c.apellido_materno, 
+            c.fecha_nacimiento, g.nombre region, h.nombre comuna, c.codigo_postal, c.rut, c.correo, c.telefono, d.nombre estado, e.nombre impresora, e.kwh, e.marca, f.nombre color",
+            "impresion3d",
+            "impresion a",
+            "",
+            "JOIN impresion3d.parte b ON a.id = b.impresion
+            JOIN cliente.cliente c ON a.cliente = c.id
+            JOIN comun.estado d ON a.estado = d.id
+            JOIN comun.impresora e ON b.impresora = e.id
+            JOIN comun.color f ON b.color = f.id
+            JOIN comun.region g ON c.region = g.id
+            JOIN comun.comuna h ON c.comuna = h.id",
+            true
+        );
         break;
 }
 
