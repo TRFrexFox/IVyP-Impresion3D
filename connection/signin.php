@@ -9,9 +9,9 @@ if ($process->getEncKey($_POST['password']) == $usuario['contraseña']) {
     $info = new stdClass;
     $info->Nombre = $usuario['nombre'];
     setcookie('user', json_encode($info), 0, '/');
-    header('Location: ../Home.php');
+    header('Location: ../Home.htm');
 }else{
-    header('Location: ../index.php?messaje=error');
+    header('Location: ../index.htm?messaje=error');
 }
 
 class Process

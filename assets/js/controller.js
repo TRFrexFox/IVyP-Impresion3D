@@ -5,8 +5,10 @@ var Init = {
                 Functions.CerrarSession();
                 rej(true)
             }
+            $("body").prepend(Template.Sidebar());
             $("body").prepend(Template.SideNav());
             $("main").prepend(Template.NavBar());
+            $("#Contenedor").parent().append(Template.Footer());
             res(true);
         })
     },
@@ -61,6 +63,7 @@ var Init = {
                 { tab: 'Textura', icon: 'fas fa-hand-sparkles' },
                 { tab: 'Medicion', icon: 'fas fa-ruler' },
                 { tab: 'Tienda', icon: 'fas fa-store' },
+                { tab: 'Impresora', icon: 'fas fa-print' },
             ];
             $("#Contenedor").eq(0).prepend(Template.TabBar(tabs))
 
@@ -115,8 +118,31 @@ var Init = {
     Impresiones: () => {
         Functions.MenuSelection("Impresiones", "bg-gradient-primary", 'animate__animated animate__headShake');
         Functions.Transition('main', '#Contenedor').then(() => {
+            $("#Contenedor").append(Template.CardTable('ListImpresiones', true, 12, true, 'Impresiones', false, false));
+            $("#ListImpresiones .card-body").append(Template.Table("ListImpresiones", Functions.ChargeData('Impresion', 'Listar-Impresiones', true),
+                // { fn: "$(\'main > .container-fluid\').prepend(Template.Etiqueta());$('#etiqueta-content').empty().append(Template.Imp3DDetalle(this.attributes.rowid.value,'Impresion'));const ps = new PerfectScrollbar('#etiqueta', {wheelSpeed: 2,wheelPropagation: true,minScrollbarLength: 20});$('#etiqueta').removeClass('animate__animated animate__fadeOutBottomRight')" },
+                { fn: "$(\'.modal-body\').empty().append(Template.Imp3DDetalle(this.attributes.rowid.value,'Impresion'));$(\'.modal-footer\').empty();$(\'.modal-title\').empty().append(\'Detalle de Impresion\');$(\'#modal\').modal(\'show\')" },
+                { fn: 'Formulario.Impresion(this.attributes.rowid.value, true)' },
+                false,
+                [],
+                []
+            ));
+            $("body").append(Template.Modal([{}]))
+            $("table").DataTable({
+                orderFixed: [7, 'asc'],
+                rowGroup: {
+                    dataSrc: 7
+                },
+                columnDefs: [{ targets: [], visible: false }],
+                responsive: true
+            });
+        })
+    },
+    Pendientes: () => {
+        Functions.MenuSelection("Pendientes", "bg-gradient-primary", 'animate__animated animate__headShake');
+        Functions.Transition('main', '#Contenedor').then(() => {
             $("#Contenedor").append(Template.CardTable('ListImpresiones', true, 12, true, 'Impresion - Partes', false, false));
-            $("#ListImpresiones .card-body").append(Template.Table("ListImpresiones", Functions.ChargeData('Impresion', 'Listar', true),
+            $("#ListImpresiones .card-body").append(Template.Table("ListImpresiones", Functions.ChargeData('Impresion', 'Listar-Partes-Pendientes', true),
                 // { fn: "$(\'main > .container-fluid\').prepend(Template.Etiqueta());$('#etiqueta-content').empty().append(Template.Imp3DDetalle(this.attributes.rowid.value,'Impresion'));const ps = new PerfectScrollbar('#etiqueta', {wheelSpeed: 2,wheelPropagation: true,minScrollbarLength: 20});$('#etiqueta').removeClass('animate__animated animate__fadeOutBottomRight')" },
                 { fn: "$(\'.modal-body\').empty().append(Template.Imp3DDetalle(this.attributes.rowid.value,'Impresion'));$(\'.modal-footer\').empty();$(\'.modal-title\').empty().append(\'Detalle de Impresion\');$(\'#modal\').modal(\'show\')" },
                 { fn: 'Formulario.Impresion(this.attributes.rowid.value, true)' },
@@ -171,93 +197,88 @@ var Template = {
         '<div class="sidenav-header">' +
         '<i class="fas fa-times p-3 cursor-pointer text-white opacity-5 position-absolute end-0 top-0 d-none d-xl-none" aria-hidden="true" id="iconSidenav"></i>' +
         '<a class="navbar-brand m-0" href=" https://demos.creative-tim.com/material-dashboard/pages/dashboard " target="_blank">' +
-        '<img src="./assets/img/logo-ct.png" class="navbar-brand-img h-100" alt="main_logo">' +
-        '<span class="ms-1 font-weight-bold text-white">Material Dashboard 2</span>' +
+        '<img src="./assets/img/Logo.png" class="navbar-brand-img h-100" alt="main_logo">' +
+        '<span class="ms-3 font-weight-bold text-white">Impresiona tu Mundo</span>' +
         '</a>' +
         '</div>' +
         '<hr class="horizontal light mt-0 mb-2">' +
         '<div class="collapse navbar-collapse  w-auto  max-height-vh-100" id="sidenav-collapse-main">' +
         '<ul class="navbar-nav">' +
         '<li class="nav-item">' +
-        '<a class="nav-link text-white active bg-gradient-primary" href="./pages/dashboard.html">' +
+        '<a class="nav-link text-white" onclick="Init.Home()" page="Dashboard">' +
         '<div class="text-white text-center me-2 d-flex align-items-center justify-content-center">' +
         '<i class="material-icons opacity-10">dashboard</i>' +
         '</div>' +
-        '<span class="nav-link-text ms-1">Dasboard</span>' +
-        '</a>' +
-        '</li>' +
-        '<li class="nav-item">' +
-        '<a class="nav-link text-white " href="./pages/tables.html">' +
-        '<div class="text-white text-center me-2 d-flex align-items-center justify-content-center">' +
-        '<i class="material-icons opacity-10">table_view</i>' +
-        '</div>' +
-        '<span class="nav-link-text ms-1">Tables</span>' +
-        '</a>' +
-        '</li>' +
-        '<li class="nav-item">' +
-        '<a class="nav-link text-white " href="./pages/billing.html">' +
-        '<div class="text-white text-center me-2 d-flex align-items-center justify-content-center">' +
-        '<i class="material-icons opacity-10">receipt_long</i>' +
-        '</div>' +
-        '<span class="nav-link-text ms-1">Billing</span>' +
-        '</a>' +
-        '</li>' +
-        '<li class="nav-item">' +
-        '<a class="nav-link text-white " href="./pages/virtual-reality.html">' +
-        '<div class="text-white text-center me-2 d-flex align-items-center justify-content-center">' +
-        '<i class="material-icons opacity-10">view_in_ar</i>' +
-        '</div>' +
-        '<span class="nav-link-text ms-1">Virtual Reality</span>' +
-        '</a>' +
-        '</li>' +
-        '<li class="nav-item">' +
-        '<a class="nav-link text-white " href="./pages/rtl.html">' +
-        '<div class="text-white text-center me-2 d-flex align-items-center justify-content-center">' +
-        '<i class="material-icons opacity-10">format_textdirection_r_to_l</i>' +
-        '</div>' +
-        '<span class="nav-link-text ms-1">RTL</span>' +
-        '</a>' +
-        '</li>' +
-        '<li class="nav-item">' +
-        '<a class="nav-link text-white " href="./pages/notifications.html">' +
-        '<div class="text-white text-center me-2 d-flex align-items-center justify-content-center">' +
-        '<i class="material-icons opacity-10">notifications</i>' +
-        '</div>' +
-        '<span class="nav-link-text ms-1">Notifications</span>' +
+        '<span class="nav-link-text ms-1">Dashboard</span>' +
         '</a>' +
         '</li>' +
         '<li class="nav-item mt-3">' +
-        '<h6 class="ps-4 ms-2 text-uppercase text-xs text-white font-weight-bolder opacity-8">Account pages</h6>' +
+        '<h6 class="ps-4 ms-2 text-uppercase text-xs text-white font-weight-bolder opacity-8">Impresion 3D</h6>' +
         '</li>' +
         '<li class="nav-item">' +
-        '<a class="nav-link text-white " href="./pages/profile.html">' +
-        '<div class="text-white text-center me-2 d-flex align-items-center justify-content-center">' +
-        '<i class="material-icons opacity-10">person</i>' +
-        '</div>' +
-        '<span class="nav-link-text ms-1">Profile</span>' +
-        '</a>' +
-        '</li>' +
-        '<li class="nav-item">' +
-        '<a class="nav-link text-white " href="./pages/sign-in.html">' +
-        '<div class="text-white text-center me-2 d-flex align-items-center justify-content-center">' +
-        '<i class="material-icons opacity-10">login</i>' +
-        '</div>' +
-        '<span class="nav-link-text ms-1">Sign In</span>' +
-        '</a>' +
-        '</li>' +
-        '<li class="nav-item">' +
-        '<a class="nav-link text-white " href="./pages/sign-up.html">' +
+        '<a class="nav-link text-white" onclick="Init.Impresiones()" page="Impresiones">' +
         '<div class="text-white text-center me-2 d-flex align-items-center justify-content-center">' +
         '<i class="material-icons opacity-10">assignment</i>' +
         '</div>' +
-        '<span class="nav-link-text ms-1">Sign Up</span>' +
+        '<span class="nav-link-text ms-1">Impresiones</span>' +
+        '</a>' +
+        '</li>' +
+        '<li class="nav-item">' +
+        '<a class="nav-link text-white" onclick="Init.Pendientes()" page="Pendientes">' +
+        '<div class="text-white text-center me-2 d-flex align-items-center justify-content-center">' +
+        '<i class="material-icons opacity-10">assignment_late</i>' +
+        '</div>' +
+        '<span class="nav-link-text ms-1">Pendientes</span>' +
+        '</a>' +
+        '</li>' +
+        '<li class="nav-item">' +
+        '<a class="nav-link text-white" onclick="Init.Formulario()" page="Solicitud3D">' +
+        '<div class="text-white text-center me-2 d-flex align-items-center justify-content-center">' +
+        '<i class="material-icons opacity-10">content_paste</i>' +
+        '</div>' +
+        '<span class="nav-link-text ms-1">Solicitud</span>' +
+        '</a>' +
+        '</li>' +
+        '<li class="nav-item mt-3">' +
+        '<h6 class="ps-4 ms-2 text-uppercase text-xs text-white font-weight-bolder opacity-8">Impresion Papel</h6>' +
+        '</li>' +
+        '<li class="nav-item">' +
+        '<a class="nav-link text-white" onclick="Init.FormularioPapel()" page="SolicitudPapel">' +
+        '<div class="text-white text-center me-2 d-flex align-items-center justify-content-center">' +
+        '<i class="material-icons opacity-10">import_contacts</i>' +
+        '</div>' +
+        '<span class="nav-link-text ms-1">Solicitud</span>' +
+        '</a>' +
+        '</li>' +
+        '<li class="nav-item mt-3">' +
+        '<h6 class="ps-4 ms-2 text-uppercase text-xs text-white font-weight-bolder opacity-8">Administracion</h6>' +
+        '</li>' +
+        '<li class="nav-item">' +
+        '<a class="nav-link text-white" onclick="Init.Mantenedor()" page="Mantenedor">' +
+        '<div class="text-white text-center me-2 d-flex align-items-center justify-content-center">' +
+        '<i class="material-icons opacity-10">settings</i>' +
+        '</div>' +
+        '<span class="nav-link-text ms-1">Mantenedor</span>' +
+        '</a>' +
+        '</li>' +
+        '<li class="nav-item">' +
+        '<a class="nav-link text-white" onclick="Init.Perfil()" page="Perfil">' +
+        '<div class="text-white text-center me-2 d-flex align-items-center justify-content-center">' +
+        '<i class="material-icons opacity-10">person</i>' +
+        '</div>' +
+        '<span class="nav-link-text ms-1">Perfil</span>' +
         '</a>' +
         '</li>' +
         '</ul>' +
         '</div>' +
         '<div class="sidenav-footer position-absolute w-100 bottom-0 ">' +
         '<div class="mx-3">' +
-        '<a class="btn bg-gradient-primary mt-4 w-100" href="https://www.creative-tim.com/product/material-dashboard-pro?ref=sidebarfree" type="button">Upgrade to pro</a>' +
+        '<button class="btn bg-gradient-primary mt-4 w-100" onclick="Functions.CerrarSession()">' +
+        '<div class="text-white text-center me-2 d-flex align-items-center justify-content-center">' +
+        '<i class="material-icons opacity-10">power_settings_new</i>' +
+        '<span class="nav-link-text ms-1">Salir</span>' +
+        '</div>' +
+        '</button>' +
         '</div>' +
         '</div>' +
         '</aside>',
@@ -533,15 +554,12 @@ var Template = {
         '<div class="row align-items-center justify-content-lg-between">' +
         '<div class="col-lg-6 mb-lg-0 mb-4">' +
         '<div class="copyright text-center text-sm text-muted text-lg-start">' +
-        '© <script>' +
-        'document.write(new Date().getFullYear())' +
-        '</script>,' +
-        'made with <i class="fa fa-heart"></i> by' +
-        '<a href="https://www.creative-tim.com" class="font-weight-bold" target="_blank">Creative Tim</a>' +
-        'for a better web.' +
+        '© ' +
+        new Date().getFullYear() +
+        ', Informatica VyP Servicios' +
         '</div>' +
         '</div>' +
-        '<div class="col-lg-6">' +
+        '<!-- <div class="col-lg-6">' +
         '<ul class="nav nav-footer justify-content-center justify-content-lg-end">' +
         '<li class="nav-item">' +
         '<a href="https://www.creative-tim.com" class="nav-link text-muted" target="_blank">Creative Tim</a>' +
@@ -556,7 +574,7 @@ var Template = {
         '<a href="https://www.creative-tim.com/license" class="nav-link pe-0 text-muted" target="_blank">License</a>' +
         '</li>' +
         '</ul>' +
-        '</div>' +
+        '</div> -->' +
         '</div>' +
         '</div>' +
         '</footer>',
@@ -665,17 +683,17 @@ var Template = {
         html += (row) ? '</div>' : '';
         return html;
     },
-    Table: (id, data, view, edit, del, remCols = []) => {
+    Table: (id, data, view, edit, del, remCols = [], respCols = []) => {
         let th = true;
         let html = '<div class="table-responsive p-0" style="padding: 0px 5px 5px 5px !important;">' +
-            '<table id="' + id + '" class="table hover stripe align-items-center mb-0">';
+            '<table id="' + id + '" class="table hover stripe align-items-center mb-0 responsive nowrap">';
         data.forEach((e, k) => {
             if (th) {
                 html += '<thead>' +
                     '<tr>';
                 (Object.keys(e)).forEach((key, idx) => {
                     if (!remCols.some(x => x == idx))
-                        html += '<th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 text-center">' + key.replace("_", " ") + '</th>';
+                        html += '<th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 text-center ' + (respCols.some(x => x == idx) ? 'none' : '') + '">' + key.replace("_", " ") + '</th>';
                 });
                 html += (view || edit || del) ? '<th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 text-center">Acciones</th>' : '';
                 html += '</tr>' +
@@ -1237,11 +1255,11 @@ var Formulario = {
     },
     Parte: () => {
         return Template.Formulario('Parte', 'Parte', [
-            { type: 'text', col: 3, disabled: '', label: "nombre", ref: 'nombre', fn: 'oninput=""' },
+            { type: 'text', col: 3, disabled: '', label: "nombre", ref: 'nombre', fn: 'oninput="Functions.CalcularDetalle()"' },
             { type: 'number', col: 3, disabled: '', label: "cantidad", ref: 'cantidad', fn: 'oninput="Functions.CalcularDetalle()"' },
             { type: 'number', col: 3, disabled: '', label: "minutos", ref: 'minutos', fn: 'oninput="Functions.CalcularDetalle()"' },
             { type: 'select', col: 3, disabled: '', label: "impresora", ref: 'impresora', fn: 'onchange="Functions.CalcularDetalle()"' },
-            { type: 'select', col: 3, disabled: '', label: "color", ref: 'color' },
+            { type: 'select', col: 3, disabled: '', label: "color", ref: 'color', fn: 'oninput="Functions.CalcularDetalle()"' },
             { type: 'number', col: 3, disabled: '', label: "gramos", ref: 'gramos', fn: 'oninput="Functions.CalcularDetalle()"' },
         ]);
     },
@@ -1311,6 +1329,15 @@ var Formulario = {
                 { type: 'email', col: 6, disabled: '', def: (filled) ? def.correo : "", label: "correo", ref: 'correo' },
             ]));
         })
+    },
+    Impresora: (id, filled) => {
+        Formulario.Modal("Impresora", id, filled).then((def) => {
+            $(".modal-body").empty().append(Template.Formulario('Impresora', 'Impresora', [
+                { type: 'text', col: 6, disabled: '', def: (filled) ? def.nombre : "", label: "nombre", ref: 'nombre' },
+                { type: 'number', col: 6, disabled: '', def: (filled) ? def.kwh : "", label: "kwh", ref: 'kwh' },
+                { type: 'select', col: 6, disabled: '', def: (filled) ? def.marca : "", label: "marca", ref: 'marca' },
+            ]));
+        })
     }
 }
 
@@ -1364,10 +1391,20 @@ var Functions = {
     },
     CalcularDetalle: () => {
         let Calc = Persistant.Detalle = { Costo: 0, Subtotal: 0, Horas: 0, Kw: 0, Descuento: 0, Total: 0, Ganancia: 0, Cantidad: 0 };
-
+        let Part = Persistant.Partes = [];
         Calc.Descuento = $('#descuento').val();
         $("form").each(function (i, e) {
             if (i != 0) {
+                let parte = {};
+                parte.nombre = $(this).find("#nombre").val();
+                parte.cantidad = $(this).find("#cantidad").val();
+                parte.minutos = $(this).find("#minutos").val();
+                parte.impresora = $(this).find("#impresora option:selected").val();
+                parte.color = $(this).find("#color option:selected").val();
+                parte.gramos = $(this).find("#gramos").val();
+
+                Part.push(parte);
+
                 Calc.Cantidad = ($(this).find("#cantidad").val() != undefined) ? $(this).find("#cantidad").val() : 0;
                 Functions.CalcularHoras($(this).find("#minutos").val() * Calc.Cantidad);
                 Functions.CalcularUso(($(this).find("#impresora option:selected").attr('kwh') != undefined) ? $(this).find("#impresora option:selected").attr('kwh') : 0);
@@ -1406,6 +1443,9 @@ var Functions = {
                 parte = parte.concat({ name: 'impresion', value: imp.returning });
                 Functions.setData('Parte', 'Create', 0, parte);
             })
+                (Persistant.Partes).forEach(e => {
+
+                });
             $("form").trigger("reset");
             $("form").parent().parent().parent("[id*='Parte']").empty();
             $("#Horas, #KW, #Costo, #Subtotal, #Descuento, #Total\\ a\\ Pagar, #Ganancia").html(0)
@@ -1781,6 +1821,13 @@ var Fix = {
                 }
                 this.parentElement.classList.remove('is-focused');
             }, false);
+        }
+    },
+    Override: () => {
+        var Override = Object.key;
+        Override = function (str) {
+            console.log("Funcion Desactivada. Atte: VOrtega");
+            return true;
         }
     }
 }

@@ -20,6 +20,10 @@ li {
     margin-top: -1px;
 }
 
+.mr-3{
+    margin-right: 3px;
+}
+
 .custom-input {
     padding-left: 12px !important;
     border: 1px solid #d2d6da !important;

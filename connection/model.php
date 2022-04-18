@@ -5,6 +5,7 @@ require "conn.php";
 
 $process = new Process($conexion);
 // echo $process->getEncKey('Isidora221518');
+// $process->mail();
 switch (ucwords($Funcion)) {
     case 'Dashboard':
         if ($Accion == 'Card-Data') echo $process->read("*", "comun", "marca", "", "", true);
@@ -102,7 +103,7 @@ switch (ucwords($Funcion)) {
         else if ($Accion == 'Delete') echo $process->delete("comun", "tienda", $_POST['Id']);
         break;
     case 'Impresora':
-        if ($Accion == 'Read') echo $process->read("*", "comun", "impresora", "", "", true);
+        if ($Accion == 'Read') echo $process->read("a.id, a.nombre, a.kwh, b.nombre marca", "comun", "impresora a", "", "JOIN comun.marca b ON a.marca = b.id", true);
         break;
     case 'Categoria':
     case 'Parte':
@@ -112,13 +113,43 @@ switch (ucwords($Funcion)) {
     case 'Impresion':
         if ($Accion == 'Read') echo $process->read("*", "impresion3d", "impresion", "", "", true);
         else if ($Accion == 'Create') echo $process->create("impresion3d", "impresion", $_POST['Obj']);
-        else if ($Accion == 'Listar') echo $process->read(
+        else if ($Accion == 'Listar-Partes') echo $process->read(
             "b.id, a.costo, a.subtotal, a.descuento, a.total, a.modelo, b.nombre parte, b.minutos, b.gramos, b.cantidad, c.nombre, c.apellido_paterno, c.apellido_materno, 
             c.fecha_nacimiento, g.nombre region, h.nombre comuna, c.codigo_postal, c.rut, c.correo, c.telefono, d.nombre estado, e.nombre impresora, e.kwh, e.marca, f.nombre color",
             "impresion3d",
             "impresion a",
             "",
             "JOIN impresion3d.parte b ON a.id = b.impresion
+            JOIN cliente.cliente c ON a.cliente = c.id
+            JOIN comun.estado d ON a.estado = d.id
+            JOIN comun.impresora e ON b.impresora = e.id
+            JOIN comun.color f ON b.color = f.id
+            JOIN comun.region g ON c.region = g.id
+            JOIN comun.comuna h ON c.comuna = h.id",
+            true
+        );
+        else if ($Accion == 'Listar-Partes-Pendientes') echo $process->read(
+            "b.id, a.costo, a.subtotal, a.descuento, a.total, a.modelo, b.nombre parte, b.minutos, b.gramos, b.cantidad, c.nombre, c.apellido_paterno, c.apellido_materno, 
+            c.fecha_nacimiento, g.nombre region, h.nombre comuna, c.codigo_postal, c.rut, c.correo, c.telefono, d.nombre estado, e.nombre impresora, e.kwh, e.marca, f.nombre color",
+            "impresion3d",
+            "impresion a",
+            "estado NOT IN (5,6)",
+            "JOIN impresion3d.parte b ON a.id = b.impresion
+            JOIN cliente.cliente c ON a.cliente = c.id
+            JOIN comun.estado d ON a.estado = d.id
+            JOIN comun.impresora e ON b.impresora = e.id
+            JOIN comun.color f ON b.color = f.id
+            JOIN comun.region g ON c.region = g.id
+            JOIN comun.comuna h ON c.comuna = h.id",
+            true
+        );
+        else if ($Accion == 'Listar-Impresiones') echo $process->read(
+            "a.id impresion, a.costo, a.subtotal, a.descuento, a.total, CONCAT(c.nombre,' ',c.apellido_paterno,' ',c.apellido_materno) cliente, d.nombre estado, a.modelo, 
+            b.nombre parte, e.nombre impresora, b.minutos, b.gramos, b.cantidad, f.nombre color, g.nombre region, h.nombre comuna, c.codigo_postal, c.correo, c.telefono",
+            "impresion3D",
+            "impresion a",
+            "",
+            "JOIN impresion3D.parte b ON a.id = b.impresion
             JOIN cliente.cliente c ON a.cliente = c.id
             JOIN comun.estado d ON a.estado = d.id
             JOIN comun.impresora e ON b.impresora = e.id
@@ -143,8 +174,8 @@ class Process
     public function read($columns, $schema, $table, $where, $join, $json)
     {
         $query = "SELECT $columns FROM $schema.$table";
-        $query .= (strlen($where) > 0) ? " WHERE " . $where : "";
         $query .= (strlen($join) > 0) ? " " . $join : "";
+        $query .= (strlen($where) > 0) ? " WHERE " . $where : "";
 
         $QRes = pg_query($this->conexion, $query);
         $Values = pg_fetch_all($QRes);
@@ -207,6 +238,51 @@ class Process
     public function getDecKey($text)
     {
         return $this->decript($text);
+    }
+
+    public function mail()
+    {
+        // Varios destinatarios
+        $para  = 'aidan@example.com' . ', '; // atención a la coma
+        $para .= 'wez@example.com';
+
+        // título
+        $título = 'Recordatorio de cumpleaños para Agosto';
+
+        // mensaje
+        $mensaje = '<html>
+                    <head>
+                    <title>Recordatorio de cumpleaños para Agosto</title>
+                    </head>
+                    <body>
+                    <p>¡Estos son los cumpleaños para Agosto!</p>
+                    <table>
+                        <tr>
+                        <th>Quien</th><th>Día</th><th>Mes</th><th>Año</th>
+                        </tr>
+                        <tr>
+                        <td>Joe</td><td>3</td><td>Agosto</td><td>1970</td>
+                        </tr>
+                        <tr>
+                        <td>Sally</td><td>17</td><td>Agosto</td><td>1973</td>
+                        </tr>
+                    </table>
+                    </body>
+                    </html>
+                    ';
+
+        // Para enviar un correo HTML, debe establecerse la cabecera Content-type
+        $cabeceras  = 'MIME-Version: 1.0' . "\r\n";
+        $cabeceras .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
+
+        // Cabeceras adicionales
+        $cabeceras .= 'To: Victor <v.ortegaaz@gmail.com>' . "\r\n";
+        $cabeceras .= 'From: Recordatorio <informacion@impresionatumundo.com>' . "\r\n";
+        //$cabeceras .= 'Cc: birthdayarchive@example.com' . "\r\n";
+        //$cabeceras .= 'Bcc: birthdaycheck@example.com' . "\r\n";
+
+        // Enviarlo
+        mail($para, $título, $mensaje, $cabeceras);
     }
 
     private function toJson($data)
