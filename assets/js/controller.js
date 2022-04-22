@@ -1402,6 +1402,8 @@ var Functions = {
                 parte.impresora = $(this).find("#impresora option:selected").val();
                 parte.color = $(this).find("#color option:selected").val();
                 parte.gramos = $(this).find("#gramos").val();
+                parte.horas = Persistant.Horas;
+                parte.kw = parseFloat(Persistant.KW);
 
                 Part.push(parte);
 
@@ -1442,10 +1444,22 @@ var Functions = {
                 let parte = $(this).serializeArray();
                 parte = parte.concat({ name: 'impresion', value: imp.returning });
                 Functions.setData('Parte', 'Create', 0, parte);
-            })
-                (Persistant.Partes).forEach(e => {
-
-                });
+            });
+            (Persistant.Partes).forEach(e => {
+                let parte = [];
+                parte.push(
+                    { name: 'nombre', value: e.nombre },
+                    { name: 'cantidad', value: e.cantidad },
+                    { name: 'minutos', value: e.minutos },
+                    { name: 'impresora', value: e.impresora },
+                    { name: 'color', value: e.color },
+                    { name: 'gramos', value: e.gramos },
+                    { name: 'impresion', value: imp.returning },
+                    { name: 'impresion', value: imp.returning },
+                    { name: 'impresion', value: imp.returning },
+                    { name: 'impresion', value: imp.returning }
+                );
+            });
             $("form").trigger("reset");
             $("form").parent().parent().parent("[id*='Parte']").empty();
             $("#Horas, #KW, #Costo, #Subtotal, #Descuento, #Total\\ a\\ Pagar, #Ganancia").html(0)
