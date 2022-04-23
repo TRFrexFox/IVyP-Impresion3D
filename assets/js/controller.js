@@ -99,7 +99,7 @@ var Init = {
             $("#Solicitud").append(Template.CardTable('Parte', false, 12, true, 'Parte', false, false, true, 'margin-top:50px'));
             $("#Parte > .card > .card-body").append(Formulario.Parte());
 
-            $("#Detalle").append(Template.CardTable('Clientes', false, 12, true, 'Clientes', false, false, false, 'margin-top:50px'));
+            $("#Detalle").append(Template.CardTable('Clientes', false, 12, true, 'Clientes', false, { fn: 'Formulario.Cliente()' }, false, 'margin-top:50px'));
             $("#Detalle > .card > .card-body").append(Template.Detalle([
                 { nombre: 'Horas', hr: false, iconn: '<i class="far fa-clock"></i>' },
                 { nombre: 'KW', hr: false, iconn: '<i class="fas fa-bolt"></i>' },
@@ -113,6 +113,7 @@ var Init = {
             Functions.ChargeData("Valorizacion", "Read", true);
 
             Functions.TooltipInit();
+            $("table").DataTable({searching: false, info: false, "lengthChange": false});
         })
     },
     Impresiones: () => {
@@ -178,6 +179,7 @@ var Init = {
             Functions.ChargeData("Valorizacion", "Read", true);
 
             Functions.TooltipInit();
+            $("table").DataTable({searching: false, info: false, "lengthChange": false});
         })
     },
     Perfil: () => {
@@ -362,7 +364,7 @@ var Template = {
         '<td>' +
         '<div class="d-flex px-2 py-1">' +
         '<div>' +
-        '<img src="./assets/img/small-logos/logo-xd.svg" class="avatar avatar-sm me-3" alt="xd">' +
+        '<img src="assets/img/small-logos/logo-xd.svg" class="avatar avatar-sm me-3" alt="xd">' +
         '</div>' +
         '<div class="d-flex flex-column justify-content-center">' +
         '<h6 class="mb-0 text-sm">Material XD Version</h6>' +
@@ -372,16 +374,16 @@ var Template = {
         '<td>' +
         '<div class="avatar-group mt-2">' +
         '<a href="javascript:;" class="avatar avatar-xs rounded-circle" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Ryan Tompson">' +
-        '<img src="./assets/img/team-1.jpg" alt="team1">' +
+        '<img src="assets/img/team-1.jpg" alt="team1">' +
         '</a>' +
         '<a href="javascript:;" class="avatar avatar-xs rounded-circle" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Romina Hadid">' +
-        '<img src="./assets/img/team-2.jpg" alt="team2">' +
+        '<img src="assets/img/team-2.jpg" alt="team2">' +
         '</a>' +
         '<a href="javascript:;" class="avatar avatar-xs rounded-circle" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Alexander Smith">' +
-        '<img src="./assets/img/team-3.jpg" alt="team3">' +
+        '<img src="assets/img/team-3.jpg" alt="team3">' +
         '</a>' +
         '<a href="javascript:;" class="avatar avatar-xs rounded-circle" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Jessica Doe">' +
-        '<img src="./assets/img/team-4.jpg" alt="team4">' +
+        '<img src="assets/img/team-4.jpg" alt="team4">' +
         '</a>' +
         '</div>' +
         '</td>' +
@@ -401,8 +403,6 @@ var Template = {
         '</div>' +
         '</td>' +
         '</tr>' +
-
-
         '</tbody>' +
         '</table>' +
         '</div>' +
@@ -803,25 +803,41 @@ var Template = {
     },
     ListClientes: (name, Data) => {
         let html = "";
+        html += '<table class="table hover stripe align-items-center mb-0 responsive nowrap">' +
+                '<thead>' +
+                '<th>Nombre</th>' +
+                '<th>Rut</th>' +
+                '<th>Correo</th>' +
+                '<th>Telefono</th>' +
+                '<th>Region</th>' +
+                '<th>Comuna</th>' +
+                '<th>Cod. Postal</th>' +
+                '<th>Fecha Nacimiento</th>' +
+                '<th>Accion</th>' +
+                '</thead>' +
+                '<tbody>';
         Data.forEach(e => {
-            html += '<div class="row">' +
-                '<div class="col-8" data-bs-toggle="tooltip" data-bs-placement="top" title="' + e.rut + ' - ' + e.region + ' - ' + e.comuna + '">' +
-                e.nombre + ' ' + e.apellido_paterno + ' ' + e.apellido_materno +
-                '</div>' +
-                // '<div class="col-4" data-bs-toggle="tooltip" data-bs-placement="top" title="' + e.region + '">' +
-                // e.comuna +
-                // '</div>' +
-                '<div class="col-4">' +
+            html += '<tr>' +
+                '<td>' + e.nombre + ' ' + e.apellido_paterno + ' ' + e.apellido_materno + '</td>' +
+                '<td>' + e.rut + '</td>' +
+                '<td>' + e.correo + '</td>' +
+                '<td>' + e.telefono + '</td>' +
+                '<td>' + e.region + '</td>' +
+                '<td>' + e.comuna + '</td>' +
+                '<td>' + e.codigo_postal + '</td>' +
+                '<td>' + e.fecha_nacimiento + '</td>' +
+                '<td>' +
                 '<div class="pretty p-switch p-fill">' +
                 '<input type="radio" name="' + name + '" value="' + e.id + '" />' +
                 '<div class="state p-success">' +
                 '<label></label>' +
                 '</div>' +
                 '</div>' +
-                '</div>' +
-                '</div>' +
-                '<hr>';
+                '</td>' +
+                '</tr>';
         });
+        html += '</tbody>' +
+                '</table>';
         return html;
     },
     Detalle: (Data, btn = false) => {
@@ -1149,8 +1165,8 @@ var Formulario = {
             let def;
             $("#modal").remove();
             $("body").append(Template.Modal([
-                { class: 'btn btn-info', text: 'Limpiar', fn: '$(\'form\').reset()' },
-                { class: 'btn btn-success', text: ((!filled) ? 'Agregar' : 'Actualizar'), fn: 'Functions.setData(\'' + ref + '\', \'' + ((!filled) ? 'Create' : 'Update') + '\', ' + ((!filled) ? 0 : id) + ', $(\'form\').serializeArray()).then(()=>{$(\'#modal\').modal(\'hide\');$(\'[tab=' + ref + ']\').click()})' }
+                { class: 'btn btn-info', text: 'Limpiar', fn: '$(\'form#'+ref+'\')[0].reset()' },
+                { class: 'btn btn-success', text: ((!filled) ? 'Agregar' : 'Actualizar'), fn: 'Functions.setData(\'' + ref + '\', \'' + ((!filled) ? 'Create' : 'Update') + '\', ' + ((!filled) ? 0 : id) + ', $(\'form#'+ref+'\').serializeArray()).then(()=>{$(\'#modal\').modal(\'hide\');$(\'[tab=' + ref + ']\').click()})' }
             ]));
             if (filled) {
                 $(".modal-title").empty().append("Editar " + ref);
