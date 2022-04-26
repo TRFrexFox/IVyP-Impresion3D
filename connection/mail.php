@@ -38,8 +38,15 @@ try {
     //Content
     $mail->isHTML(true);                                      //Set email format to HTML
     $mail->Subject = 'Here is the subject';
-    $mail->Body    = 'This is the HTML message body <b>in bold!</b>';
+    $mail->Body    = file_get_contents('../assets/mail/Carta/index.html');
     $mail->AltBody = 'This is the body in plain text for non-HTML mail clients';
+
+    $files = opendir('../assets/mail/Carta/images');
+    while (($file = readdir($files)) !== false) {
+        if($file != '.' && $file != '..')
+        $mail->AddEmbeddedImage("../assets/mail/Carta/images/$file", explode (".", $file)[0], $file);
+    }
+    closedir($files);
 
     $mail->send();
     echo 'Message has been sent';
