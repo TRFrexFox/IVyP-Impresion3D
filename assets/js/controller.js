@@ -113,30 +113,23 @@ var Init = {
             Functions.ChargeData("Valorizacion", "Read", true);
 
             Functions.TooltipInit();
-            $("table").DataTable({searching: false, info: false, "lengthChange": false});
+            $("table").DataTable({ searching: false, info: false, "lengthChange": false });
         })
     },
     Impresiones: () => {
         Functions.MenuSelection("Impresiones", "bg-gradient-primary", 'animate__animated animate__headShake');
         Functions.Transition('main', '#Contenedor').then(() => {
             $("#Contenedor").append(Template.CardTable('ListImpresiones', true, 12, true, 'Impresiones', false, false));
-            $("#ListImpresiones .card-body").append(Template.Table("ListImpresiones", Functions.ChargeData('Impresion', 'Listar-Impresiones', true),
+            $("#ListImpresiones .card-body").append(Template.Table("ListImpresiones", Functions.ChargeData('Impresion', 'Listar-Impresiones-y-Partes', true),
                 // { fn: "$(\'main > .container-fluid\').prepend(Template.Etiqueta());$('#etiqueta-content').empty().append(Template.Imp3DDetalle(this.attributes.rowid.value,'Impresion'));const ps = new PerfectScrollbar('#etiqueta', {wheelSpeed: 2,wheelPropagation: true,minScrollbarLength: 20});$('#etiqueta').removeClass('animate__animated animate__fadeOutBottomRight')" },
                 { fn: "$(\'.modal-body\').empty().append(Template.Imp3DDetalle(this.attributes.rowid.value,'Impresion'));$(\'.modal-footer\').empty();$(\'.modal-title\').empty().append(\'Detalle de Impresion\');$(\'#modal\').modal(\'show\')" },
                 { fn: 'Formulario.Impresion(this.attributes.rowid.value, true)' },
                 false,
-                [],
+                [8],
                 []
             ));
             $("body").append(Template.Modal([{}]))
-            $("table").DataTable({
-                orderFixed: [7, 'asc'],
-                rowGroup: {
-                    dataSrc: 7
-                },
-                columnDefs: [{ targets: [], visible: false }],
-                responsive: true
-            });
+            $("table").DataTable();
         })
     },
     Pendientes: () => {
@@ -179,7 +172,7 @@ var Init = {
             Functions.ChargeData("Valorizacion", "Read", true);
 
             Functions.TooltipInit();
-            $("table").DataTable({searching: false, info: false, "lengthChange": false});
+            $("table").DataTable({ searching: false, info: false, "lengthChange": false });
         })
     },
     Perfil: () => {
@@ -704,7 +697,7 @@ var Template = {
             html += '<tr>';
             (Object.keys(e)).forEach((key, idx) => {
                 if (!remCols.some(x => x == idx))
-                    html += '<td class="align-middle text-center">' + e[key] + '</th>';
+                    html += '<td class="align-middle text-center">' + e[key] + '</td>';
             });
             html += (view || edit || del) ? '<td class="align-middle text-center">' : '';
             html += (view) ? '<button class="btn btn-info btn-accion" rowid="' + e['id'] + '" onclick="' + view.fn + '"><i class="fas fa-eye"></i></button>' : '';
@@ -804,18 +797,18 @@ var Template = {
     ListClientes: (name, Data) => {
         let html = "";
         html += '<table class="table hover stripe align-items-center mb-0 responsive nowrap">' +
-                '<thead>' +
-                '<th>Nombre</th>' +
-                '<th>Rut</th>' +
-                '<th>Correo</th>' +
-                '<th>Telefono</th>' +
-                '<th>Region</th>' +
-                '<th>Comuna</th>' +
-                '<th>Cod. Postal</th>' +
-                '<th>Fecha Nacimiento</th>' +
-                '<th>Accion</th>' +
-                '</thead>' +
-                '<tbody>';
+            '<thead>' +
+            '<th>Nombre</th>' +
+            '<th>Rut</th>' +
+            '<th>Correo</th>' +
+            '<th>Telefono</th>' +
+            '<th>Region</th>' +
+            '<th>Comuna</th>' +
+            '<th>Cod. Postal</th>' +
+            '<th>Fecha Nacimiento</th>' +
+            '<th>Accion</th>' +
+            '</thead>' +
+            '<tbody>';
         Data.forEach(e => {
             html += '<tr>' +
                 '<td>' + e.nombre + ' ' + e.apellido_paterno + ' ' + e.apellido_materno + '</td>' +
@@ -837,9 +830,76 @@ var Template = {
                 '</tr>';
         });
         html += '</tbody>' +
-                '</table>';
+            '</table>';
         return html;
     },
+    // ListImpresiones: (id, data, view, edit, del, remCols = [], respCols = []) => {
+    //     let th = true;
+    //     let thc = true;
+    //     let html = '<div class="table-responsive p-0" style="padding: 0px 5px 5px 5px !important;">' +
+    //         '<table id="' + id + '" class="table hover stripe align-items-center mb-0 responsive nowrap">';
+    //     (data.Impresiones).forEach((e, k) => {
+    //         if (th) {
+    //             html += '<thead>' +
+    //                 '<tr>';
+    //             (Object.keys(e)).forEach((key, idx) => {
+    //                 if (!remCols.some(x => x == idx))
+    //                     html += '<th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 text-center ' + (respCols.some(x => x == idx) ? 'none' : '') + '">' + key.replace("_", " ") + '</th>';
+    //             });
+    //             html += (view || edit || del) ? '<th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 text-center">Acciones</th>' : '';
+    //             html += '</tr>' +
+    //                 '</thead>';
+    //             html += '<tbody>';
+    //         }
+    //         th = false;
+    //         html += '<tr>';
+    //         (Object.keys(e)).forEach((key, idx) => {
+    //             if (!remCols.some(x => x == idx))
+    //                 html += '<td class="align-middle text-center">' + e[key] + '</td>';
+    //         });
+
+
+    //         html += '<td>';
+    //         html += '<table id="' + id + '" class="table hover stripe align-items-center mb-0 responsive nowrap">';
+    //         thc = true;
+    //         (e.partes).forEach((f, ke) => {
+    //             if (thc) {
+    //                 html += '<thead>' +
+    //                     '<tr>';
+    //                 (Object.keys(f)).forEach((key, idx) => {
+    //                     if (!remCols.some(x => x == idx))
+    //                         html += '<th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 text-center ' + (respCols.some(x => x == idx) ? 'none' : '') + '">' + key.replace("_", " ") + '</th>';
+    //                 });
+    //                 html += '</tr>' +
+    //                     '</thead>';
+    //                 html += '<tbody>';
+    //             }
+    //             thc = false;
+    //             html += '<tr>';
+    //             (Object.keys(f)).forEach((key, idx) => {
+    //                 if (!remCols.some(x => x == idx))
+    //                     html += '<td class="align-middle text-center">' + f[key] + '</td>';
+    //             });
+    //             html += '</tr>';
+    //         });
+    //         html += '</tbody>' +
+    //             '</table>';
+    //         html += '</td>';
+
+
+
+    //         html += (view || edit || del) ? '<td class="align-middle text-center">' : '';
+    //         html += (view) ? '<button class="btn btn-info btn-accion" rowid="' + e['id'] + '" onclick="' + view.fn + '"><i class="fas fa-eye"></i></button>' : '';
+    //         html += (edit) ? '<button class="btn btn-success btn-accion" rowid="' + e['id'] + '" onclick="' + edit.fn + '"><i class="fas fa-edit"></i></button>' : '';
+    //         html += (del) ? '<button class="btn btn-danger btn-accion" rowid="' + e['id'] + '" onclick="' + del.fn + '"><i class="fas fa-trash"></i></button>' : '';
+    //         html += (view || edit || del) ? '</td>' : '';
+    //         html += '</tr>';
+    //     });
+    //     html += '</tbody>' +
+    //         '</table>' +
+    //         '</div>';
+    //     return html;
+    // },
     Detalle: (Data, btn = false) => {
         let html = "";
         Data.forEach(e => {
@@ -1165,8 +1225,8 @@ var Formulario = {
             let def;
             $("#modal").remove();
             $("body").append(Template.Modal([
-                { class: 'btn btn-info', text: 'Limpiar', fn: '$(\'form#'+ref+'\')[0].reset()' },
-                { class: 'btn btn-success', text: ((!filled) ? 'Agregar' : 'Actualizar'), fn: 'Functions.setData(\'' + ref + '\', \'' + ((!filled) ? 'Create' : 'Update') + '\', ' + ((!filled) ? 0 : id) + ', $(\'form#'+ref+'\').serializeArray()).then(()=>{$(\'#modal\').modal(\'hide\');$(\'[tab=' + ref + ']\').click()})' }
+                { class: 'btn btn-info', text: 'Limpiar', fn: '$(\'form#' + ref + '\')[0].reset()' },
+                { class: 'btn btn-success', text: ((!filled) ? 'Agregar' : 'Actualizar'), fn: 'Functions.setData(\'' + ref + '\', \'' + ((!filled) ? 'Create' : 'Update') + '\', ' + ((!filled) ? 0 : id) + ', $(\'form#' + ref + '\').serializeArray()).then(()=>{$(\'#modal\').modal(\'hide\');$(\'[tab=' + ref + ']\').click()})' }
             ]));
             if (filled) {
                 $(".modal-title").empty().append("Editar " + ref);
