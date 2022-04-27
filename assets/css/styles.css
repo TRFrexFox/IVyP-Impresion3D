@@ -12,6 +12,14 @@ li {
     text-transform: capitalize;
 }
 
+table{
+    width: 100% !important;
+}
+
+.modal-title{
+    text-transform: capitalize;
+}
+
 .btn-Card-Title {
     padding: 5px 12px !important;
     float: right;

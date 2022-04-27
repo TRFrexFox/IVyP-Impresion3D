@@ -74,9 +74,21 @@ var Init = {
 
                 let datos = Functions.ChargeData(atr, 'Read', true);
                 $("#" + atr + " .card-body").append(Template.Table(atr, datos,
-                    false,
-                    { fn: 'Formulario.' + atr + '(this.attributes.rowid.value, true)' },
-                    { fn: 'Template.SADecision(\'question\',\'¿Elimnar registro?\', \'Se eliminar el registro \'+ this.attributes.rowid.value).then((d)=>{if(d)Functions.setData(\'' + atr + '\', \'Delete\', this.attributes.rowid.value).then(()=>{$(\'[tab=' + atr + ']\').click()})})' }
+                    [
+                        {
+                            class: 'btn btn-success btn-accion', cattr: '', icon: 'fas fa-edit', text: '',
+                            fn: 'Formulario.' + atr + '(this.attributes.rowid.value, true)'
+                        },
+                        {
+                            class: 'btn btn-danger btn-accion', cattr: '', icon: 'fas fa-trash', text: '',
+                            fn: 'Template.SADecision(\'question\',\'¿Elimnar registro?\', \'Se eliminar el registro \'+ this.attributes.rowid.value)' +
+                                '.then((d)=>{' +
+                                'if(d)' +
+                                'Functions.setData(\'' + atr + '\', \'Delete\', this.attributes.rowid.value)' +
+                                '.then(()=>{' +
+                                '$(\'[tab=' + atr + ']\').click();})})'
+                        }
+                    ]
                 ));
                 $("table").DataTable();
             })
@@ -121,14 +133,31 @@ var Init = {
         Functions.Transition('main', '#Contenedor').then(() => {
             $("#Contenedor").append(Template.CardTable('ListImpresiones', true, 12, true, 'Impresiones', false, false));
             $("#ListImpresiones .card-body").append(Template.Table("ListImpresiones", Functions.ChargeData('Impresion', 'Listar-Impresiones-y-Partes', true),
-                // { fn: "$(\'main > .container-fluid\').prepend(Template.Etiqueta());$('#etiqueta-content').empty().append(Template.Imp3DDetalle(this.attributes.rowid.value,'Impresion'));const ps = new PerfectScrollbar('#etiqueta', {wheelSpeed: 2,wheelPropagation: true,minScrollbarLength: 20});$('#etiqueta').removeClass('animate__animated animate__fadeOutBottomRight')" },
-                { fn: "$(\'.modal-body\').empty().append(Template.Imp3DDetalle(this.attributes.rowid.value,'Impresion'));$(\'.modal-footer\').empty();$(\'.modal-title\').empty().append(\'Detalle de Impresion\');$(\'#modal\').modal(\'show\')" },
-                { fn: 'Formulario.Impresion(this.attributes.rowid.value, true)' },
-                false,
+                [
+                    {
+                        class: 'btn btn-info btn-accion', cattr: '', icon: 'fas fa-eye', text: '',
+                        fn: "$(\'.modal-body\').empty().append(Template.Imp3DDetalle(this.attributes.rowid.value,'Impresion'));" +
+                            "$(\'.modal-footer\').empty();" +
+                            "$(\'.modal-title\').empty().append(\'Detalle de Impresion\');" +
+                            "$(\'#modal\').modal(\'show\')"
+                    },
+                    {
+                        class: 'btn btn-primary btn-accion', cattr: '', icon: 'fas fa-list', text: '',
+                        fn: "$(\'.modal-body\').empty().append(Template.Table(\'ListPartes\', Persistant.Impresion[this.attributes.rowid.value-1].partes,[],[0,1]));" +
+                            "$(\'.modal-footer\').empty();" +
+                            "$(\'.modal-title\').empty().append(\'Detalle de Partes - \'+Persistant.Impresion[this.attributes.rowid.value-1].modelo);" +
+                            "$(\'#modal\').modal(\'show\');" +
+                            "$(\'#ListPartes\').DataTable();"
+                    },
+                    {
+                        class: 'btn btn-success btn-accion', cattr: '', icon: 'fas fa-edit', text: '',
+                        fn: 'Formulario.Impresion(this.attributes.rowid.value, true)'
+                    }
+                ],
                 [8],
                 []
             ));
-            $("body").append(Template.Modal([{}]))
+            $("body").append(Template.Modal('modal', [{}], 'modal-xl'))
             $("table").DataTable();
         })
     },
@@ -137,13 +166,23 @@ var Init = {
         Functions.Transition('main', '#Contenedor').then(() => {
             $("#Contenedor").append(Template.CardTable('ListImpresiones', true, 12, true, 'Impresion - Partes', false, false));
             $("#ListImpresiones .card-body").append(Template.Table("ListImpresiones", Functions.ChargeData('Impresion', 'Listar-Partes-Pendientes', true),
-                // { fn: "$(\'main > .container-fluid\').prepend(Template.Etiqueta());$('#etiqueta-content').empty().append(Template.Imp3DDetalle(this.attributes.rowid.value,'Impresion'));const ps = new PerfectScrollbar('#etiqueta', {wheelSpeed: 2,wheelPropagation: true,minScrollbarLength: 20});$('#etiqueta').removeClass('animate__animated animate__fadeOutBottomRight')" },
-                { fn: "$(\'.modal-body\').empty().append(Template.Imp3DDetalle(this.attributes.rowid.value,'Impresion'));$(\'.modal-footer\').empty();$(\'.modal-title\').empty().append(\'Detalle de Impresion\');$(\'#modal\').modal(\'show\')" },
-                { fn: 'Formulario.Impresion(this.attributes.rowid.value, true)' },
-                false,
+                [
+                    {
+                        class: 'btn btn-info btn-accion', cattr: '', icon: 'fas fa-eye', text: '',
+                        fn: "$(\'.modal-body\').empty().append(Template.Imp3DDetalle(this.attributes.rowid.value,'Impresion'));" +
+                            "$(\'.modal-footer\').empty();" +
+                            "$(\'.modal-title\').empty().append(\'Detalle de Impresion\');" +
+                            "$(\'#modal\').modal(\'show\')"
+                    },
+                    {
+                        class: 'btn btn-success btn-accion', cattr: '', icon: 'fas fa-edit', text: '',
+                        fn: 'Formulario.Impresion(this.attributes.rowid.value, true)'
+                    }
+                ],
+                [],
                 [1, 2, 3, 4, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 22, 23]
             ));
-            $("body").append(Template.Modal([{}]))
+            $("body").append(Template.Modal('modal', [{}]))
             $("table").DataTable();
         })
     },
@@ -676,7 +715,7 @@ var Template = {
         html += (row) ? '</div>' : '';
         return html;
     },
-    Table: (id, data, view, edit, del, remCols = [], respCols = []) => {
+    Table: (id, data, btn, remCols = [], respCols = []) => {
         let th = true;
         let html = '<div class="table-responsive p-0" style="padding: 0px 5px 5px 5px !important;">' +
             '<table id="' + id + '" class="table hover stripe align-items-center mb-0 responsive nowrap">';
@@ -688,7 +727,7 @@ var Template = {
                     if (!remCols.some(x => x == idx))
                         html += '<th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 text-center ' + (respCols.some(x => x == idx) ? 'none' : '') + '">' + key.replace("_", " ") + '</th>';
                 });
-                html += (view || edit || del) ? '<th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 text-center">Acciones</th>' : '';
+                html += (btn.length > 0) ? '<th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 text-center">Acciones</th>' : '';
                 html += '</tr>' +
                     '</thead>';
                 html += '<tbody>';
@@ -699,11 +738,14 @@ var Template = {
                 if (!remCols.some(x => x == idx))
                     html += '<td class="align-middle text-center">' + e[key] + '</td>';
             });
-            html += (view || edit || del) ? '<td class="align-middle text-center">' : '';
-            html += (view) ? '<button class="btn btn-info btn-accion" rowid="' + e['id'] + '" onclick="' + view.fn + '"><i class="fas fa-eye"></i></button>' : '';
-            html += (edit) ? '<button class="btn btn-success btn-accion" rowid="' + e['id'] + '" onclick="' + edit.fn + '"><i class="fas fa-edit"></i></button>' : '';
-            html += (del) ? '<button class="btn btn-danger btn-accion" rowid="' + e['id'] + '" onclick="' + del.fn + '"><i class="fas fa-trash"></i></button>' : '';
-            html += (view || edit || del) ? '</td>' : '';
+            html += (btn.length > 0) ? '<td class="align-middle text-center">' : '';
+            btn.forEach(btn => {
+                html += '<button class="' + btn.class + '" rowid="' + e['id'] + '" onclick="' + btn.fn + '"><i class="' + btn.icon + '"></i>' + btn.text + '</button>';
+            });
+            // html += (view) ? '<button class="btn btn-info btn-accion" rowid="' + e['id'] + '" onclick="' + view.fn + '"><i class="fas fa-eye"></i></button>' : '';
+            // html += (edit) ? '<button class="btn btn-success btn-accion" rowid="' + e['id'] + '" onclick="' + edit.fn + '"><i class="fas fa-edit"></i></button>' : '';
+            // html += (del) ? '<button class="btn btn-danger btn-accion" rowid="' + e['id'] + '" onclick="' + del.fn + '"><i class="fas fa-trash"></i></button>' : '';
+            html += (btn.length > 0) ? '</td>' : '';
             html += '</tr>';
         });
         html += '</tbody>' +
@@ -711,9 +753,10 @@ var Template = {
             '</div>';
         return html;
     },
-    Modal: (btn) => {
-        let html = '<div class="modal fade" id="modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">' +
-            '<div class="modal-dialog">' +
+    Modal: (id, btn, size = '') => {
+        $('.modal').remove();
+        let html = '<div class="modal fade" id="' + id + '" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">' +
+            '<div class="modal-dialog ' + size + '">' +
             '<div class="modal-content">' +
             '<div class="modal-header">' +
             '<h5 class="modal-title"></h5>' +
@@ -740,7 +783,7 @@ var Template = {
                 html += '<input type="text" id="' + Val.ref + '" name="' + Val.ref + '" class="form-control custom-input ' + Val.class + '" ' + Val.fn + ' value="' + ((Val.def != undefined) ? Val.def : "") + '" ' + Val.disabled + ' ' + Val.required + '/>';
             } else if (Val.type == "select") {
                 let data = Functions.ChargeData(Val.ref, 'Read');
-                html += Template.Select(Val.ref, data, Val.fn, Val.def);
+                html += Template.Select(Val.ref, data, Val.fn, Val.def, Val.cparam);
             } else if (Val.type == "password") {
                 html += '<input type="password" id="' + Val.ref + '" name="' + Val.ref + '" class="form-control custom-input ' + Val.class + '" ' + Val.fn + ' value="' + ((Val.def != undefined) ? Val.def : "") + '" ' + Val.disabled + ' ' + Val.required + '/>';
             } else if (Val.type == "date") {
@@ -762,16 +805,25 @@ var Template = {
             '</form>';
         return html;
     },
-    Select: (id, data, fn, def) => {
+    Select: (id, data, fn, def, cparam = 'nombre') => {
         let attr;
         let html = '<select id="' + id + '" name="' + id + '" class="form-control custom-input" ' + fn + ' style="width: 100% !important;">';
+        let selected = "";
         html += '<option value="-1" ' + ((def == undefined) ? 'selected' : '') + ' readonly>Seleccione</option>';
         data.forEach(e => {
             attr = "";
             (Object.keys(e)).forEach(key => {
                 attr += key + '="' + e[key] + '"';
             });
-            html += '<option ' + ((def == e.nombre) ? 'selected' : '') + ' value="' + e.id + '" ' + attr + '>' + e.nombre + '</option>';
+            selected = "";
+            cparam.forEach(param => {
+                selected += e[param]+' ';
+            });
+            html += '<option ' + ((def == selected.trim()) ? 'selected' : '') + ' value="' + e.id + '" ' + attr + '>';
+            cparam.forEach(param => {
+                html += e[param]+' ';
+            });
+            html += '</option>';
         });
         html += '</select>';
         return html;
@@ -833,73 +885,6 @@ var Template = {
             '</table>';
         return html;
     },
-    // ListImpresiones: (id, data, view, edit, del, remCols = [], respCols = []) => {
-    //     let th = true;
-    //     let thc = true;
-    //     let html = '<div class="table-responsive p-0" style="padding: 0px 5px 5px 5px !important;">' +
-    //         '<table id="' + id + '" class="table hover stripe align-items-center mb-0 responsive nowrap">';
-    //     (data.Impresiones).forEach((e, k) => {
-    //         if (th) {
-    //             html += '<thead>' +
-    //                 '<tr>';
-    //             (Object.keys(e)).forEach((key, idx) => {
-    //                 if (!remCols.some(x => x == idx))
-    //                     html += '<th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 text-center ' + (respCols.some(x => x == idx) ? 'none' : '') + '">' + key.replace("_", " ") + '</th>';
-    //             });
-    //             html += (view || edit || del) ? '<th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 text-center">Acciones</th>' : '';
-    //             html += '</tr>' +
-    //                 '</thead>';
-    //             html += '<tbody>';
-    //         }
-    //         th = false;
-    //         html += '<tr>';
-    //         (Object.keys(e)).forEach((key, idx) => {
-    //             if (!remCols.some(x => x == idx))
-    //                 html += '<td class="align-middle text-center">' + e[key] + '</td>';
-    //         });
-
-
-    //         html += '<td>';
-    //         html += '<table id="' + id + '" class="table hover stripe align-items-center mb-0 responsive nowrap">';
-    //         thc = true;
-    //         (e.partes).forEach((f, ke) => {
-    //             if (thc) {
-    //                 html += '<thead>' +
-    //                     '<tr>';
-    //                 (Object.keys(f)).forEach((key, idx) => {
-    //                     if (!remCols.some(x => x == idx))
-    //                         html += '<th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 text-center ' + (respCols.some(x => x == idx) ? 'none' : '') + '">' + key.replace("_", " ") + '</th>';
-    //                 });
-    //                 html += '</tr>' +
-    //                     '</thead>';
-    //                 html += '<tbody>';
-    //             }
-    //             thc = false;
-    //             html += '<tr>';
-    //             (Object.keys(f)).forEach((key, idx) => {
-    //                 if (!remCols.some(x => x == idx))
-    //                     html += '<td class="align-middle text-center">' + f[key] + '</td>';
-    //             });
-    //             html += '</tr>';
-    //         });
-    //         html += '</tbody>' +
-    //             '</table>';
-    //         html += '</td>';
-
-
-
-    //         html += (view || edit || del) ? '<td class="align-middle text-center">' : '';
-    //         html += (view) ? '<button class="btn btn-info btn-accion" rowid="' + e['id'] + '" onclick="' + view.fn + '"><i class="fas fa-eye"></i></button>' : '';
-    //         html += (edit) ? '<button class="btn btn-success btn-accion" rowid="' + e['id'] + '" onclick="' + edit.fn + '"><i class="fas fa-edit"></i></button>' : '';
-    //         html += (del) ? '<button class="btn btn-danger btn-accion" rowid="' + e['id'] + '" onclick="' + del.fn + '"><i class="fas fa-trash"></i></button>' : '';
-    //         html += (view || edit || del) ? '</td>' : '';
-    //         html += '</tr>';
-    //     });
-    //     html += '</tbody>' +
-    //         '</table>' +
-    //         '</div>';
-    //     return html;
-    // },
     Detalle: (Data, btn = false) => {
         let html = "";
         Data.forEach(e => {
@@ -1224,7 +1209,7 @@ var Formulario = {
         return new Promise((res, rej) => {
             let def;
             $("#modal").remove();
-            $("body").append(Template.Modal([
+            $("body").append(Template.Modal('modal', [
                 { class: 'btn btn-info', text: 'Limpiar', fn: '$(\'form#' + ref + '\')[0].reset()' },
                 { class: 'btn btn-success', text: ((!filled) ? 'Agregar' : 'Actualizar'), fn: 'Functions.setData(\'' + ref + '\', \'' + ((!filled) ? 'Create' : 'Update') + '\', ' + ((!filled) ? 0 : id) + ', $(\'form#' + ref + '\').serializeArray()).then(()=>{$(\'#modal\').modal(\'hide\');$(\'[tab=' + ref + ']\').click()})' }
             ]));
@@ -1245,8 +1230,8 @@ var Formulario = {
                 { type: 'text', col: 6, disabled: '', def: (filled) ? def.apellido_paterno : "", label: "apellido paterno*", ref: 'apellido_paterno' },
                 { type: 'text', col: 6, disabled: '', def: (filled) ? def.apellido_materno : "", label: "apellido materno*", ref: 'apellido_materno' },
                 { type: 'date', col: 6, disabled: '', def: (filled) ? def.fecha_nacimiento : "", label: "fecha de nacimiento", ref: 'fecha_nacimiento' },
-                { type: 'select', col: 6, disabled: '', def: (filled) ? def.region : "", label: "region", ref: 'region' },
-                { type: 'select', col: 6, disabled: '', def: (filled) ? def.comuna : "", label: "comuna", ref: 'comuna' },
+                { type: 'select', col: 6, disabled: '', def: (filled) ? def.region : "", label: "region", ref: 'region', cparam: ['nombre'] },
+                { type: 'select', col: 6, disabled: '', def: (filled) ? def.comuna : "", label: "comuna", ref: 'comuna', cparam: ['nombre'] },
                 { type: 'number', col: 6, disabled: '', def: (filled) ? def.codigo_postal : "", label: "codigo postal", ref: 'codigo_postal' },
                 { type: 'text', col: 6, disabled: '', def: (filled) ? def.rut : "", label: "rut", ref: 'rut' },
                 { type: 'email', col: 6, disabled: '', def: (filled) ? def.correo : "", label: "correo", ref: 'correo' },
@@ -1280,7 +1265,7 @@ var Formulario = {
         Formulario.Modal("Comuna", id, filled).then((def) => {
             $(".modal-body").empty().append(Template.Formulario('Comuna', 'Comuna', [
                 { type: 'text', col: 6, disabled: '', def: (filled) ? def.nombre : "", label: "nombre", ref: 'nombre' },
-                { type: 'select', col: 6, disabled: '', def: (filled) ? def.region : "", label: "region", ref: 'region' },
+                { type: 'select', col: 6, disabled: '', def: (filled) ? def.region : "", label: "region", ref: 'region', cparam: ['nombre'] },
                 { type: 'number', col: 6, disabled: '', def: (filled) ? def.cut : "", label: "cut", ref: 'cut' },
             ]));
         })
@@ -1296,12 +1281,12 @@ var Formulario = {
     Pla: (id, filled) => {
         Formulario.Modal("Pla", id, filled).then((def) => {
             $(".modal-body").empty().append(Template.Formulario('Pla', 'Pla', [
-                { type: 'select', col: 6, disabled: '', def: (filled) ? def.color : "", label: "color", ref: 'color' },
-                { type: 'select', col: 6, disabled: '', def: (filled) ? def.marca : "", label: "marca", ref: 'marca' },
+                { type: 'select', col: 6, disabled: '', def: (filled) ? def.color : "", label: "color", ref: 'color', cparam: ['nombre'] },
+                { type: 'select', col: 6, disabled: '', def: (filled) ? def.marca : "", label: "marca", ref: 'marca', cparam: ['nombre'] },
                 { type: 'number', col: 6, disabled: '', def: (filled) ? def.diametro : "", label: "diametro", ref: 'diametro' },
                 { type: 'text', col: 6, disabled: '', def: (filled) ? def.temperatura : "", label: "temperatura", ref: 'temperatura' },
                 { type: 'number', col: 6, disabled: '', def: (filled) ? def.gramos : "", label: "gramos", ref: 'gramos' },
-                { type: 'select', col: 6, disabled: '', def: (filled) ? def.categoria : "", label: "categoria", ref: 'categoria' },
+                { type: 'select', col: 6, disabled: '', def: (filled) ? def.categoria : "", label: "categoria", ref: 'categoria', cparam: ['nombre'] },
                 { type: 'number', col: 6, disabled: '', def: (filled) ? def.valor : "", label: "valor", ref: 'valor' },
             ]));
         })
@@ -1334,25 +1319,20 @@ var Formulario = {
             { type: 'text', col: 3, disabled: '', label: "nombre", ref: 'nombre', fn: 'oninput="Functions.CalcularDetalle()"' },
             { type: 'number', col: 3, disabled: '', label: "cantidad", ref: 'cantidad', fn: 'oninput="Functions.CalcularDetalle()"' },
             { type: 'number', col: 3, disabled: '', label: "minutos", ref: 'minutos', fn: 'oninput="Functions.CalcularDetalle()"' },
-            { type: 'select', col: 3, disabled: '', label: "impresora", ref: 'impresora', fn: 'onchange="Functions.CalcularDetalle()"' },
-            { type: 'select', col: 3, disabled: '', label: "color", ref: 'color', fn: 'oninput="Functions.CalcularDetalle()"' },
+            { type: 'select', col: 3, disabled: '', label: "impresora", ref: 'impresora', fn: 'onchange="Functions.CalcularDetalle()"', cparam: ['nombre'] },
+            { type: 'select', col: 3, disabled: '', label: "color", ref: 'color', fn: 'oninput="Functions.CalcularDetalle()"', cparam: ['nombre'] },
             { type: 'number', col: 3, disabled: '', label: "gramos", ref: 'gramos', fn: 'oninput="Functions.CalcularDetalle()"' },
         ]);
     },
     Impresion: (id, filled) => {
         Formulario.Modal("Impresion", id, filled).then((def) => {
             $(".modal-body").empty().append(Template.Formulario('Impresion', 'Impresion', [
-                { type: 'number', col: 6, disabled: '', def: (filled) ? def.cantidad : "", label: "cantidad", ref: 'cantidad' },
-                { type: 'select', col: 6, disabled: '', def: (filled) ? def.color : "", label: "color", ref: 'color' },
-                { type: 'number', col: 6, disabled: '', def: (filled) ? def.gramos : "", label: "gramos", ref: 'gramos' },
-                { type: 'number', col: 6, disabled: '', def: (filled) ? def.minutos : "", label: "minutos", ref: 'minutos' },
-                { type: 'select', col: 6, disabled: '', def: (filled) ? def.impresora : "", label: "impresora", ref: 'impresora' },
-                { type: 'select', col: 6, disabled: '', def: (filled) ? def.estado : "", label: "estado", ref: 'estado' },
+                { type: 'select', col: 6, disabled: '', def: (filled) ? def.estado : "", label: "estado", ref: 'estado', cparam: ['nombre'] },
                 { type: 'number', col: 6, disabled: '', def: (filled) ? def.descuento : "", label: "descuento", ref: 'descuento' },
-                { type: 'number', col: 6, disabled: '', def: (filled) ? def.costo : "", label: "costo", ref: 'costo' },
                 { type: 'number', col: 6, disabled: '', def: (filled) ? def.costo : "", label: "costo", ref: 'costo' },
                 { type: 'number', col: 6, disabled: '', def: (filled) ? def.subtotal : "", label: "subtotal", ref: 'subtotal' },
                 { type: 'number', col: 6, disabled: '', def: (filled) ? def.total : "", label: "total", ref: 'total' },
+                { type: 'select', col: 6, disabled: '', def: (filled) ? def.cliente : "", label: "cliente", ref: 'cliente', cparam: ['nombre','apellido_paterno','apellido_materno'] },
             ]));
         })
     },
@@ -1360,13 +1340,13 @@ var Formulario = {
         Formulario.Modal("Papeleria", id, filled).then((def) => {
             $(".modal-body").empty().append(Template.Formulario('Papeleria', 'Papeleria', [
                 { type: 'text', col: 6, disabled: '', def: (filled) ? def.nombre : "", label: "nombre", ref: 'nombre' },
-                { type: 'select', col: 6, disabled: '', def: (filled) ? def.marca : "", label: "marca", ref: 'marca' },
+                { type: 'select', col: 6, disabled: '', def: (filled) ? def.marca : "", label: "marca", ref: 'marca', cparam: ['nombre'] },
                 { type: 'number', col: 6, disabled: '', def: (filled) ? def.cantidad : "", label: "cantidad", ref: 'cantidad' },
-                { type: 'select', col: 6, disabled: '', def: (filled) ? def.formato : "", label: "formato", ref: 'formato_papel' },
+                { type: 'select', col: 6, disabled: '', def: (filled) ? def.formato : "", label: "formato", ref: 'formato_papel', cparam: ['nombre'] },
                 { type: 'number', col: 6, disabled: '', def: (filled) ? def.precio : "", label: "precio", ref: 'precio' },
                 { type: 'number', col: 6, disabled: '', def: (filled) ? def.gramaje : "", label: "gramaje", ref: 'gramaje' },
-                { type: 'select', col: 6, disabled: '', def: (filled) ? def.color : "", label: "color", ref: 'color' },
-                { type: 'select', col: 6, disabled: '', def: (filled) ? def.textura : "", label: "textura", ref: 'textura' },
+                { type: 'select', col: 6, disabled: '', def: (filled) ? def.color : "", label: "color", ref: 'color', cparam: ['nombre'] },
+                { type: 'select', col: 6, disabled: '', def: (filled) ? def.textura : "", label: "textura", ref: 'textura', cparam: ['nombre'] },
             ]));
         })
     },
@@ -1375,7 +1355,7 @@ var Formulario = {
             $(".modal-body").empty().append(Template.Formulario('FormatoPapel', 'FormatoPapel', [
                 { type: 'text', col: 6, disabled: '', def: (filled) ? def.nombre : "", label: "nombre", ref: 'nombre' },
                 { type: 'text', col: 6, disabled: '', def: (filled) ? def.medida : "", label: "medida", ref: 'medida' },
-                { type: 'select', col: 6, disabled: '', def: (filled) ? def.medicion : "", label: "medicion", ref: 'medicion' },
+                { type: 'select', col: 6, disabled: '', def: (filled) ? def.medicion : "", label: "medicion", ref: 'medicion', cparam: ['nombre'] },
             ]));
         })
     },
@@ -1399,8 +1379,8 @@ var Formulario = {
             $(".modal-body").empty().append(Template.Formulario('Tienda', 'Tienda', [
                 { type: 'text', col: 6, disabled: '', def: (filled) ? def.nombre : "", label: "nombre", ref: 'nombre' },
                 { type: 'text', col: 6, disabled: '', def: (filled) ? def.direccion : "", label: "direccion", ref: 'direccion' },
-                { type: 'select', col: 6, disabled: '', def: (filled) ? def.comuna : "", label: "comuna", ref: 'comuna' },
-                { type: 'select', col: 6, disabled: '', def: (filled) ? def.region : "", label: "region", ref: 'region' },
+                { type: 'select', col: 6, disabled: '', def: (filled) ? def.comuna : "", label: "comuna", ref: 'comuna', cparam: ['nombre'] },
+                { type: 'select', col: 6, disabled: '', def: (filled) ? def.region : "", label: "region", ref: 'region', cparam: ['nombre'] },
                 { type: 'number', col: 6, disabled: '', def: (filled) ? def.telefono : "", label: "telefono", ref: 'telefono' },
                 { type: 'email', col: 6, disabled: '', def: (filled) ? def.correo : "", label: "correo", ref: 'correo' },
             ]));
@@ -1411,7 +1391,7 @@ var Formulario = {
             $(".modal-body").empty().append(Template.Formulario('Impresora', 'Impresora', [
                 { type: 'text', col: 6, disabled: '', def: (filled) ? def.nombre : "", label: "nombre", ref: 'nombre' },
                 { type: 'number', col: 6, disabled: '', def: (filled) ? def.kwh : "", label: "kwh", ref: 'kwh' },
-                { type: 'select', col: 6, disabled: '', def: (filled) ? def.marca : "", label: "marca", ref: 'marca' },
+                { type: 'select', col: 6, disabled: '', def: (filled) ? def.marca : "", label: "marca", ref: 'marca', cparam: ['nombre'] },
             ]));
         })
     }
@@ -1478,14 +1458,17 @@ var Functions = {
                 parte.impresora = $(this).find("#impresora option:selected").val();
                 parte.color = $(this).find("#color option:selected").val();
                 parte.gramos = $(this).find("#gramos").val();
-                parte.horas = Persistant.Horas;
-                parte.kw = parseFloat(Persistant.KW);
 
                 Part.push(parte);
 
                 Calc.Cantidad = ($(this).find("#cantidad").val() != undefined) ? $(this).find("#cantidad").val() : 0;
                 Functions.CalcularHoras($(this).find("#minutos").val() * Calc.Cantidad);
                 Functions.CalcularUso(($(this).find("#impresora option:selected").attr('kwh') != undefined) ? $(this).find("#impresora option:selected").attr('kwh') : 0);
+
+                // parte.horas = Persistant.Horas;
+                // parte.kw = parseFloat(Persistant.KW);
+                parte.costo = Math.round(((Persistant.Valorizacion[0].costo * parte.gramos) * Calc.Cantidad) + (Persistant.Valorizacion[1].costo * Persistant.KW) + (Persistant.Valorizacion[2].costo * Persistant.Horas));
+                parte.total = Math.round(((Persistant.Valorizacion[0].venta * parte.gramos) * Calc.Cantidad) + (Persistant.Valorizacion[1].venta * Persistant.KW) + (Persistant.Valorizacion[2].venta * Persistant.Horas));
 
                 Calc.Horas += Persistant.Horas;
                 Calc.Kw += parseFloat(Persistant.KW);
@@ -1513,32 +1496,26 @@ var Functions = {
             { name: 'descuento', value: Persistant.Detalle.Descuento },
             { name: 'total', value: Persistant.Detalle.Total },
             { name: 'cliente', value: $("[name='Cliente']:checked").val() },
-        ]
+        ];
         if (Functions.ValidateForm("form")) return;
         Functions.setData('Impresion', 'Create', 0, impresion).then((imp) => {
-            $("form[ref='Parte']").each(function (i, e) {
-                let parte = $(this).serializeArray();
-                parte = parte.concat({ name: 'impresion', value: imp.returning });
-                Functions.setData('Parte', 'Create', 0, parte);
+
+            // $("form[ref='Parte']").each(function (i, e) {
+            //     let parte = $(this).serializeArray();
+            //     parte = parte.concat({ name: 'impresion', value: imp.returning });
+            //     Functions.setData('Parte', 'Create', 0, parte);
+            // });
+
+            Functions.serializeJson(Persistant.Partes).then((partes) => {
+                partes.forEach(parte => {
+                    parte = parte.concat({ name: 'impresion', value: imp.returning });
+                    Functions.setData('Parte', 'Create', 0, parte);
+                });
             });
-            (Persistant.Partes).forEach(e => {
-                let parte = [];
-                parte.push(
-                    { name: 'nombre', value: e.nombre },
-                    { name: 'cantidad', value: e.cantidad },
-                    { name: 'minutos', value: e.minutos },
-                    { name: 'impresora', value: e.impresora },
-                    { name: 'color', value: e.color },
-                    { name: 'gramos', value: e.gramos },
-                    { name: 'impresion', value: imp.returning },
-                    { name: 'impresion', value: imp.returning },
-                    { name: 'impresion', value: imp.returning },
-                    { name: 'impresion', value: imp.returning }
-                );
-            });
+
             $("form").trigger("reset");
             $("form").parent().parent().parent("[id*='Parte']").empty();
-            $("#Horas, #KW, #Costo, #Subtotal, #Descuento, #Total\\ a\\ Pagar, #Ganancia").html(0)
+            $("#Horas, #KW, #Costo, #Subtotal, #Descuento, #Total\\ a\\ Pagar, #Ganancia").html(0);
         })
     },
     FloatToTime: number => {
@@ -1885,6 +1862,22 @@ var Functions = {
     CerrarSession: () => {
         Cookies.remove('user', { path: '/' });
         window.location.href = 'index.php';
+    },
+    serializeJson: (json) => {
+        return new Promise((res, rej) => {
+            let serialized = [], conv = {}, toreturn = [];
+            json.forEach(e => {
+                (Object.keys(e)).forEach((k, i) => {
+                    conv = {};
+                    conv.nombre = k;
+                    conv.value = e[k];
+                    serialized.push(conv);
+                })
+                toreturn.push(serialized);
+                serialized = [];
+            });
+            res(toreturn);
+        })
     }
 }
 

@@ -158,12 +158,28 @@ switch (ucwords($Funcion)) {
             JOIN comun.comuna h ON c.comuna = h.id",
             true
         );
-        else if ($Accion == 'Listar-Impresiones-y-Partes'){
+        else if ($Accion == 'Listar-Impresiones-y-Partes') {
             $Datos = array();
-            $Datos = $process->read('*', 'impresion3D', 'impresion', '', '', false);
+            $Datos = $process->read(
+                "a.id, a.modelo, CONCAT(b.nombre,' ',b.apellido_paterno,' ',b.apellido_materno) cliente, a.costo, a.subtotal, a.descuento, a.total, c.nombre estado",
+                'impresion3D',
+                'impresion a',
+                '',
+                'JOIN cliente.cliente b ON a.cliente = b.id
+            JOIN comun.estado c ON a.estado = c.id',
+                false
+            );
             foreach ($Datos as $key => $value) {
                 $Parte = new stdClass;
-                $Parte = $process->read('*', 'impresion3D', 'parte', "impresion = $value[id]", '', false);
+                $Parte = $process->read(
+                    'a.id, a.impresion, a.nombre, a.cantidad, a.minutos, a.gramos, c.nombre color, b.nombre impresora',
+                    'impresion3D',
+                    'parte a',
+                    "impresion = $value[id]",
+                    'JOIN comun.impresora b ON a.impresora = b.id
+                    JOIN comun.color c ON a.color = c.id',
+                    false
+                );
                 // array_push($Datos->Impresiones[$key],$Parte);
                 $Datos[$key]['partes'] = $Parte;
             }
