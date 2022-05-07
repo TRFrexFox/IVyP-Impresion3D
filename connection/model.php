@@ -8,7 +8,17 @@ $process = new Process($conexion);
 // $process->mail();
 switch (ucwords($Funcion)) {
     case 'Dashboard':
-        if ($Accion == 'Card-Data') echo $process->read("*", "comun", "marca", "", "", true);
+        if ($Accion == 'Card-Data') echo $process->custom_read("
+        SELECT (SELECT SUM(total) FROM impresion3d.parte) total, 
+        (SELECT SUM(descuento) FROM impresion3d.impresion) descuentos,
+        (SELECT SUM(costo) FROM impresion3d.parte) costo,
+        (SELECT SUM(total) FROM impresion3d.parte)-(SELECT SUM(descuento) FROM impresion3d.impresion) ventas,
+        ((SELECT SUM(total) FROM impresion3d.parte)-(SELECT SUM(descuento) FROM impresion3d.impresion))-(SELECT SUM(costo) FROM impresion3d.parte) ganancias,
+        (SELECT COUNT(id) FROM impresion3d.parte) impresiones_realizadas,
+        (SELECT COUNT(id) FROM impresion3d.impresion) pedidos_realizados,
+        (SELECT COUNT(id) FROM impresion3d.parte WHERE estado IN (1,2,3)) partes_pendientes", true);
+        if ($Accion == 'Graph-Data') echo $process->read("*", "comun", "marca", "", "", true);
+        if ($Accion == 'Task-Data') echo $process->read("*", "comun", "marca", "", "", true);
         break;
     case 'Cliente':
         if ($Accion == 'Read') echo $process->read("a.id, a.nombre, a.apellido_paterno, a.apellido_materno, b.nombre region, c.nombre comuna, a.codigo_postal, a.rut, a.correo, a.telefono, a.fecha_nacimiento", "cliente", "cliente a", "", "LEFT JOIN comun.region b ON a.region = b.id LEFT JOIN comun.comuna c ON a.comuna = c.id", true);
@@ -39,7 +49,7 @@ switch (ucwords($Funcion)) {
         else if ($Accion == 'Delete') echo $process->delete("comun", "comuna", $_POST['Id']);
         else if ($Accion == 'Create') echo $process->create("comun", "comuna", $_POST['Obj']);
         else if ($Accion == 'Update') echo $process->update("comun", "comuna", $_POST['Obj'], $_POST['Id']);
-        else if ($Accion == 'Filter-Region') echo $process->read("a.id, a.nombre, b.nombre region, a.cut", "comun", "comuna a", "", "LEFT JOIN comun.region b ON a.region = b.id", true);
+        else if ($Accion == 'Filter-Region') echo $process->read("a.id, a.nombre, b.nombre region, a.cut", "comun", "comuna a", "a.region = " . $_POST['Filtro'], "LEFT JOIN comun.region b ON a.region = b.id", true);
         break;
     case 'Region':
         if ($Accion == 'Read') echo $process->read("*", "comun", "region", "", "", true);
@@ -109,31 +119,29 @@ switch (ucwords($Funcion)) {
     case 'Parte':
         if ($Accion == 'Read') echo $process->read("*", "impresion3d", "parte", "", "", true);
         else if ($Accion == 'Create') echo $process->create("impresion3d", "parte", $_POST['Obj']);
+        else if ($Accion == 'Update') echo $process->update("impresion3d", "parte", $_POST['Obj'], $_POST['Id']);
+        else if ($Accion == 'Listar-Partes-Pendientes') echo $process->read(
+            "a.id, b.modelo, a.nombre, c.nombre impresora, a.minutos, a.gramos, a.cantidad, d.nombre color, a.costo, a.total, e.nombre estado",
+            "impresion3d",
+            "parte a",
+            "a.estado NOT IN (5,6)",
+            "JOIN impresion3d.impresion b ON a.impresion = b.id
+            JOIN comun.impresora c ON a.impresora = c.id
+            JOIN comun.color d ON a.color = d.id
+            JOIN comun.estado e ON a.estado = e.id",
+            true
+        );
         break;
     case 'Impresion':
         if ($Accion == 'Read') echo $process->read("*", "impresion3d", "impresion", "", "", true);
         else if ($Accion == 'Create') echo $process->create("impresion3d", "impresion", $_POST['Obj']);
+        else if ($Accion == 'Update') echo $process->update("impresion3d", "impresion", $_POST['Obj'], $_POST['Id']);
         else if ($Accion == 'Listar-Partes') echo $process->read(
             "b.id, a.costo, a.subtotal, a.descuento, a.total, a.modelo, b.nombre parte, b.minutos, b.gramos, b.cantidad, c.nombre, c.apellido_paterno, c.apellido_materno, 
             c.fecha_nacimiento, g.nombre region, h.nombre comuna, c.codigo_postal, c.rut, c.correo, c.telefono, d.nombre estado, e.nombre impresora, e.kwh, e.marca, f.nombre color",
             "impresion3d",
             "impresion a",
             "",
-            "JOIN impresion3d.parte b ON a.id = b.impresion
-            JOIN cliente.cliente c ON a.cliente = c.id
-            JOIN comun.estado d ON a.estado = d.id
-            JOIN comun.impresora e ON b.impresora = e.id
-            JOIN comun.color f ON b.color = f.id
-            JOIN comun.region g ON c.region = g.id
-            JOIN comun.comuna h ON c.comuna = h.id",
-            true
-        );
-        else if ($Accion == 'Listar-Partes-Pendientes') echo $process->read(
-            "b.id, a.costo, a.subtotal, a.descuento, a.total, a.modelo, b.nombre parte, b.minutos, b.gramos, b.cantidad, c.nombre, c.apellido_paterno, c.apellido_materno, 
-            c.fecha_nacimiento, g.nombre region, h.nombre comuna, c.codigo_postal, c.rut, c.correo, c.telefono, d.nombre estado, e.nombre impresora, e.kwh, e.marca, f.nombre color",
-            "impresion3d",
-            "impresion a",
-            "estado NOT IN (5,6)",
             "JOIN impresion3d.parte b ON a.id = b.impresion
             JOIN cliente.cliente c ON a.cliente = c.id
             JOIN comun.estado d ON a.estado = d.id
@@ -161,7 +169,18 @@ switch (ucwords($Funcion)) {
         else if ($Accion == 'Listar-Impresiones-y-Partes') {
             $Datos = array();
             $Datos = $process->read(
-                "a.id, a.modelo, CONCAT(b.nombre,' ',b.apellido_paterno,' ',b.apellido_materno) cliente, a.costo, a.subtotal, a.descuento, a.total, c.nombre estado",
+                "a.id, a.modelo, CONCAT(b.nombre,' ',b.apellido_paterno,' ',b.apellido_materno) cliente,
+                (Select SUM(Costo)
+                 FROM impresion3d.parte
+                 WHERE impresion = a.id ) costo,
+                 (Select SUM(Total)
+                 FROM impresion3d.parte
+                 WHERE impresion = a.id ) subtotal,
+                a.descuento,
+                (Select SUM(Total)
+                 FROM impresion3d.parte
+                 WHERE impresion = a.id )-a.descuento total, 
+                c.nombre estado",
                 'impresion3D',
                 'impresion a',
                 '',
@@ -204,6 +223,13 @@ class Process
         $query .= (strlen($join) > 0) ? " " . $join : "";
         $query .= (strlen($where) > 0) ? " WHERE " . $where : "";
 
+        $QRes = pg_query($this->conexion, $query);
+        $Values = pg_fetch_all($QRes);
+        return ($json) ? $this->toJson($Values) : $Values;
+    }
+
+    public function custom_read($query, $json)
+    {
         $QRes = pg_query($this->conexion, $query);
         $Values = pg_fetch_all($QRes);
         return ($json) ? $this->toJson($Values) : $Values;

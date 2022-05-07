@@ -18,21 +18,24 @@ var Init = {
             //Cards
             let datos = Functions.ChargeData('Dashboard', 'Card-Data', true);
             let Datos = [
-                { xl: 3, sm: 6, icon: 'weekend', title: 'today Money', value: 50, footer: '50 than last week', color: 'bg-gradient-dark' },
-                { xl: 3, sm: 6, icon: 'person', title: 'today Users', value: 2300, footer: '5 than lask month', color: 'bg-gradient-primary' },
-                { xl: 3, sm: 6, icon: 'person', title: 'today Clients', value: 3462, footer: '5 than yesterday', color: 'bg-gradient-success' },
-                { xl: 3, sm: 6, icon: 'weekend', title: 'Sales', value: 103430, footer: '4 than yesterday', color: 'bg-gradient-info' }
+                { xl: 2, sm: 6, icon: 'view_in_ar', iclass: 'animate__animated animate__flash animate__infinite', istyle: '--animate-duration: 4s;', title: 'Pendientes', value: datos[0].partes_pendientes, footer: 'Partes pendientes a imprimir', color: 'bg-gradient-dark' },
+                { xl: 2, sm: 6, icon: 'person', iclass: '', istyle: '', title: 'today Users', value: 2300, footer: '5 than lask month', color: 'bg-gradient-primary' },
+                { xl: 2, sm: 6, icon: 'person', iclass: '', istyle: '', title: 'today Clients', value: 3462, footer: '5 than yesterday', color: 'bg-gradient-success' },
+                { xl: 2, sm: 6, icon: 'weekend', iclass: '', istyle: '', title: 'Sales', value: 103430, footer: '4 than yesterday', color: 'bg-gradient-info' },
+                { xl: 2, sm: 6, icon: 'weekend', iclass: '', istyle: '', title: 'Sales', value: 103430, footer: '4 than yesterday', color: 'bg-gradient-info' },
+                { xl: 2, sm: 6, icon: 'weekend', iclass: '', istyle: '', title: 'Sales', value: 103430, footer: '4 than yesterday', color: 'bg-gradient-info' }
             ]
             $("#Contenedor").append('<div id="DCard" class="row"></div><div id="DGraph" class="row mt-4"></div><div id="DTask" class="row mb-4"></div>')
             Datos.forEach((e, i) => {
-                $("#DCard").append(Template.Card(e.xl, e.sm, e.icon, e.title, e.value, e.footer, e.color));
+                $("#DCard").append(Template.Card(e.xl, e.sm, e.icon, e.iclass, e.istyle, e.title, e.value, e.footer, e.color));
             });
 
             //Graphs
             let Datos2 = [
-                { lg: 4, md: 6, chid: 'chart-bars', chheight: 170, title: 'Website Views', subtitle: '50 than last week', icon: 'schedule', footer: 'test', color: 'bg-gradient-primary' },
-                { lg: 4, md: 6, chid: 'chart-line', chheight: 170, title: 'Daily Sales', subtitle: '5 than lask month', icon: 'schedule', footer: 'test', color: 'bg-gradient-success' },
-                { lg: 4, md: 6, chid: 'chart-line-tasks', chheight: 170, title: 'Completed Tasks', subtitle: '5 than yesterday', icon: 'schedule', footer: 'test', color: 'bg-gradient-dark' }
+                { lg: 3, md: 6, chid: 'chart-bars', chheight: 170, title: 'Website Views', subtitle: '50 than last week', icon: 'schedule', footer: 'test', color: 'bg-gradient-primary' },
+                { lg: 3, md: 6, chid: 'chart-line', chheight: 170, title: 'Daily Sales', subtitle: '5 than lask month', icon: 'schedule', footer: 'test', color: 'bg-gradient-success' },
+                { lg: 3, md: 6, chid: 'chart-line-tasks', chheight: 170, title: 'Completed Tasks', subtitle: '5 than yesterday', icon: 'schedule', footer: 'test', color: 'bg-gradient-dark' },
+                { lg: 3, md: 6, chid: 'chart-line-tasks', chheight: 170, title: 'Completed Tasks', subtitle: '5 than yesterday', icon: 'schedule', footer: 'test', color: 'bg-gradient-dark' }
             ]
             Datos2.forEach((e, i) => {
                 $("#DGraph").append(Template.Graph(e.lg, e.md, e.chid, e.chheight, e.title, e.subtitle, e.icon, e.footer, e.color));
@@ -109,7 +112,7 @@ var Init = {
                 .append(Template.CardTable('Solicitud', false, 9, true, 'Solicitud', false, { fn: "Functions.addParte()" }, true));
             $("#Solicitud .card-body").append(Formulario.Solicitud());
             $("#Solicitud").append(Template.CardTable('Parte', false, 12, true, 'Parte', false, false, true, 'margin-top:50px'));
-            $("#Parte > .card > .card-body").append(Formulario.Parte());
+            $("#Parte > .card > .card-body").append(Formulario.Parte(0, false, 3, true));
 
             $("#Detalle").append(Template.CardTable('Clientes', false, 12, true, 'Clientes', false, { fn: 'Formulario.Cliente()' }, false, 'margin-top:50px'));
             $("#Detalle > .card > .card-body").append(Template.Detalle([
@@ -135,29 +138,37 @@ var Init = {
             $("#ListImpresiones .card-body").append(Template.Table("ListImpresiones", Functions.ChargeData('Impresion', 'Listar-Impresiones-y-Partes', true),
                 [
                     {
-                        class: 'btn btn-info btn-accion', cattr: '', icon: 'fas fa-eye', text: '',
-                        fn: "$(\'.modal-body\').empty().append(Template.Imp3DDetalle(this.attributes.rowid.value,'Impresion'));" +
-                            "$(\'.modal-footer\').empty();" +
-                            "$(\'.modal-title\').empty().append(\'Detalle de Impresion\');" +
-                            "$(\'#modal\').modal(\'show\')"
-                    },
-                    {
                         class: 'btn btn-primary btn-accion', cattr: '', icon: 'fas fa-list', text: '',
-                        fn: "$(\'.modal-body\').empty().append(Template.Table(\'ListPartes\', Persistant.Impresion[this.attributes.rowid.value-1].partes,[],[0,1]));" +
+                        fn: "$('body').append(Template.Modal('modal', [{}], 'modal-xl'));" +
+                            "Persistant.SelectedRow = this.attributes.rowid.value;" +
+                            "$(\'.modal-body\').empty().append(Template.Table(\'ListPartes\', Persistant.Impresion.find(x => x.id == this.attributes.rowid.value).partes," +
+                            "[" +
+                            "{" +
+                            "class: 'btn btn-success btn-accion', cattr: '', icon: 'fas fa-edit', text: ''," +
+                            "fn: '$(body).append(Template.Modal(\\'modal-second\\', [{" +
+                            "class: \\'btn btn-success\\', cattr: \\'\\', icon: \\'fas fa-edit\\', text: \\'Actualizar\\'," +
+                            "fn: \\'test()\\'," +
+                            "attr: \\'\\'" +
+                            "}], \\'modal-md\\', false));" +
+                            "$(\\'#modal-second .modal-body\\').empty().append(Formulario.Parte(Persistant.Impresion.find(x => x.id == Persistant.SelectedRow).partes.find(y => y.id == this.attributes.rowid.value), true, 6, false));" +
+                            "$(\\'#modal-second\\').modal(\\'show\\');'" +
+                            "}" +
+                            "],[0,1]));" +
                             "$(\'.modal-footer\').empty();" +
-                            "$(\'.modal-title\').empty().append(\'Detalle de Partes - \'+Persistant.Impresion[this.attributes.rowid.value-1].modelo);" +
+                            "$(\'.modal-title\').empty().append(\'Detalle de Partes - \'+Persistant.Impresion.find(x => x.id == this.attributes.rowid.value).modelo);" +
                             "$(\'#modal\').modal(\'show\');" +
                             "$(\'#ListPartes\').DataTable();"
                     },
                     {
                         class: 'btn btn-success btn-accion', cattr: '', icon: 'fas fa-edit', text: '',
-                        fn: 'Formulario.Impresion(this.attributes.rowid.value, true)'
+                        fn: 'Formulario.Impresion(this.attributes.rowid.value, true);'
                     }
                 ],
                 [8],
                 []
             ));
-            $("body").append(Template.Modal('modal', [{}], 'modal-xl'))
+            // $("body").append(Template.Modal('modal', [{}], 'modal-xl'));
+            // $("body").append(Template.Modal('modal-second', [{}], 'modal-sm', false))
             $("table").DataTable();
         })
     },
@@ -165,22 +176,15 @@ var Init = {
         Functions.MenuSelection("Pendientes", "bg-gradient-primary", 'animate__animated animate__headShake');
         Functions.Transition('main', '#Contenedor').then(() => {
             $("#Contenedor").append(Template.CardTable('ListImpresiones', true, 12, true, 'Impresion - Partes', false, false));
-            $("#ListImpresiones .card-body").append(Template.Table("ListImpresiones", Functions.ChargeData('Impresion', 'Listar-Partes-Pendientes', true),
+            $("#ListImpresiones .card-body").append(Template.Table("ListImpresiones", Functions.ChargeData('Parte', 'Listar-Partes-Pendientes', true),
                 [
                     {
-                        class: 'btn btn-info btn-accion', cattr: '', icon: 'fas fa-eye', text: '',
-                        fn: "$(\'.modal-body\').empty().append(Template.Imp3DDetalle(this.attributes.rowid.value,'Impresion'));" +
-                            "$(\'.modal-footer\').empty();" +
-                            "$(\'.modal-title\').empty().append(\'Detalle de Impresion\');" +
-                            "$(\'#modal\').modal(\'show\')"
-                    },
-                    {
                         class: 'btn btn-success btn-accion', cattr: '', icon: 'fas fa-edit', text: '',
-                        fn: 'Formulario.Impresion(this.attributes.rowid.value, true)'
+                        fn: 'Formulario.DetParte(this.attributes.rowid.value, true)'
                     }
                 ],
                 [],
-                [1, 2, 3, 4, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 22, 23]
+                []
             ));
             $("body").append(Template.Modal('modal', [{}]))
             $("table").DataTable();
@@ -195,7 +199,7 @@ var Init = {
                 .append(Template.CardTable('Solicitud', false, 9, true, 'Solicitud', false, { fn: "Functions.addParte()" }));
             $("#Solicitud .card-body").append(Formulario.Solicitud());
             $("#Solicitud").append(Template.CardTable('Parte', false, 12, true, 'Parte', false, false, false, 'margin-top:50px'));
-            $("#Parte > .card > .card-body").append(Formulario.Parte());
+            $("#Parte > .card > .card-body").append(Formulario.Parte(0, false, 3, true));
 
             $("#Detalle").append(Template.CardTable('Clientes', false, 12, true, 'Clientes', false, false, false, 'margin-top:50px'));
             $("#Detalle > .card > .card-body").append(Template.Detalle([
@@ -316,11 +320,11 @@ var Template = {
         '</div>' +
         '</div>' +
         '</aside>',
-    Card: (xl = 3, sm = 6, icon, title, value, footer, color) => '<div class="col-xl-' + xl + ' col-sm-' + sm + ' mb-xl-0 mb-4">' +
+    Card: (xl = 3, sm = 6, icon, iclass, istyle, title, value, footer, color) => '<div class="col-xl-' + xl + ' col-sm-' + sm + ' mb-xl-0 mb-4">' +
         '<div class="card">' +
         '<div class="card-header p-3 pt-2">' +
         '<div class="icon icon-lg icon-shape ' + color + ' shadow-dark text-center border-radius-xl mt-n4 position-absolute">' +
-        '<i class="material-icons opacity-10">' + icon + '</i>' +
+        '<i class="material-icons opacity-10 '+iclass+'" style="'+istyle+'">' + icon + '</i>' +
         '</div>' +
         '<div class="text-end pt-1">' +
         '<p class="text-sm mb-0 text-capitalize">' + title + '</p >' +
@@ -406,16 +410,16 @@ var Template = {
         '<td>' +
         '<div class="avatar-group mt-2">' +
         '<a href="javascript:;" class="avatar avatar-xs rounded-circle" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Ryan Tompson">' +
-        '<img src="assets/img/team-1.jpg" alt="team1">' +
+        // '<img src="assets/img/team-1.jpg" alt="team1">' +
         '</a>' +
         '<a href="javascript:;" class="avatar avatar-xs rounded-circle" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Romina Hadid">' +
-        '<img src="assets/img/team-2.jpg" alt="team2">' +
+        // '<img src="assets/img/team-2.jpg" alt="team2">' +
         '</a>' +
         '<a href="javascript:;" class="avatar avatar-xs rounded-circle" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Alexander Smith">' +
-        '<img src="assets/img/team-3.jpg" alt="team3">' +
+        // '<img src="assets/img/team-3.jpg" alt="team3">' +
         '</a>' +
         '<a href="javascript:;" class="avatar avatar-xs rounded-circle" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Jessica Doe">' +
-        '<img src="assets/img/team-4.jpg" alt="team4">' +
+        // '<img src="assets/img/team-4.jpg" alt="team4">' +
         '</a>' +
         '</div>' +
         '</td>' +
@@ -628,7 +632,7 @@ var Template = {
             '<a class="dropdown-item border-radius-md" href="javascript:;">' +
             '<div class="d-flex py-1">' +
             '<div class="my-auto">' +
-            '<img src="./assets/img/team-2.jpg" class="avatar avatar-sm  me-3 ">' +
+            // '<img src="./assets/img/team-2.jpg" class="avatar avatar-sm  me-3 ">' +
             '</div>' +
             '<div class="d-flex flex-column justify-content-center">' +
             '<h6 class="text-sm font-weight-normal mb-1">' +
@@ -753,8 +757,8 @@ var Template = {
             '</div>';
         return html;
     },
-    Modal: (id, btn, size = '') => {
-        $('.modal').remove();
+    Modal: (id, btn, size = '', remove = true) => {
+        (remove) ? $('.modal').remove() : '';
         let html = '<div class="modal fade" id="' + id + '" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">' +
             '<div class="modal-dialog ' + size + '">' +
             '<div class="modal-content">' +
@@ -765,7 +769,7 @@ var Template = {
             '<div class="modal-body"></div>' +
             '<div class="modal-footer">';
         btn.forEach(e => {
-            html += '<button class="' + e.class + '" onclick="' + e.fn + '">' + e.text + '</button>';
+            html += '<button class="' + e.class + '" onclick="' + e.fn + '" ' + e.attr + '>' + e.text + '</button>';
         });
         html += '</div>' +
             '</div>' +
@@ -773,7 +777,7 @@ var Template = {
             '</div>';
         return html;
     },
-    Formulario: (id, ref, form) => {
+    Formulario: (id, ref, form, filter = '') => {
         let html = '<form id="' + id + '" ref="' + ref + '">' +
             '<div class="row">';
         form.forEach(Val => {
@@ -783,7 +787,7 @@ var Template = {
                 html += '<input type="text" id="' + Val.ref + '" name="' + Val.ref + '" class="form-control custom-input ' + Val.class + '" ' + Val.fn + ' value="' + ((Val.def != undefined) ? Val.def : "") + '" ' + Val.disabled + ' ' + Val.required + '/>';
             } else if (Val.type == "select") {
                 let data = Functions.ChargeData(Val.ref, 'Read');
-                html += Template.Select(Val.ref, data, Val.fn, Val.def, Val.cparam);
+                html += Template.Select(Val.ref, data, Val.fn, Val.def, Val.cparam, Val.disabled);
             } else if (Val.type == "password") {
                 html += '<input type="password" id="' + Val.ref + '" name="' + Val.ref + '" class="form-control custom-input ' + Val.class + '" ' + Val.fn + ' value="' + ((Val.def != undefined) ? Val.def : "") + '" ' + Val.disabled + ' ' + Val.required + '/>';
             } else if (Val.type == "date") {
@@ -805,9 +809,9 @@ var Template = {
             '</form>';
         return html;
     },
-    Select: (id, data, fn, def, cparam = 'nombre') => {
+    Select: (id, data, fn, def, cparam = 'nombre', disabled = '') => {
         let attr;
-        let html = '<select id="' + id + '" name="' + id + '" class="form-control custom-input" ' + fn + ' style="width: 100% !important;">';
+        let html = '<select id="' + id + '" name="' + id + '" class="form-control custom-input" ' + fn + ' style="width: 100% !important;" ' + disabled + '>';
         let selected = "";
         html += '<option value="-1" ' + ((def == undefined) ? 'selected' : '') + ' readonly>Seleccione</option>';
         data.forEach(e => {
@@ -817,11 +821,11 @@ var Template = {
             });
             selected = "";
             cparam.forEach(param => {
-                selected += e[param]+' ';
+                selected += e[param] + ' ';
             });
             html += '<option ' + ((def == selected.trim()) ? 'selected' : '') + ' value="' + e.id + '" ' + attr + '>';
             cparam.forEach(param => {
-                html += e[param]+' ';
+                html += e[param] + ' ';
             });
             html += '</option>';
         });
@@ -1167,7 +1171,7 @@ var Template = {
             '</li>' +
             '<li class="list-group-item border-0 d-flex align-items-center px-0 mb-2">' +
             '<div class="avatar me-3">' +
-            '<img src="assets/img/team-4.jpg" alt="kal" class="border-radius-lg shadow">' +
+            // '<img src="assets/img/team-4.jpg" alt="kal" class="border-radius-lg shadow">' +
             '</div>' +
             '<div class="d-flex align-items-start flex-column justify-content-center">' +
             '<h6 class="mb-0 text-sm">Peterson</h6>' +
@@ -1177,7 +1181,7 @@ var Template = {
             '</li>' +
             '<li class="list-group-item border-0 d-flex align-items-center px-0">' +
             '<div class="avatar me-3">' +
-            '<img src="assets/img/team-3.jpg" alt="kal" class="border-radius-lg shadow">' +
+            // '<img src="assets/img/team-3.jpg" alt="kal" class="border-radius-lg shadow">' +
             '</div>' +
             '<div class="d-flex align-items-start flex-column justify-content-center">' +
             '<h6 class="mb-0 text-sm">Nick Daniel</h6>' +
@@ -1208,16 +1212,15 @@ var Formulario = {
     Modal: (ref, id, filled) => {
         return new Promise((res, rej) => {
             let def;
-            $("#modal").remove();
             $("body").append(Template.Modal('modal', [
                 { class: 'btn btn-info', text: 'Limpiar', fn: '$(\'form#' + ref + '\')[0].reset()' },
                 { class: 'btn btn-success', text: ((!filled) ? 'Agregar' : 'Actualizar'), fn: 'Functions.setData(\'' + ref + '\', \'' + ((!filled) ? 'Create' : 'Update') + '\', ' + ((!filled) ? 0 : id) + ', $(\'form#' + ref + '\').serializeArray()).then(()=>{$(\'#modal\').modal(\'hide\');$(\'[tab=' + ref + ']\').click()})' }
             ]));
             if (filled) {
-                $(".modal-title").empty().append("Editar " + ref);
+                $("#modal .modal-title").empty().append("Editar " + ref);
                 def = Persistant[ref].find(x => x.id == id);
             } else
-                $(".modal-title").empty().append("Agregar " + ref);
+                $("#modal .modal-title").empty().append("Agregar " + ref);
 
             $("#modal").modal("show");
             res(def);
@@ -1230,8 +1233,8 @@ var Formulario = {
                 { type: 'text', col: 6, disabled: '', def: (filled) ? def.apellido_paterno : "", label: "apellido paterno*", ref: 'apellido_paterno' },
                 { type: 'text', col: 6, disabled: '', def: (filled) ? def.apellido_materno : "", label: "apellido materno*", ref: 'apellido_materno' },
                 { type: 'date', col: 6, disabled: '', def: (filled) ? def.fecha_nacimiento : "", label: "fecha de nacimiento", ref: 'fecha_nacimiento' },
-                { type: 'select', col: 6, disabled: '', def: (filled) ? def.region : "", label: "region", ref: 'region', cparam: ['nombre'] },
-                { type: 'select', col: 6, disabled: '', def: (filled) ? def.comuna : "", label: "comuna", ref: 'comuna', cparam: ['nombre'] },
+                { type: 'select', col: 6, disabled: '', def: (filled) ? def.region : "", label: "region", ref: 'region', cparam: ['nombre'], fn: 'onchange="Functions.ChargeSelect(\'#comuna\', \'Comuna\', \'Filter-Region\', false, this.value)"' },
+                { type: 'select', col: 6, disabled: 'disabled = "disabled"', def: (filled) ? def.comuna : "", label: "comuna", ref: 'comuna', cparam: ['nombre'] },
                 { type: 'number', col: 6, disabled: '', def: (filled) ? def.codigo_postal : "", label: "codigo postal", ref: 'codigo_postal' },
                 { type: 'text', col: 6, disabled: '', def: (filled) ? def.rut : "", label: "rut", ref: 'rut' },
                 { type: 'email', col: 6, disabled: '', def: (filled) ? def.correo : "", label: "correo", ref: 'correo' },
@@ -1314,25 +1317,38 @@ var Formulario = {
             { type: 'number', col: 3, disabled: '', label: "descuento (Opcional)", ref: 'descuento', fn: 'oninput="Functions.CalcularDetalle()"', required: 'required', min: 0 },
         ]));
     },
-    Parte: () => {
+    Parte: (obj, filled, col, wfn = false) => {
         return Template.Formulario('Parte', 'Parte', [
-            { type: 'text', col: 3, disabled: '', label: "nombre", ref: 'nombre', fn: 'oninput="Functions.CalcularDetalle()"' },
-            { type: 'number', col: 3, disabled: '', label: "cantidad", ref: 'cantidad', fn: 'oninput="Functions.CalcularDetalle()"' },
-            { type: 'number', col: 3, disabled: '', label: "minutos", ref: 'minutos', fn: 'oninput="Functions.CalcularDetalle()"' },
-            { type: 'select', col: 3, disabled: '', label: "impresora", ref: 'impresora', fn: 'onchange="Functions.CalcularDetalle()"', cparam: ['nombre'] },
-            { type: 'select', col: 3, disabled: '', label: "color", ref: 'color', fn: 'oninput="Functions.CalcularDetalle()"', cparam: ['nombre'] },
-            { type: 'number', col: 3, disabled: '', label: "gramos", ref: 'gramos', fn: 'oninput="Functions.CalcularDetalle()"' },
+            { type: 'text', col: col, disabled: '', def: (filled) ? obj.nombre : '', label: "nombre", ref: 'nombre', fn: (wfn) ? 'oninput="Functions.CalcularDetalle()"' : '' },
+            { type: 'number', col: col, disabled: '', def: (filled) ? obj.cantidad : '', label: "cantidad", ref: 'cantidad', fn: (wfn) ? 'oninput="Functions.CalcularDetalle()"' : '' },
+            { type: 'number', col: col, disabled: '', def: (filled) ? obj.minutos : '', label: "minutos", ref: 'minutos', fn: (wfn) ? 'oninput="Functions.CalcularDetalle()"' : '' },
+            { type: 'select', col: col, disabled: '', def: (filled) ? obj.impresora : '', label: "impresora", ref: 'impresora', fn: (wfn) ? 'onchange="Functions.CalcularDetalle()"' : '', cparam: ['nombre'] },
+            { type: 'select', col: col, disabled: '', def: (filled) ? obj.color : '', label: "color", ref: 'color', fn: (wfn) ? 'oninput="Functions.CalcularDetalle()"' : '', cparam: ['nombre'] },
+            { type: 'number', col: col, disabled: '', def: (filled) ? obj.gramos : '', label: "gramos", ref: 'gramos', fn: (wfn) ? 'oninput="Functions.CalcularDetalle()"' : '' },
         ]);
+    },
+    DetParte: (id, filled) => {
+        Formulario.Modal("Parte", id, filled).then((def) => {
+            $(".modal-body").empty().append(Template.Formulario('Parte', 'Parte', [
+                { type: 'text', col: 6, disabled: '', def: (filled) ? def.nombre : "", label: "nombre", ref: 'nombre' },
+                { type: 'select', col: 6, disabled: '', def: (filled) ? def.impresora : "", label: "impresora", ref: 'impresora', cparam: ['nombre'] },
+                { type: 'select', col: 6, disabled: '', def: (filled) ? def.estado : "", label: "estado", ref: 'estado', cparam: ['nombre'] },
+                { type: 'select', col: 6, disabled: '', def: (filled) ? def.color : "", label: "color", ref: 'color', cparam: ['nombre'] },
+                { type: 'number', col: 6, disabled: '', def: (filled) ? def.minutos : "", label: "minutos", ref: 'minutos' },
+                { type: 'number', col: 6, disabled: '', def: (filled) ? def.gramos : "", label: "gramos", ref: 'gramos' },
+                { type: 'number', col: 6, disabled: '', def: (filled) ? def.cantidad : "", label: "cantidad", ref: 'cantidad' },
+                { type: 'number', col: 6, disabled: '', def: (filled) ? def.costo : "", label: "costo", ref: 'costo' },
+                { type: 'number', col: 6, disabled: '', def: (filled) ? def.total : "", label: "total", ref: 'total' },
+                { type: 'date', col: 6, disabled: '', def: (filled) ? def.fecha_impresion : "", label: "fecha_impresion", ref: 'fecha_impresion' },
+            ]));
+        })
     },
     Impresion: (id, filled) => {
         Formulario.Modal("Impresion", id, filled).then((def) => {
             $(".modal-body").empty().append(Template.Formulario('Impresion', 'Impresion', [
+                { type: 'select', col: 6, disabled: '', def: (filled) ? def.cliente : "", label: "cliente", ref: 'cliente', cparam: ['nombre', 'apellido_paterno', 'apellido_materno'] },
                 { type: 'select', col: 6, disabled: '', def: (filled) ? def.estado : "", label: "estado", ref: 'estado', cparam: ['nombre'] },
-                { type: 'number', col: 6, disabled: '', def: (filled) ? def.descuento : "", label: "descuento", ref: 'descuento' },
-                { type: 'number', col: 6, disabled: '', def: (filled) ? def.costo : "", label: "costo", ref: 'costo' },
-                { type: 'number', col: 6, disabled: '', def: (filled) ? def.subtotal : "", label: "subtotal", ref: 'subtotal' },
-                { type: 'number', col: 6, disabled: '', def: (filled) ? def.total : "", label: "total", ref: 'total' },
-                { type: 'select', col: 6, disabled: '', def: (filled) ? def.cliente : "", label: "cliente", ref: 'cliente', cparam: ['nombre','apellido_paterno','apellido_materno'] },
+                { type: 'number', col: 6, disabled: '', def: (filled) ? def.descuento : "", label: "descuento", ref: 'descuento', fn: '' },
             ]));
         })
     },
@@ -1402,12 +1418,12 @@ var Functions = {
         $(".tab-panel").removeClass("tab-panel-active")
         $("#" + obj.attributes.tab.value).addClass("tab-panel-active")
     },
-    ChargeData: (funcion, accion, persistant = false) => {
+    ChargeData: (funcion, accion, persistant = false, filtro = '') => {
         let datos = $.ajax({
             url: "connection/model.php",
             dataType: "script",
             type: 'POST',
-            data: { Funcion: funcion, Accion: accion },
+            data: { Funcion: funcion, Accion: accion, Filtro: filtro },
             success: function (data) { },
             async: false,
             error: function (err) {
@@ -1416,6 +1432,15 @@ var Functions = {
         }).responseText;
         (persistant) ? Persistant[funcion.toString()] = JSON.parse(datos) : "";
         return JSON.parse(datos);
+    },
+    ChargeSelect: (target, funcion, accion, persistant = false, filtro = '') => {
+        var dt = $.map(Functions.ChargeData(funcion, accion, persistant, filtro), function (obj) {
+            let rt = {};
+            rt.id = obj.id;
+            rt.text = obj.nombre;
+            return rt;
+        });
+        $(target).empty().prop("disabled", false).select2({ data: dt, dropdownParent: $('#modal') });
     },
     setData: (funcion, accion, id = 0, obj = [{}]) => {
         return new Promise((res, rej) => {
@@ -1435,7 +1460,7 @@ var Functions = {
     addParte: () => {
         let version = Persistant.Incremental++;
         $("#Solicitud").append(Template.CardTable('Parte' + version, false, 12, true, 'Parte', false, false, true, 'margin-top:50px'));
-        $("#Parte" + version + " > .card > .card-body").append(Formulario.Parte());
+        $("#Parte" + version + " > .card > .card-body").append(Formulario.Parte(0, false, 3, true));
     },
     CalcularHoras: (valor) => {
         Persistant.Horas = parseInt(valor) / 60;
@@ -1491,10 +1516,7 @@ var Functions = {
     PrepararSolicitud3D: () => {
         let impresion = [
             { name: 'modelo', value: $("form#Solicitud").find("#nombre").val() },
-            { name: 'costo', value: Persistant.Detalle.Costo },
-            { name: 'subtotal', value: Persistant.Detalle.Subtotal },
             { name: 'descuento', value: Persistant.Detalle.Descuento },
-            { name: 'total', value: Persistant.Detalle.Total },
             { name: 'cliente', value: $("[name='Cliente']:checked").val() },
         ];
         if (Functions.ValidateForm("form")) return;
