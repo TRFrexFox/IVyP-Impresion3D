@@ -75,12 +75,19 @@ switch (ucwords($Funcion)) {
         else if ($Accion == 'Update') echo $process->update("comun", "valorizacion", $_POST['Obj'], $_POST['Id']);
         else if ($Accion == 'Delete') echo $process->delete("comun", "valorizacion", $_POST['Id']);
         break;
-    case 'Formato_papel':
-    case 'Formato_Papel':
-        if ($Accion == 'Read') echo $process->read("a.id, a.nombre, a.medida, b.nombre medicion", "comun", "formato_papel a", "", "JOIN comun.medicion b ON a.medicion = b.id", true);
-        else if ($Accion == 'Create') echo $process->create("comun", "formato_papel", $_POST['Obj']);
-        else if ($Accion == 'Update') echo $process->update("comun", "formato_papel", $_POST['Obj'], $_POST['Id']);
-        else if ($Accion == 'Delete') echo $process->delete("comun", "formato_papel", $_POST['Id']);
+    case 'Formato_hoja':
+    case 'Formato_Hoja':
+        if ($Accion == 'Read') echo $process->read("a.id, a.nombre, a.medida, b.nombre medicion", "comun", "formato_hoja a", "", "JOIN comun.medicion b ON a.medicion = b.id", true);
+        else if ($Accion == 'Create') echo $process->create("comun", "formato_hoja", $_POST['Obj']);
+        else if ($Accion == 'Update') echo $process->update("comun", "formato_hoja", $_POST['Obj'], $_POST['Id']);
+        else if ($Accion == 'Delete') echo $process->delete("comun", "formato_hoja", $_POST['Id']);
+        break;
+    case 'Tipo_hoja':
+    case 'Tipo_Hoja':
+        if ($Accion == 'Read') echo $process->read("*", "comun", "tipo_hoja", "", "", true);
+        else if ($Accion == 'Create') echo $process->create("comun", "tipo_hoja", $_POST['Obj']);
+        else if ($Accion == 'Update') echo $process->update("comun", "tipo_hoja", $_POST['Obj'], $_POST['Id']);
+        else if ($Accion == 'Delete') echo $process->delete("comun", "tipo_hoja", $_POST['Id']);
         break;
     case 'Textura':
         if ($Accion == 'Read') echo $process->read("*", "comun", "textura", "", "", true);
@@ -88,17 +95,11 @@ switch (ucwords($Funcion)) {
         else if ($Accion == 'Update') echo $process->update("comun", "textura", $_POST['Obj'], $_POST['Id']);
         else if ($Accion == 'Delete') echo $process->delete("comun", "textura", $_POST['Id']);
         break;
-    case 'Papel':
-        if ($Accion == 'Read') echo $process->read("*", "comun", "papel", "", "", true);
-        else if ($Accion == 'Create') echo $process->create("comun", "papel", $_POST['Obj']);
-        else if ($Accion == 'Update') echo $process->update("comun", "papel", $_POST['Obj'], $_POST['Id']);
-        else if ($Accion == 'Delete') echo $process->delete("comun", "papel", $_POST['Id']);
-        break;
-    case 'Papeleria':
-        if ($Accion == 'Read') echo $process->read("a.id, a.nombre, b.nombre marca, a.cantidad, c.nombre formato_papel, a.precio, d.nombre color, e.nombre textura", "materia", "papeleria a", "", "JOIN comun.marca b ON a.marca = b.id JOIN comun.formato_papel c ON a.formato_papel = c.id JOIN comun.color d ON a.color = d.id JOIN comun.textura e ON a.textura = e.id ", true);
-        else if ($Accion == 'Create') echo $process->create("materia", "papeleria", $_POST['Obj']);
-        else if ($Accion == 'Update') echo $process->update("materia", "papeleria", $_POST['Obj'], $_POST['Id']);
-        else if ($Accion == 'Delete') echo $process->delete("materia", "papeleria", $_POST['Id']);
+    case 'Hoja':
+        if ($Accion == 'Read') echo $process->read("a.id, a.nombre, b.nombre marca, a.cantidad, a.gramaje, d.nombre color, c.nombre formato_hoja, e.nombre textura, f.nombre tipo_hoja, a.costo, a.venta", "materia", "hoja a", "", "JOIN comun.marca b ON a.marca = b.id JOIN comun.formato_hoja c ON a.formato_hoja = c.id JOIN comun.color d ON a.color = d.id JOIN comun.textura e ON a.textura = e.id JOIN comun.tipo_hoja f ON a.tipo_hoja = f.id ", true);
+        else if ($Accion == 'Create') echo $process->create("materia", "hoja", $_POST['Obj']);
+        else if ($Accion == 'Update') echo $process->update("materia", "hoja", $_POST['Obj'], $_POST['Id']);
+        else if ($Accion == 'Delete') echo $process->delete("materia", "hoja", $_POST['Id']);
         break;
     case 'Medicion':
         if ($Accion == 'Read') echo $process->read("*", "comun", "medicion", "", "", true);
@@ -114,6 +115,9 @@ switch (ucwords($Funcion)) {
         break;
     case 'Impresora':
         if ($Accion == 'Read') echo $process->read("a.id, a.nombre, a.kwh, b.nombre marca", "comun", "impresora a", "", "JOIN comun.marca b ON a.marca = b.id", true);
+        else if ($Accion == 'Create') echo $process->create("comun", "impresora", $_POST['Obj']);
+        else if ($Accion == 'Update') echo $process->update("comun", "impresora", $_POST['Obj'], $_POST['Id']);
+        else if ($Accion == 'Delete') echo $process->delete("comun", "impresora", $_POST['Id']);
         break;
     case 'Categoria':
     case 'Parte':
@@ -205,8 +209,54 @@ switch (ucwords($Funcion)) {
             echo json_encode($Datos);
         }
         break;
+    case 'Documento':
+        if ($Accion == 'Read') echo $process->read("*", "impresionpapel", "documento", "", "", true);
+        else if ($Accion == 'Update') echo $process->update("impresionpapel", "documento", $_POST['Obj'], $_POST['Id']);
+        else if ($Accion == 'Delete') echo $process->delete("impresionpapel", "documento", $_POST['Id']);
+        else if ($Accion == 'Carga-Documento') echo $process->setDocument("impresionpapel", "documento");
+        break;
+    case 'Anillo':
+        if ($Accion == 'Read') echo $process->read(
+            "a.id, a.nombre, a.diametro, a.largo, b.nombre material, c.nombre color, a.cantidad, d.nombre marca, a.costo, a.venta, e.nombre forma",
+            "materia",
+            "anillo a",
+            "",
+            "JOIN comun.material b ON a.material = b.id
+            JOIN comun.color c ON a.color = c.id
+            JOIN comun.marca d ON a.marca = d.id
+            JOIN comun.forma e ON a.forma = e.id",
+            true
+        );
+        else if ($Accion == 'Create') echo $process->create("materia", "anillo", $_POST['Obj']);
+        else if ($Accion == 'Update') echo $process->update("materia", "anillo", $_POST['Obj'], $_POST['Id']);
+        else if ($Accion == 'Delete') echo $process->delete("materia", "anillo", $_POST['Id']);
+        break;
+    case 'Material':
+        if ($Accion == 'Read') echo $process->read("*", "comun", "material", "", "", true);
+        else if ($Accion == 'Create') echo $process->create("comun", "material", $_POST['Obj']);
+        else if ($Accion == 'Update') echo $process->update("comun", "material", $_POST['Obj'], $_POST['Id']);
+        else if ($Accion == 'Delete') echo $process->delete("comun", "material", $_POST['Id']);
+        break;
+    case 'Forma':
+        if ($Accion == 'Read') echo $process->read("*", "comun", "forma", "", "", true);
+        else if ($Accion == 'Create') echo $process->create("comun", "forma", $_POST['Obj']);
+        else if ($Accion == 'Update') echo $process->update("comun", "forma", $_POST['Obj'], $_POST['Id']);
+        else if ($Accion == 'Delete') echo $process->delete("comun", "forma", $_POST['Id']);
+        break;
+    case 'Tinta':
+        if ($Accion == 'Read') echo $process->read(
+            "a.id, a.nombre, b.nombre marca, a.cantidad, c.abreviacion medicion, a.rendimiento, d.nombre color, a.costo", 
+            "materia", "tinta a", 
+            "", 
+            "JOIN comun.marca b ON a.marca = b.id
+            JOIN comun.medicion c ON a.medicion = c.id
+            JOIN comun.color d ON a.color = d.id", 
+            true);
+        else if ($Accion == 'Create') echo $process->create("materia", "tinta", $_POST['Obj']);
+        else if ($Accion == 'Update') echo $process->update("materia", "tinta", $_POST['Obj'], $_POST['Id']);
+        else if ($Accion == 'Delete') echo $process->delete("materia", "tinta", $_POST['Id']);
+        break;
 }
-
 
 class Process
 {
@@ -281,6 +331,50 @@ class Process
     {
         $Query = "DELETE FROM $Schema.$Table WHERE id = $Id";
         return (pg_query($this->conexion, $Query)) ? json_encode(array('status' => 'Registro Exitoso')) : 'Ocurrio un error';
+    }
+
+    public function setDocument()
+    {
+        $dir_subida = '../docs/';
+        $count = 0;
+        $success = 0;
+
+        for ($i = 0; $i < $_POST['count']; $i++) {
+            $documentos  = scandir('../docs');
+            if (!in_array($_FILES['documento' . $i]['name'], $documentos)) {
+                $fichero_subido = $dir_subida . basename($_FILES['documento' . $i]['name']);
+                if (move_uploaded_file($_FILES['documento' . $i]['tmp_name'], $fichero_subido)) {
+                    $reversedParts = explode('.', strrev($_FILES['documento' . $i]['name']), 2);
+
+                    if (strrev($reversedParts[0]) == 'pdf') {
+                        $pdf = file_get_contents("../docs/" . $_FILES['documento' . $i]['name']);
+                        $count = preg_match_all("/\/Page\W/", $pdf, $dummy);
+                    }
+
+                    if (strrev($reversedParts[0]) == 'docx' || strrev($reversedParts[0]) == 'pptx') {
+                        $zip = new ZipArchive();
+
+                        if ($zip->open("../docs/" . $_FILES['documento' . $i]['name']) === true) {
+                            if (($index = $zip->locateName('docProps/app.xml')) !== false) {
+                                $data = $zip->getFromIndex($index);
+
+                                $xml = new SimpleXMLElement($data);
+                                if (strrev($reversedParts[0]) == 'docx') $count = $xml->Pages;
+                                if (strrev($reversedParts[0]) == 'pptx') $count = $xml->Slides;
+                            }
+                            $zip->close();
+                        }
+                    }
+
+                    $Query = "INSERT INTO impresionpapel.documento(nombre, formato, cantidad_paginas, ruta, fecha_recepcion)
+                          VALUES ('" . strrev($reversedParts[1]) . "', '" . strrev($reversedParts[0]) . "', " . (is_numeric($count) ? $count : 0) . ", 'docs', now());";
+                    $Res = pg_query($this->conexion, $Query);
+                    if ($Res) $success++;
+                }
+            }
+        }
+
+        return ($success > 0) ? json_encode(array('status' => 'Registro Exitoso', 'success' => $success)) : json_encode(array('status' => 'Error al cargar documento o el archivo esta duplicado'));
     }
 
     public function getEncKey($text)

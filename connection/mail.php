@@ -38,7 +38,7 @@ try {
     //Content
     $mail->isHTML(true);                                      //Set email format to HTML
     $mail->Subject = 'Here is the subject';
-    $mail->Body    = file_get_contents('../assets/mail/Carta/index.html');
+    $mail->Body    = file_get_contents('../assets/mail/Carta/index.php');
     $mail->AltBody = 'This is the body in plain text for non-HTML mail clients';
 
     $files = opendir('../assets/mail/Carta/images');

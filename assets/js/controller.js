@@ -1,3 +1,5 @@
+"use strict";
+
 var Init = {
     Index: () => {
         return new Promise((res, rej) => {
@@ -5,7 +7,21 @@ var Init = {
                 Functions.CerrarSession();
                 rej(true)
             }
-            $("body").prepend(Template.Sidebar());
+            $("body").prepend(Template.Sidebar('./assets/img/Logo.png', [
+                { fn: 'Init.Home()', page: 'Dashboard', icon: 'dashboard', name: 'Dashboard' },
+                { name: 'Impresion 3D', separator: true },
+                { fn: 'Init.Impresiones()', page: 'Impresiones', icon: 'assignment', name: 'Impresiones' },
+                { fn: 'Init.Pendientes()', page: 'Pendientes', icon: 'assignment_late', name: 'Pendientes' },
+                { fn: 'Init.Formulario3D()', page: 'Solicitud3D', icon: 'content_paste', name: 'Solicitud' },
+                { name: 'Agendas y Libretas', separator: true },
+                { fn: 'Init.FormularioAgenda()', page: 'SolicitudAgenda', icon: 'style', name: 'Solicitud' },
+                { name: 'Impresion Papel', separator: true },
+                { fn: 'Init.FormularioPapel()', page: 'SolicitudPapel', icon: 'import_contacts', name: 'Solicitud' },
+                { fn: 'Init.Documentos()', page: 'Documentos', icon: 'description', name: 'Documentos' },
+                { name: 'Administracion', separator: true },
+                { fn: 'Init.Mantenedor()', page: 'Mantenedor', icon: 'settings', name: 'Mantenedor' },
+                { fn: 'Init.Perfil()', page: 'Perfil', icon: 'person', name: 'Perfil' },
+            ]));
             $("body").prepend(Template.SideNav());
             $("main").prepend(Template.NavBar());
             $("#Contenedor").parent().append(Template.Footer());
@@ -18,12 +34,10 @@ var Init = {
             //Cards
             let datos = Functions.ChargeData('Dashboard', 'Card-Data', true);
             let Datos = [
-                { xl: 2, sm: 6, icon: 'view_in_ar', iclass: 'animate__animated animate__flash animate__infinite', istyle: '--animate-duration: 4s;', title: 'Pendientes', value: datos[0].partes_pendientes, footer: 'Partes pendientes a imprimir', color: 'bg-gradient-dark' },
-                { xl: 2, sm: 6, icon: 'person', iclass: '', istyle: '', title: 'today Users', value: 2300, footer: '5 than lask month', color: 'bg-gradient-primary' },
-                { xl: 2, sm: 6, icon: 'person', iclass: '', istyle: '', title: 'today Clients', value: 3462, footer: '5 than yesterday', color: 'bg-gradient-success' },
-                { xl: 2, sm: 6, icon: 'weekend', iclass: '', istyle: '', title: 'Sales', value: 103430, footer: '4 than yesterday', color: 'bg-gradient-info' },
-                { xl: 2, sm: 6, icon: 'weekend', iclass: '', istyle: '', title: 'Sales', value: 103430, footer: '4 than yesterday', color: 'bg-gradient-info' },
-                { xl: 2, sm: 6, icon: 'weekend', iclass: '', istyle: '', title: 'Sales', value: 103430, footer: '4 than yesterday', color: 'bg-gradient-info' }
+                { xl: 3, sm: 6, icon: 'view_in_ar', iclass: 'animate__animated animate__flash animate__infinite', istyle: '--animate-duration: 4s;', title: 'Pendientes', value: datos[0].partes_pendientes, footer: 'Partes pendientes', color: 'bg-gradient-dark' },
+                { xl: 3, sm: 6, icon: 'style', iclass: '', istyle: '', title: 'today Users', value: 2300, footer: 'Agendas pendientes', color: 'bg-gradient-primary' },
+                { xl: 3, sm: 6, icon: 'import_contacts', iclass: '', istyle: '', title: 'today Clients', value: 3462, footer: 'Impresiones pendientes', color: 'bg-gradient-success' },
+                { xl: 3, sm: 6, icon: 'attach_money', iclass: '', istyle: '', title: 'Sales', value: 103430, footer: 'total recaudado', color: 'bg-gradient-info' },
             ]
             $("#Contenedor").append('<div id="DCard" class="row"></div><div id="DGraph" class="row mt-4"></div><div id="DTask" class="row mb-4"></div>')
             Datos.forEach((e, i) => {
@@ -32,20 +46,58 @@ var Init = {
 
             //Graphs
             let Datos2 = [
-                { lg: 3, md: 6, chid: 'chart-bars', chheight: 170, title: 'Website Views', subtitle: '50 than last week', icon: 'schedule', footer: 'test', color: 'bg-gradient-primary' },
-                { lg: 3, md: 6, chid: 'chart-line', chheight: 170, title: 'Daily Sales', subtitle: '5 than lask month', icon: 'schedule', footer: 'test', color: 'bg-gradient-success' },
-                { lg: 3, md: 6, chid: 'chart-line-tasks', chheight: 170, title: 'Completed Tasks', subtitle: '5 than yesterday', icon: 'schedule', footer: 'test', color: 'bg-gradient-dark' },
-                { lg: 3, md: 6, chid: 'chart-line-tasks', chheight: 170, title: 'Completed Tasks', subtitle: '5 than yesterday', icon: 'schedule', footer: 'test', color: 'bg-gradient-dark' }
+                { lg: 6, md: 6, chid: 'chart-bars', chheight: 170, title: 'Website Views', subtitle: '50 than last week', icon: 'schedule', footer: 'test', color: 'bg-gradient-primary' },
+                { lg: 6, md: 6, chid: 'chart-line', chheight: 170, title: 'Daily Sales', subtitle: '5 than lask month', icon: 'schedule', footer: 'test', color: 'bg-gradient-success' },
             ]
             Datos2.forEach((e, i) => {
                 $("#DGraph").append(Template.Graph(e.lg, e.md, e.chid, e.chheight, e.title, e.subtitle, e.icon, e.footer, e.color));
             });
 
             //DTask
-            $("#DTask").append(Template.Project(8, 6, 'Projects', 'fa fa-check', 30, 'this month'));
-            $("#DTask").append(Template.Order());
 
-            Functions.Graphics();
+            let tabs = [
+                { tab: 'Impresion3D', ref: 'Partes', icon: 'fab fa-unity' },
+                { tab: 'Agenda', ref: 'Agendas', icon: 'fas fa-book' },
+                { tab: 'Impresion', ref: 'Impresiones', icon: 'fas fa-scroll' },
+                { tab: 'Finanza', ref: 'Finanzas', icon: 'fas fa-dollar-sign' },
+            ];
+            $("#DGraph").eq(0).prepend(Template.TabBar(tabs))
+            $(".tabs a").click((obj) => {
+                let atr = obj.currentTarget.attributes.tab.value;
+                let ref = obj.currentTarget.attributes.ref.value;
+
+                $("#DTask").empty().append(Template.CardTable('List', true, 12, true, 'Partes', false, false));
+                $("#List .card-body").append(Template.Table("List", Functions.ChargeData('Parte', 'Listar-' + ref + '-Pendientes', true),
+                    [
+                        {
+                            class: 'btn btn-success btn-accion', cattr: '', icon: 'fas fa-edit', text: '',
+                            fn: 'Formulario.DetParte(this.attributes.rowid.value, true)'
+                        }
+                    ],
+                    [0, 8, 9],
+                    []
+                ));
+                $("table").DataTable();
+
+                Functions.GraphicBar(
+                    "chart-bars",
+                    ["L", "M", "M", "J", "V", "S", "D"],
+                    "Sales",
+                    [70, 20, 10, 22, 50, 10, 40]
+                );
+                Functions.GraphicLine(
+                    "chart-line",
+                    ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep"],
+                    "Mobile apps",
+                    [50, 40, 300, 320, 500, 350, 200, 230, 500],
+                    true
+                );
+            })
+            Functions.TabsInit();
+
+            $("a[tab]:eq(0)").click()
+
+
         })
     },
     Mantenedor: () => {
@@ -61,12 +113,17 @@ var Init = {
                 { tab: 'Pla', icon: 'fas fa-wave-square' },
                 { tab: 'Categoria', icon: 'far fa-list-alt' },
                 { tab: 'Valorizacion', icon: 'fas fa-dollar-sign' },
-                { tab: 'Papeleria', icon: 'fas fa-scroll' },
-                { tab: 'Formato_Papel', icon: 'fas fa-ruler-combined' },
+                { tab: 'Hoja', icon: 'fas fa-scroll' },
+                { tab: 'Anillo', icon: 'fas fa-ring' },
+                { tab: 'Formato_Hoja', icon: 'fas fa-ruler-combined' },
+                { tab: 'Tipo_Hoja', icon: 'fas fa-fingerprint' },
                 { tab: 'Textura', icon: 'fas fa-hand-sparkles' },
                 { tab: 'Medicion', icon: 'fas fa-ruler' },
                 { tab: 'Tienda', icon: 'fas fa-store' },
                 { tab: 'Impresora', icon: 'fas fa-print' },
+                { tab: 'Material', icon: 'fab fa-creative-commons-remix' },
+                { tab: 'Forma', icon: 'fas fa-shapes' },
+                { tab: 'Tinta', icon: 'fas fa-tint' },
             ];
             $("#Contenedor").eq(0).prepend(Template.TabBar(tabs))
 
@@ -100,10 +157,10 @@ var Init = {
             $("table").DataTable();
 
             Functions.TabsInit();
-            Functions.TooltipInit();
+            Functions.TooltipInit({ show: 1000, hide: 0 });
         })
     },
-    Formulario: () => {
+    Formulario3D: () => {
         Functions.MenuSelection("Solicitud3D", "bg-gradient-primary", 'animate__animated animate__headShake');
         Functions.Transition('main', '#Contenedor').then(() => {
             Persistant.Incremental = 0;
@@ -113,22 +170,23 @@ var Init = {
             $("#Solicitud .card-body").append(Formulario.Solicitud());
             $("#Solicitud").append(Template.CardTable('Parte', false, 12, true, 'Parte', false, false, true, 'margin-top:50px'));
             $("#Parte > .card > .card-body").append(Formulario.Parte(0, false, 3, true));
+            $('select').select2();
 
             $("#Detalle").append(Template.CardTable('Clientes', false, 12, true, 'Clientes', false, { fn: 'Formulario.Cliente()' }, false, 'margin-top:50px'));
             $("#Detalle > .card > .card-body").append(Template.Detalle([
-                { nombre: 'Horas', hr: false, iconn: '<i class="far fa-clock"></i>' },
-                { nombre: 'KW', hr: false, iconn: '<i class="fas fa-bolt"></i>' },
-                { nombre: 'Costo', hr: true, iconn: '<i class="fas fa-dollar-sign"></i>' },
-                { nombre: 'Subtotal', hr: false },
-                { nombre: 'Descuento', hr: false },
-                { nombre: 'Total a Pagar', hr: true },
-                { nombre: 'Ganancia', hr: true },
+                { nombre: 'Horas', hr: false, icon: '<i class="far fa-clock"></i>' },
+                { nombre: 'KW', hr: false, icon: '<i class="fas fa-bolt"></i>' },
+                { nombre: 'Costo', hr: true, icon: '<i class="fas fa-hand-holding-usd"></i>' },
+                { nombre: 'Subtotal', hr: false, icon: '<i class="fas fa-comment-dollar"></i>' },
+                { nombre: 'Descuento', hr: false, icon: '<i class="fas fa-percent"></i>' },
+                { nombre: 'Total a Pagar', hr: true, icon: '<i class="fas fa-dollar-sign"></i>' },
+                { nombre: 'Ganancia', hr: true, icon: '<i class="fas fa-hand-holding-usd"></i>' },
             ], true));
             $("#Clientes > .card > .card-body").append(Template.ListClientes('Cliente', Functions.ChargeData("Cliente", "Read", false)));
             Functions.ChargeData("Valorizacion", "Read", true);
 
-            Functions.TooltipInit();
-            $("table").DataTable({ searching: false, info: false, "lengthChange": false });
+            Functions.TooltipInit({ show: 0, hide: 0 });
+            $("table").DataTable({ searching: false, info: false, "lengthChange": false, "pageLength": 5 });
         })
     },
     Impresiones: () => {
@@ -139,7 +197,7 @@ var Init = {
                 [
                     {
                         class: 'btn btn-primary btn-accion', cattr: '', icon: 'fas fa-list', text: '',
-                        fn: "$('body').append(Template.Modal('modal', [{}], 'modal-xl'));" +
+                        fn: "$('body').append(Template.Modal('modal', [], 'modal-xl'));" +
                             "Persistant.SelectedRow = this.attributes.rowid.value;" +
                             "$(\'.modal-body\').empty().append(Template.Table(\'ListPartes\', Persistant.Impresion.find(x => x.id == this.attributes.rowid.value).partes," +
                             "[" +
@@ -154,7 +212,6 @@ var Init = {
                             "$(\\'#modal-second\\').modal(\\'show\\');'" +
                             "}" +
                             "],[0,1]));" +
-                            "$(\'.modal-footer\').empty();" +
                             "$(\'.modal-title\').empty().append(\'Detalle de Partes - \'+Persistant.Impresion.find(x => x.id == this.attributes.rowid.value).modelo);" +
                             "$(\'#modal\').modal(\'show\');" +
                             "$(\'#ListPartes\').DataTable();"
@@ -167,8 +224,6 @@ var Init = {
                 [8],
                 []
             ));
-            // $("body").append(Template.Modal('modal', [{}], 'modal-xl'));
-            // $("body").append(Template.Modal('modal-second', [{}], 'modal-sm', false))
             $("table").DataTable();
         })
     },
@@ -186,12 +241,41 @@ var Init = {
                 [],
                 []
             ));
-            $("body").append(Template.Modal('modal', [{}]))
+            $("body").append(Template.Modal('modal', []))
             $("table").DataTable();
         })
     },
     FormularioPapel: () => {
         Functions.MenuSelection("SolicitudPapel", "bg-gradient-primary", 'animate__animated animate__headShake');
+        Functions.Transition('main', '#Contenedor').then(() => {
+            Persistant.Incremental = 0;
+            $("#Contenedor")
+                .append(Template.CardTable('Detalle', false, 3, true, 'Detalle', false, false))
+                .append(Template.CardTable('Solicitud', false, 9, true, 'Solicitud', false, false));
+            $("#Solicitud .card-body").append(Formulario.SolicitudPapel());
+
+            $("#Detalle").append(Template.CardTable('Clientes', false, 12, true, 'Clientes', false, false, false, 'margin-top:50px'));
+            $("#Detalle > .card > .card-body").append(Template.Detalle([
+                { nombre: 'Hoja', hr: false, icon: '<i class="far fa-copy"></i>' },
+                { nombre: 'Tinta', hr: false, icon: '<i class="fas fa-tint"></i>' },
+                { nombre: 'Anillo', hr: false, icon: '<i class="fas fa-ring"></i>' },
+                { nombre: 'Micas', hr: true, icon: '<i class="fas fa-portrait"></i>' },
+                { nombre: 'Subtotal', hr: false, icon: '<i class="fas fa-comment-dollar"></i>' },
+                { nombre: 'Descuento', hr: false, icon: '<i class="fas fa-percent"></i>' },
+                { nombre: 'Total a Pagar', hr: true, icon: '<i class="fas fa-dollar-sign"></i>' },
+                { nombre: 'Costo', hr: false, icon: '<i class="fas fa-hand-holding-usd"></i>' },
+                { nombre: 'Ganancia', hr: false, icon: '<i class="fas fa-coins"></i>' },
+            ], true));
+
+            $("#Clientes > .card > .card-body").append(Template.ListClientes('Cliente', Functions.ChargeData("Cliente", "Read", false)));
+            Functions.ChargeData("Valorizacion", "Read", true);
+
+            Functions.TooltipInit({ show: 0, hide: 0 });
+            $("table").DataTable({ searching: false, info: false, "lengthChange": false, "pageLength": 5 });
+        })
+    },
+    FormularioAgenda: () => {
+        Functions.MenuSelection("SolicitudAgenda", "bg-gradient-primary", 'animate__animated animate__headShake');
         Functions.Transition('main', '#Contenedor').then(() => {
             Persistant.Incremental = 0;
             $("#Contenedor")
@@ -203,19 +287,19 @@ var Init = {
 
             $("#Detalle").append(Template.CardTable('Clientes', false, 12, true, 'Clientes', false, false, false, 'margin-top:50px'));
             $("#Detalle > .card > .card-body").append(Template.Detalle([
-                { nombre: 'Horas', hr: false, iconn: '<i class="far fa-clock"></i>' },
-                { nombre: 'KW', hr: false, iconn: '<i class="fas fa-bolt"></i>' },
-                { nombre: 'Costo', hr: true, iconn: '<i class="fas fa-dollar-sign"></i>' },
-                { nombre: 'Subtotal', hr: false },
-                { nombre: 'Descuento', hr: false },
-                { nombre: 'Total a Pagar', hr: true },
-                { nombre: 'Ganancia', hr: true },
+                { nombre: 'Horas', hr: false, icon: '<i class="far fa-clock"></i>' },
+                { nombre: 'KW', hr: false, icon: '<i class="fas fa-bolt"></i>' },
+                { nombre: 'Costo', hr: true, icon: '<i class="fas fa-hand-holding-usd"></i>' },
+                { nombre: 'Subtotal', hr: false, icon: '<i class="fas fa-comment-dollar"></i>' },
+                { nombre: 'Descuento', hr: false, icon: '<i class="fas fa-percent"></i>' },
+                { nombre: 'Total a Pagar', hr: true, icon: '<i class="fas fa-dollar-sign"></i>' },
+                { nombre: 'Ganancia', hr: true, icon: '<i class="fas fa-hand-holding-usd"></i>' },
             ], true));
             $("#Clientes > .card > .card-body").append(Template.ListClientes('Cliente', Functions.ChargeData("Cliente", "Read", false)));
             Functions.ChargeData("Valorizacion", "Read", true);
 
-            Functions.TooltipInit();
-            $("table").DataTable({ searching: false, info: false, "lengthChange": false });
+            Functions.TooltipInit({ show: 0, hide: 0 });
+            $("table").DataTable({ searching: false, info: false, "lengthChange": false, "pageLength": 5 });
         })
     },
     Perfil: () => {
@@ -225,106 +309,68 @@ var Init = {
                 .append(Template.CardMask())
                 .append(Template.BigCard())
         })
+    },
+    Documentos: () => {
+        Functions.MenuSelection("Documentos", "bg-gradient-primary", 'animate__animated animate__headShake');
+        Functions.Transition('main', '#Contenedor').then(() => {
+            Charge.ListDocument();
+            $("body").append(Template.Modal('modal', []));
+
+            Functions.TooltipInit({ show: 2000, hide: 0 });
+        })
     }
 }
 
 var Persistant = {};
 
 var Template = {
-    Sidebar: () => '<aside class="sidenav navbar navbar-vertical navbar-expand-xs border-0 border-radius-xl my-3 fixed-start ms-3   bg-gradient-dark" id="sidenav-main">' +
-        '<div class="sidenav-header">' +
-        '<i class="fas fa-times p-3 cursor-pointer text-white opacity-5 position-absolute end-0 top-0 d-none d-xl-none" aria-hidden="true" id="iconSidenav"></i>' +
-        '<a class="navbar-brand m-0" href=" https://demos.creative-tim.com/material-dashboard/pages/dashboard " target="_blank">' +
-        '<img src="./assets/img/Logo.png" class="navbar-brand-img h-100" alt="main_logo">' +
-        '<span class="ms-3 font-weight-bold text-white">Impresiona tu Mundo</span>' +
-        '</a>' +
-        '</div>' +
-        '<hr class="horizontal light mt-0 mb-2">' +
-        '<div class="collapse navbar-collapse  w-auto  max-height-vh-100" id="sidenav-collapse-main">' +
-        '<ul class="navbar-nav">' +
-        '<li class="nav-item">' +
-        '<a class="nav-link text-white" onclick="Init.Home()" page="Dashboard">' +
-        '<div class="text-white text-center me-2 d-flex align-items-center justify-content-center">' +
-        '<i class="material-icons opacity-10">dashboard</i>' +
-        '</div>' +
-        '<span class="nav-link-text ms-1">Dashboard</span>' +
-        '</a>' +
-        '</li>' +
-        '<li class="nav-item mt-3">' +
-        '<h6 class="ps-4 ms-2 text-uppercase text-xs text-white font-weight-bolder opacity-8">Impresion 3D</h6>' +
-        '</li>' +
-        '<li class="nav-item">' +
-        '<a class="nav-link text-white" onclick="Init.Impresiones()" page="Impresiones">' +
-        '<div class="text-white text-center me-2 d-flex align-items-center justify-content-center">' +
-        '<i class="material-icons opacity-10">assignment</i>' +
-        '</div>' +
-        '<span class="nav-link-text ms-1">Impresiones</span>' +
-        '</a>' +
-        '</li>' +
-        '<li class="nav-item">' +
-        '<a class="nav-link text-white" onclick="Init.Pendientes()" page="Pendientes">' +
-        '<div class="text-white text-center me-2 d-flex align-items-center justify-content-center">' +
-        '<i class="material-icons opacity-10">assignment_late</i>' +
-        '</div>' +
-        '<span class="nav-link-text ms-1">Pendientes</span>' +
-        '</a>' +
-        '</li>' +
-        '<li class="nav-item">' +
-        '<a class="nav-link text-white" onclick="Init.Formulario()" page="Solicitud3D">' +
-        '<div class="text-white text-center me-2 d-flex align-items-center justify-content-center">' +
-        '<i class="material-icons opacity-10">content_paste</i>' +
-        '</div>' +
-        '<span class="nav-link-text ms-1">Solicitud</span>' +
-        '</a>' +
-        '</li>' +
-        '<li class="nav-item mt-3">' +
-        '<h6 class="ps-4 ms-2 text-uppercase text-xs text-white font-weight-bolder opacity-8">Impresion Papel</h6>' +
-        '</li>' +
-        '<li class="nav-item">' +
-        '<a class="nav-link text-white" onclick="Init.FormularioPapel()" page="SolicitudPapel">' +
-        '<div class="text-white text-center me-2 d-flex align-items-center justify-content-center">' +
-        '<i class="material-icons opacity-10">import_contacts</i>' +
-        '</div>' +
-        '<span class="nav-link-text ms-1">Solicitud</span>' +
-        '</a>' +
-        '</li>' +
-        '<li class="nav-item mt-3">' +
-        '<h6 class="ps-4 ms-2 text-uppercase text-xs text-white font-weight-bolder opacity-8">Administracion</h6>' +
-        '</li>' +
-        '<li class="nav-item">' +
-        '<a class="nav-link text-white" onclick="Init.Mantenedor()" page="Mantenedor">' +
-        '<div class="text-white text-center me-2 d-flex align-items-center justify-content-center">' +
-        '<i class="material-icons opacity-10">settings</i>' +
-        '</div>' +
-        '<span class="nav-link-text ms-1">Mantenedor</span>' +
-        '</a>' +
-        '</li>' +
-        '<li class="nav-item">' +
-        '<a class="nav-link text-white" onclick="Init.Perfil()" page="Perfil">' +
-        '<div class="text-white text-center me-2 d-flex align-items-center justify-content-center">' +
-        '<i class="material-icons opacity-10">person</i>' +
-        '</div>' +
-        '<span class="nav-link-text ms-1">Perfil</span>' +
-        '</a>' +
-        '</li>' +
-        '</ul>' +
-        '</div>' +
-        '<div class="sidenav-footer position-absolute w-100 bottom-0 ">' +
-        '<div class="mx-3">' +
-        '<button class="btn bg-gradient-primary mt-4 w-100" onclick="Functions.CerrarSession()">' +
-        '<div class="text-white text-center me-2 d-flex align-items-center justify-content-center">' +
-        '<i class="material-icons opacity-10">power_settings_new</i>' +
-        '<span class="nav-link-text ms-1">Salir</span>' +
-        '</div>' +
-        '</button>' +
-        '</div>' +
-        '</div>' +
-        '</aside>',
+    Sidebar: (icon, items) => {
+        let html = '<aside class="sidenav navbar navbar-vertical navbar-expand-xs border-0 border-radius-xl my-3 fixed-start ms-3   bg-gradient-dark" id="sidenav-main">' +
+            '<div class="sidenav-header">' +
+            '<i class="fas fa-times p-3 cursor-pointer text-white opacity-5 position-absolute end-0 top-0 d-none d-xl-none" aria-hidden="true" id="iconSidenav"></i>' +
+            '<a class="navbar-brand m-0" href=" https://demos.creative-tim.com/material-dashboard/pages/dashboard " target="_blank">' +
+            '<img src="' + icon + '" class="navbar-brand-img h-100" alt="main_logo">' +
+            '<span class="ms-3 font-weight-bold text-white">Impresiona tu Mundo</span>' +
+            '</a>' +
+            '</div>' +
+            '<hr class="horizontal light mt-0 mb-2">' +
+            '<div class="collapse navbar-collapse  w-auto  max-height-vh-100" id="sidenav-collapse-main">' +
+            '<ul class="navbar-nav">';
+        items.forEach(i => {
+            if (i.separator)
+                html += '<li class="nav-item mt-3">' +
+                    '<h6 class="ps-4 ms-2 text-uppercase text-xs text-white font-weight-bolder opacity-8">' + i.name + '</h6>' +
+                    '</li>';
+            else
+                html += '<li class="nav-item">' +
+                    '<a class="nav-link text-white" onclick="' + i.fn + '" page="' + i.page + '">' +
+                    '<div class="text-white text-center me-2 d-flex align-items-center justify-content-center">' +
+                    '<i class="material-icons opacity-10">' + i.icon + '</i>' +
+                    '</div>' +
+                    '<span class="nav-link-text ms-1">' + i.name + '</span>' +
+                    '</a>' +
+                    '</li>';
+        });
+        html += '</ul>' +
+            '</div>' +
+            '<div class="sidenav-footer position-absolute w-100 bottom-0 ">' +
+            '<div class="mx-3">' +
+            '<button class="btn bg-gradient-primary mt-4 w-100" onclick="Functions.CerrarSession()">' +
+            '<div class="text-white text-center me-2 d-flex align-items-center justify-content-center">' +
+            '<i class="material-icons opacity-10">power_settings_new</i>' +
+            '<span class="nav-link-text ms-1">Salir</span>' +
+            '</div>' +
+            '</button>' +
+            '</div>' +
+            '</div>' +
+            '</aside>';
+        return html;
+    },
     Card: (xl = 3, sm = 6, icon, iclass, istyle, title, value, footer, color) => '<div class="col-xl-' + xl + ' col-sm-' + sm + ' mb-xl-0 mb-4">' +
         '<div class="card">' +
         '<div class="card-header p-3 pt-2">' +
         '<div class="icon icon-lg icon-shape ' + color + ' shadow-dark text-center border-radius-xl mt-n4 position-absolute">' +
-        '<i class="material-icons opacity-10 '+iclass+'" style="'+istyle+'">' + icon + '</i>' +
+        '<i class="material-icons opacity-10 ' + iclass + '" style="' + istyle + '">' + icon + '</i>' +
         '</div>' +
         '<div class="text-end pt-1">' +
         '<p class="text-sm mb-0 text-capitalize">' + title + '</p >' +
@@ -520,7 +566,7 @@ var Template = {
             '<nav class="tabs">' +
             '<div class="selector"></div>';
         tabs.forEach(e => {
-            html += '<a tab="' + e.tab + '" class="' + ((active) ? 'active' : '') + '"  data-bs-toggle="tooltip" data-bs-placement="top" title="' + e.tab.replace("_", " ") + '"><i class="' + e.icon + '"></i></a>';
+            html += '<a tab="' + e.tab + '" class="' + ((active) ? 'active' : '') + '" ref="' + ((e.ref != '' && e.ref != undefined) ? e.ref : '') + '"  data-bs-toggle="tooltip" data-bs-placement="top" title="' + e.tab.replace("_", " ") + '"><i class="' + e.icon + '"></i></a>';
             active = false;
         });
         html += '</nav>' +
@@ -744,7 +790,7 @@ var Template = {
             });
             html += (btn.length > 0) ? '<td class="align-middle text-center">' : '';
             btn.forEach(btn => {
-                html += '<button class="' + btn.class + '" rowid="' + e['id'] + '" onclick="' + btn.fn + '"><i class="' + btn.icon + '"></i>' + btn.text + '</button>';
+                html += '<button data-delay=\'{show:5000, hide:3000}\' data-bs-toggle="tooltip" data-bs-placement="top" title="' + btn.title + '" class="' + btn.class + '" rowid="' + e['id'] + '" onclick="' + btn.fn + '"><i class="' + btn.icon + '"></i>' + btn.text + '</button>';
             });
             // html += (view) ? '<button class="btn btn-info btn-accion" rowid="' + e['id'] + '" onclick="' + view.fn + '"><i class="fas fa-eye"></i></button>' : '';
             // html += (edit) ? '<button class="btn btn-success btn-accion" rowid="' + e['id'] + '" onclick="' + edit.fn + '"><i class="fas fa-edit"></i></button>' : '';
@@ -777,41 +823,51 @@ var Template = {
             '</div>';
         return html;
     },
-    Formulario: (id, ref, form, filter = '') => {
-        let html = '<form id="' + id + '" ref="' + ref + '">' +
-            '<div class="row">';
+    Formulario: (id, ref, form) => {
+        let html = '<form id="' + id + '" ref="' + ref + '">';
         form.forEach(Val => {
+            html += (Val.orow) ? '<div class="row">' : '';
             html += '<div class="col-' + Val.col + '">' +
                 '<label>' + Val.label + '</label>';
             if (Val.type == "text") {
-                html += '<input type="text" id="' + Val.ref + '" name="' + Val.ref + '" class="form-control custom-input ' + Val.class + '" ' + Val.fn + ' value="' + ((Val.def != undefined) ? Val.def : "") + '" ' + Val.disabled + ' ' + Val.required + '/>';
+                html += '<input type="text" id="' + ((Val.cref == undefined) ? Val.ref : Val.cref) + '" name="' + ((Val.cref == undefined) ? Val.ref : Val.cref) + '" class="form-control custom-input ' + Val.class + '" ' + Val.fn + ' value="' + ((Val.def != undefined) ? Val.def : "") + '" ' + Val.disabled + ' ' + Val.required + '/>';
             } else if (Val.type == "select") {
-                let data = Functions.ChargeData(Val.ref, 'Read');
-                html += Template.Select(Val.ref, data, Val.fn, Val.def, Val.cparam, Val.disabled);
+                let data = Functions.ChargeData(Val.ref, 'Read', ((Val.pers) ? true : false));
+                html += Template.Select(Val.ref, Val.cref, data, Val.fn, Val.def, Val.cparam, Val.disabled, Val.filter);
             } else if (Val.type == "password") {
-                html += '<input type="password" id="' + Val.ref + '" name="' + Val.ref + '" class="form-control custom-input ' + Val.class + '" ' + Val.fn + ' value="' + ((Val.def != undefined) ? Val.def : "") + '" ' + Val.disabled + ' ' + Val.required + '/>';
+                html += '<input type="password" id="' + ((Val.cref == undefined) ? Val.ref : Val.cref) + '" name="' + ((Val.cref == undefined) ? Val.ref : Val.cref) + '" class="form-control custom-input ' + Val.class + '" ' + Val.fn + ' value="' + ((Val.def != undefined) ? Val.def : "") + '" ' + Val.disabled + ' ' + Val.required + '/>';
             } else if (Val.type == "date") {
-                html += '<input type="date" id="' + Val.ref + '" name="' + Val.ref + '" class="form-control custom-input ' + Val.class + '" ' + Val.fn + ' value="' + ((Val.def != undefined) ? Val.def : "") + '" ' + Val.disabled + ' ' + Val.required + '/>';
+                html += '<input type="date" id="' + ((Val.cref == undefined) ? Val.ref : Val.cref) + '" name="' + ((Val.cref == undefined) ? Val.ref : Val.cref) + '" class="form-control custom-input ' + Val.class + '" ' + Val.fn + ' value="' + ((Val.def != undefined) ? Val.def : "") + '" ' + Val.disabled + ' ' + Val.required + '/>';
             } else if (Val.type == "email") {
-                html += '<input type="email" id="' + Val.ref + '" name="' + Val.ref + '" class="form-control custom-input ' + Val.class + '" ' + Val.fn + ' value="' + ((Val.def != undefined) ? Val.def : "") + '" ' + Val.disabled + ' ' + Val.required + '/>';
+                html += '<input type="email" id="' + ((Val.cref == undefined) ? Val.ref : Val.cref) + '" name="' + ((Val.cref == undefined) ? Val.ref : Val.cref) + '" class="form-control custom-input ' + Val.class + '" ' + Val.fn + ' value="' + ((Val.def != undefined) ? Val.def : "") + '" ' + Val.disabled + ' ' + Val.required + '/>';
             } else if (Val.type == "file") {
-                html += '<input type="file" id="' + Val.ref + '" name="' + Val.ref + '" class="form-control custom-input ' + Val.class + '" ' + Val.fn + ' value="' + ((Val.def != undefined) ? Val.def : "") + '" ' + Val.disabled + ' ' + Val.required + '/>';
+                html += '<input type="file" id="' + ((Val.cref == undefined) ? Val.ref : Val.cref) + '" name="' + ((Val.cref == undefined) ? Val.ref : Val.cref) + '" class="form-control custom-input ' + Val.class + '" ' + Val.fn + ' value="' + ((Val.def != undefined) ? Val.def : "") + '" ' + Val.disabled + ' ' + Val.required + '/>';
             } else if (Val.type == "number") {
-                html += '<input type="number" id="' + Val.ref + '" name="' + Val.ref + '" class="form-control custom-input ' + Val.class + '" ' + Val.fn + ' value="' + ((Val.def != undefined) ? Val.def : "") + '" ' + Val.disabled + ' ' + Val.required + '/>';
+                html += '<input type="number" id="' + ((Val.cref == undefined) ? Val.ref : Val.cref) + '" name="' + ((Val.cref == undefined) ? Val.ref : Val.cref) + '" class="form-control custom-input ' + Val.class + '" ' + Val.fn + ' value="' + ((Val.def != undefined) ? Val.def : "") + '" ' + Val.disabled + ' ' + Val.required + '/>';
             } else if (Val.type == "radio") {
-                html += '<input type="radio" id="' + Val.ref + '" name="' + Val.ref + '" class="form-control custom-input ' + Val.class + '" ' + Val.fn + ' value="' + ((Val.def != undefined) ? Val.def : "") + '" ' + Val.disabled + ' ' + Val.required + '/>';
+                html += '<input type="radio" id="' + ((Val.cref == undefined) ? Val.ref : Val.cref) + '" name="' + ((Val.cref == undefined) ? Val.ref : Val.cref) + '" class="form-control custom-input ' + Val.class + '" ' + Val.fn + ' value="' + ((Val.def != undefined) ? Val.def : "") + '" ' + Val.disabled + ' ' + Val.required + '/>';
             } else if (Val.type == "checkbox") {
-                html += '<input type="checkbox" id="' + Val.ref + '" name="' + Val.ref + '" class="form-control custom-input ' + Val.class + '" ' + Val.fn + ' value="' + ((Val.def != undefined) ? Val.def : "") + '" ' + Val.disabled + ' ' + Val.required + '/>';
+                html += '<input type="checkbox" id="' + ((Val.cref == undefined) ? Val.ref : Val.cref) + '" name="' + ((Val.cref == undefined) ? Val.ref : Val.cref) + '" class="form-control custom-input ' + Val.class + '" ' + Val.fn + ' value="' + ((Val.def != undefined) ? Val.def : "") + '" ' + Val.disabled + ' ' + Val.required + '/>';
+            } else if (Val.type == "prety-checkbox") {
+                html += '<div class="pretty p-switch p-fill" style="display:block; margin: 0px 0 10px 0;">' +
+                    '<input type="checkbox" id="' + ((Val.cref == undefined) ? Val.ref : Val.cref) + '" name="' + ((Val.cref == undefined) ? Val.ref : Val.cref) + '" value="true" ' + Val.fn + ' ' + Val.disabled + ' ' + Val.required + ' />' +
+                    '<div class="state p-success">' +
+                    '<label></label>' +
+                    '</div>' +
+                    '</div>';
             }
             html += '</div>';
+            html += (Val.crow) ? '</div>' : '';
         });
-        html += '</div>' +
-            '</form>';
+        html += '</form>';
         return html;
     },
-    Select: (id, data, fn, def, cparam = 'nombre', disabled = '') => {
+    Select: (id, cid, data, fn, def, cparam = 'nombre', disabled = '', filter = {}) => {
+        if (filter.campo != undefined) {
+            data = data.filter(x => x[filter.campo] == filter.filtro);
+        }
         let attr;
-        let html = '<select id="' + id + '" name="' + id + '" class="form-control custom-input" ' + fn + ' style="width: 100% !important;" ' + disabled + '>';
+        let html = '<select id="' + ((cid == undefined) ? id : cid) + '" name="' + ((cid == undefined) ? id : cid) + '" class="form-control custom-input" ' + fn + ' style="width: 100% !important;" ' + disabled + '>';
         let selected = "";
         html += '<option value="-1" ' + ((def == undefined) ? 'selected' : '') + ' readonly>Seleccione</option>';
         data.forEach(e => {
@@ -867,7 +923,7 @@ var Template = {
             '<tbody>';
         Data.forEach(e => {
             html += '<tr>' +
-                '<td>' + e.nombre + ' ' + e.apellido_paterno + ' ' + e.apellido_materno + '</td>' +
+                '<td>' + e.nombre.split(" ")[0] + ' ' + e.apellido_paterno + ' ' + e.apellido_materno + '</td>' +
                 '<td>' + e.rut + '</td>' +
                 '<td>' + e.correo + '</td>' +
                 '<td>' + e.telefono + '</td>' +
@@ -890,9 +946,44 @@ var Template = {
         return html;
     },
     Detalle: (Data, btn = false) => {
+        let html = '<div class="row">';
+        Data.forEach(e => {
+            html += (e.icon == undefined) ?
+                '<div class="row" style="margin: 0px">' +
+                '<div class="col-6" style="text-align:center">' +
+                e.nombre +
+                '</div>' +
+                '<div class="col-6" style="text-align:center;" id="' + e.nombre + '">' +
+                ((e.value == undefined) ? '0' : e.value) +
+                '</div>' +
+                '</div>'
+                :
+                '<div class="col-4" style="text-align: center; margin-bottom: 15px;">' +
+                '<div class="row">' +
+                '<div class="col-12" data-delay=\'{show:5000, hide:3000}\' data-bs-toggle="tooltip" data-bs-placement="top" title="' + e.nombre + '">' +
+                e.icon +
+                '</div>' +
+                '</div>' +
+                '<div class="row">' +
+                '<div class="col-12" id="' + e.nombre + '">' +
+                ((e.value == undefined) ? '0' : e.value) +
+                '</div>' +
+                '</div>' +
+                '</div>';
+            html += (e.hr) ? '<hr>' : '';
+        });
+        html += '</div>';
+        html += (btn) ? '<div class="row">' +
+            '<div class="col-12" style="text-align:center;">' +
+            '<button class="btn btn-success" onclick="Functions.PrepararSolicitud3D()">Preparar</button>' +
+            '</div>' +
+            '</div>' : '';
+        return html;
+    },
+    Detalle2: (Data, btn = false) => {
         let html = "";
         Data.forEach(e => {
-            html += (e.icon == undefined) ? '<div class="row">' +
+            html += (e.iconn == undefined) ? '<div class="row">' +
                 '<div class="col-6" style="text-align:center">' +
                 e.nombre +
                 '</div>' +
@@ -1229,7 +1320,7 @@ var Formulario = {
     Cliente: (id, filled) => {
         Formulario.Modal("Cliente", id, filled).then((def) => {
             $(".modal-body").empty().append(Template.Formulario('Cliente', 'Cliente', [
-                { type: 'text', col: 6, disabled: '', def: (filled) ? def.nombre : "", label: "nombre*", ref: 'nombre' },
+                { type: 'text', col: 6, disabled: '', def: (filled) ? def.nombre : "", label: "nombre*", ref: 'nombre', orow: true },
                 { type: 'text', col: 6, disabled: '', def: (filled) ? def.apellido_paterno : "", label: "apellido paterno*", ref: 'apellido_paterno' },
                 { type: 'text', col: 6, disabled: '', def: (filled) ? def.apellido_materno : "", label: "apellido materno*", ref: 'apellido_materno' },
                 { type: 'date', col: 6, disabled: '', def: (filled) ? def.fecha_nacimiento : "", label: "fecha de nacimiento", ref: 'fecha_nacimiento' },
@@ -1238,7 +1329,7 @@ var Formulario = {
                 { type: 'number', col: 6, disabled: '', def: (filled) ? def.codigo_postal : "", label: "codigo postal", ref: 'codigo_postal' },
                 { type: 'text', col: 6, disabled: '', def: (filled) ? def.rut : "", label: "rut", ref: 'rut' },
                 { type: 'email', col: 6, disabled: '', def: (filled) ? def.correo : "", label: "correo", ref: 'correo' },
-                { type: 'number', col: 6, disabled: '', def: (filled) ? def.telefono : "", label: "telefono", ref: 'telefono' },
+                { type: 'number', col: 6, disabled: '', def: (filled) ? def.telefono : "", label: "telefono", ref: 'telefono', crow: true },
             ]));
             $('select').select2({ dropdownParent: $('#modal') });
         })
@@ -1267,70 +1358,72 @@ var Formulario = {
     Comuna: (id, filled) => {
         Formulario.Modal("Comuna", id, filled).then((def) => {
             $(".modal-body").empty().append(Template.Formulario('Comuna', 'Comuna', [
-                { type: 'text', col: 6, disabled: '', def: (filled) ? def.nombre : "", label: "nombre", ref: 'nombre' },
+                { type: 'text', col: 6, disabled: '', def: (filled) ? def.nombre : "", label: "nombre", ref: 'nombre', orow: true },
                 { type: 'select', col: 6, disabled: '', def: (filled) ? def.region : "", label: "region", ref: 'region', cparam: ['nombre'] },
-                { type: 'number', col: 6, disabled: '', def: (filled) ? def.cut : "", label: "cut", ref: 'cut' },
+                { type: 'number', col: 6, disabled: '', def: (filled) ? def.cut : "", label: "cut", ref: 'cut', crow: true },
             ]));
+            $('select').select2({ dropdownParent: $('#modal') });
         })
     },
     Region: (id, filled) => {
         Formulario.Modal("Region", id, filled).then((def) => {
             $(".modal-body").empty().append(Template.Formulario('Region', 'Region', [
-                { type: 'text', col: 6, disabled: '', def: (filled) ? def.nombre : "", label: "nombre", ref: 'nombre' },
-                { type: 'text', col: 6, disabled: '', def: (filled) ? def.abreviacion : "", label: "abreviacion", ref: 'abreviacion' },
+                { type: 'text', col: 6, disabled: '', def: (filled) ? def.nombre : "", label: "nombre", ref: 'nombre', orow: true },
+                { type: 'text', col: 6, disabled: '', def: (filled) ? def.abreviacion : "", label: "abreviacion", ref: 'abreviacion', crow: true },
             ]));
         })
     },
     Pla: (id, filled) => {
         Formulario.Modal("Pla", id, filled).then((def) => {
             $(".modal-body").empty().append(Template.Formulario('Pla', 'Pla', [
-                { type: 'select', col: 6, disabled: '', def: (filled) ? def.color : "", label: "color", ref: 'color', cparam: ['nombre'] },
+                { type: 'select', col: 6, disabled: '', def: (filled) ? def.color : "", label: "color", ref: 'color', cparam: ['nombre'], orow: true },
                 { type: 'select', col: 6, disabled: '', def: (filled) ? def.marca : "", label: "marca", ref: 'marca', cparam: ['nombre'] },
                 { type: 'number', col: 6, disabled: '', def: (filled) ? def.diametro : "", label: "diametro", ref: 'diametro' },
                 { type: 'text', col: 6, disabled: '', def: (filled) ? def.temperatura : "", label: "temperatura", ref: 'temperatura' },
                 { type: 'number', col: 6, disabled: '', def: (filled) ? def.gramos : "", label: "gramos", ref: 'gramos' },
                 { type: 'select', col: 6, disabled: '', def: (filled) ? def.categoria : "", label: "categoria", ref: 'categoria', cparam: ['nombre'] },
-                { type: 'number', col: 6, disabled: '', def: (filled) ? def.valor : "", label: "valor", ref: 'valor' },
+                { type: 'number', col: 6, disabled: '', def: (filled) ? def.valor : "", label: "valor", ref: 'valor', crow: true },
             ]));
+            $('select').select2({ dropdownParent: $('#modal') });
         })
     },
     Categoria: (id, filled) => {
         Formulario.Modal("Categoria", id, filled).then((def) => {
             $(".modal-body").empty().append(Template.Formulario('Categoria', 'Categoria', [
-                { type: 'text', col: 6, disabled: '', def: (filled) ? def.nombre : "", label: "nombre", ref: 'nombre' },
+                { type: 'text', col: 12, disabled: '', def: (filled) ? def.nombre : "", label: "nombre", ref: 'nombre' },
             ]));
         })
     },
     Valorizacion: (id, filled) => {
         Formulario.Modal("Valorizacion", id, filled).then((def) => {
             $(".modal-body").empty().append(Template.Formulario('Valorizacion', 'Valorizacion', [
-                { type: 'text', col: 6, disabled: '', def: (filled) ? def.material : "", label: "material", ref: 'material' },
+                { type: 'text', col: 6, disabled: '', def: (filled) ? def.material : "", label: "material", ref: 'material', orow: true },
                 { type: 'text', col: 6, disabled: '', def: (filled) ? def.medida : "", label: "medida", ref: 'medida' },
                 { type: 'number', col: 6, disabled: '', def: (filled) ? def.costo : "", label: "costo", ref: 'costo' },
-                { type: 'number', col: 6, disabled: '', def: (filled) ? def.venta : "", label: "venta", ref: 'venta' },
+                { type: 'number', col: 6, disabled: '', def: (filled) ? def.venta : "", label: "venta", ref: 'venta', crow: true },
             ]));
         })
     },
     Solicitud: () => {
         $("#Solicitud > .card > .card-body").empty().append(Template.Formulario('Solicitud', 'Solicitud', [
-            { type: 'text', col: 3, disabled: '', label: "nombre*", ref: 'nombre', required: 'required' },
-            { type: 'number', col: 3, disabled: '', label: "descuento (Opcional)", ref: 'descuento', fn: 'oninput="Functions.CalcularDetalle()"', required: 'required', min: 0 },
+            { type: 'text', col: 3, disabled: '', label: "nombre*", ref: 'nombre', required: 'required', orow: true },
+            { type: 'number', col: 3, disabled: '', label: "descuento (Opcional)", ref: 'descuento', fn: 'oninput="Functions.CalcularDetalle()"', required: 'required', min: 0, crow: true },
         ]));
     },
     Parte: (obj, filled, col, wfn = false) => {
         return Template.Formulario('Parte', 'Parte', [
-            { type: 'text', col: col, disabled: '', def: (filled) ? obj.nombre : '', label: "nombre", ref: 'nombre', fn: (wfn) ? 'oninput="Functions.CalcularDetalle()"' : '' },
+            { type: 'text', col: col, disabled: '', def: (filled) ? obj.nombre : '', label: "nombre", ref: 'nombre', orow: true },
             { type: 'number', col: col, disabled: '', def: (filled) ? obj.cantidad : '', label: "cantidad", ref: 'cantidad', fn: (wfn) ? 'oninput="Functions.CalcularDetalle()"' : '' },
             { type: 'number', col: col, disabled: '', def: (filled) ? obj.minutos : '', label: "minutos", ref: 'minutos', fn: (wfn) ? 'oninput="Functions.CalcularDetalle()"' : '' },
             { type: 'select', col: col, disabled: '', def: (filled) ? obj.impresora : '', label: "impresora", ref: 'impresora', fn: (wfn) ? 'onchange="Functions.CalcularDetalle()"' : '', cparam: ['nombre'] },
             { type: 'select', col: col, disabled: '', def: (filled) ? obj.color : '', label: "color", ref: 'color', fn: (wfn) ? 'oninput="Functions.CalcularDetalle()"' : '', cparam: ['nombre'] },
-            { type: 'number', col: col, disabled: '', def: (filled) ? obj.gramos : '', label: "gramos", ref: 'gramos', fn: (wfn) ? 'oninput="Functions.CalcularDetalle()"' : '' },
+            { type: 'number', col: col, disabled: '', def: (filled) ? obj.gramos : '', label: "gramos", ref: 'gramos', fn: (wfn) ? 'oninput="Functions.CalcularDetalle()"' : '', crow: true },
         ]);
     },
     DetParte: (id, filled) => {
         Formulario.Modal("Parte", id, filled).then((def) => {
             $(".modal-body").empty().append(Template.Formulario('Parte', 'Parte', [
-                { type: 'text', col: 6, disabled: '', def: (filled) ? def.nombre : "", label: "nombre", ref: 'nombre' },
+                { type: 'text', col: 6, disabled: '', def: (filled) ? def.nombre : "", label: "nombre", ref: 'nombre', orow: true },
                 { type: 'select', col: 6, disabled: '', def: (filled) ? def.impresora : "", label: "impresora", ref: 'impresora', cparam: ['nombre'] },
                 { type: 'select', col: 6, disabled: '', def: (filled) ? def.estado : "", label: "estado", ref: 'estado', cparam: ['nombre'] },
                 { type: 'select', col: 6, disabled: '', def: (filled) ? def.color : "", label: "color", ref: 'color', cparam: ['nombre'] },
@@ -1339,8 +1432,9 @@ var Formulario = {
                 { type: 'number', col: 6, disabled: '', def: (filled) ? def.cantidad : "", label: "cantidad", ref: 'cantidad' },
                 { type: 'number', col: 6, disabled: '', def: (filled) ? def.costo : "", label: "costo", ref: 'costo' },
                 { type: 'number', col: 6, disabled: '', def: (filled) ? def.total : "", label: "total", ref: 'total' },
-                { type: 'date', col: 6, disabled: '', def: (filled) ? def.fecha_impresion : "", label: "fecha_impresion", ref: 'fecha_impresion' },
+                { type: 'date', col: 6, disabled: '', def: (filled) ? def.fecha_impresion : "", label: "fecha de impresion", ref: 'fecha_impresion', crow: true },
             ]));
+            $('select').select2({ dropdownParent: $('#modal') });
         })
     },
     Impresion: (id, filled) => {
@@ -1352,26 +1446,68 @@ var Formulario = {
             ]));
         })
     },
-    Papeleria: (id, filled) => {
-        Formulario.Modal("Papeleria", id, filled).then((def) => {
-            $(".modal-body").empty().append(Template.Formulario('Papeleria', 'Papeleria', [
-                { type: 'text', col: 6, disabled: '', def: (filled) ? def.nombre : "", label: "nombre", ref: 'nombre' },
+    Hoja: (id, filled) => {
+        Formulario.Modal("Hoja", id, filled).then((def) => {
+            $(".modal-body").empty().append(Template.Formulario('Hoja', 'Hoja', [
+                { type: 'text', col: 6, disabled: '', def: (filled) ? def.nombre : "", label: "nombre", ref: 'nombre', orow: true },
                 { type: 'select', col: 6, disabled: '', def: (filled) ? def.marca : "", label: "marca", ref: 'marca', cparam: ['nombre'] },
                 { type: 'number', col: 6, disabled: '', def: (filled) ? def.cantidad : "", label: "cantidad", ref: 'cantidad' },
-                { type: 'select', col: 6, disabled: '', def: (filled) ? def.formato : "", label: "formato", ref: 'formato_papel', cparam: ['nombre'] },
-                { type: 'number', col: 6, disabled: '', def: (filled) ? def.precio : "", label: "precio", ref: 'precio' },
+                { type: 'select', col: 6, disabled: '', def: (filled) ? def.formato_hoja : "", label: "formato", ref: 'formato_hoja', cparam: ['nombre'] },
+                { type: 'number', col: 6, disabled: '', def: (filled) ? def.costo : "", label: "costo", ref: 'costo' },
+                { type: 'number', col: 6, disabled: '', def: (filled) ? def.venta : "", label: "venta", ref: 'venta' },
                 { type: 'number', col: 6, disabled: '', def: (filled) ? def.gramaje : "", label: "gramaje", ref: 'gramaje' },
                 { type: 'select', col: 6, disabled: '', def: (filled) ? def.color : "", label: "color", ref: 'color', cparam: ['nombre'] },
-                { type: 'select', col: 6, disabled: '', def: (filled) ? def.textura : "", label: "textura", ref: 'textura', cparam: ['nombre'] },
+                { type: 'select', col: 6, disabled: '', def: (filled) ? def.tipo_hoja : "", label: "tipo", ref: 'tipo_hoja', cparam: ['nombre'] },
+                { type: 'select', col: 6, disabled: '', def: (filled) ? def.textura : "", label: "textura", ref: 'textura', cparam: ['nombre'], crow: true },
+            ]));
+            $('select').select2({ dropdownParent: $('#modal') });
+        })
+    },
+    Anillo: (id, filled) => {
+        Formulario.Modal("Anillo", id, filled).then((def) => {
+            $(".modal-body").empty().append(Template.Formulario('Anillo', 'Anillo', [
+                { type: 'text', col: 6, disabled: '', def: (filled) ? def.nombre : "", label: "nombre", ref: 'nombre', orow: true },
+                { type: 'number', col: 6, disabled: '', def: (filled) ? def.diametro : "", label: "diametro", ref: 'diametro' },
+                { type: 'number', col: 6, disabled: '', def: (filled) ? def.largo : "", label: "largo", ref: 'largo' },
+                { type: 'select', col: 6, disabled: '', def: (filled) ? def.material : "", label: "material", ref: 'material', cparam: ['nombre'] },
+                { type: 'select', col: 6, disabled: '', def: (filled) ? def.color : "", label: "color", ref: 'color', cparam: ['nombre'] },
+                { type: 'number', col: 6, disabled: '', def: (filled) ? def.cantidad : "", label: "cantidad", ref: 'cantidad' },
+                { type: 'number', col: 6, disabled: '', def: (filled) ? def.costo : "", label: "costo", ref: 'costo' },
+                { type: 'number', col: 6, disabled: '', def: (filled) ? def.venta : "", label: "venta", ref: 'venta' },
+                { type: 'select', col: 6, disabled: '', def: (filled) ? def.marca : "", label: "marca", ref: 'marca', cparam: ['nombre'] },
+                { type: 'select', col: 6, disabled: '', def: (filled) ? def.forma : "", label: "forma", ref: 'forma', cparam: ['nombre'], crow: true },
+            ]));
+            $('select').select2({ dropdownParent: $('#modal') });
+        })
+    },
+    Material: (id, filled) => {
+        Formulario.Modal("Material", id, filled).then((def) => {
+            $(".modal-body").empty().append(Template.Formulario('Material', 'Material', [
+                { type: 'text', col: 12, disabled: '', def: (filled) ? def.nombre : "", label: "nombre", ref: 'nombre' },
             ]));
         })
     },
-    Formato_Papel: (id, filled) => {
-        Formulario.Modal("Formato Papel", id, filled).then((def) => {
-            $(".modal-body").empty().append(Template.Formulario('FormatoPapel', 'FormatoPapel', [
-                { type: 'text', col: 6, disabled: '', def: (filled) ? def.nombre : "", label: "nombre", ref: 'nombre' },
+    Forma: (id, filled) => {
+        Formulario.Modal("Forma", id, filled).then((def) => {
+            $(".modal-body").empty().append(Template.Formulario('Forma', 'Forma', [
+                { type: 'text', col: 12, disabled: '', def: (filled) ? def.nombre : "", label: "nombre", ref: 'nombre' },
+            ]));
+        })
+    },
+    Formato_Hoja: (id, filled) => {
+        Formulario.Modal("Formato_Hoja", id, filled).then((def) => {
+            $(".modal-body").empty().append(Template.Formulario('Formato_Hoja', 'Formato_Hoja', [
+                { type: 'text', col: 6, disabled: '', def: (filled) ? def.nombre : "", label: "nombre", ref: 'nombre', orow: true },
                 { type: 'text', col: 6, disabled: '', def: (filled) ? def.medida : "", label: "medida", ref: 'medida' },
-                { type: 'select', col: 6, disabled: '', def: (filled) ? def.medicion : "", label: "medicion", ref: 'medicion', cparam: ['nombre'] },
+                { type: 'select', col: 6, disabled: '', def: (filled) ? def.medicion : "", label: "medicion", ref: 'medicion', cparam: ['nombre'], crow: true },
+            ]));
+            $('select').select2({ dropdownParent: $('#modal') });
+        })
+    },
+    Tipo_Hoja: (id, filled) => {
+        Formulario.Modal("Tipo_Hoja", id, filled).then((def) => {
+            $(".modal-body").empty().append(Template.Formulario('Tipo_Hoja', 'Tipo_Hoja', [
+                { type: 'text', col: 12, disabled: '', def: (filled) ? def.nombre : "", label: "nombre", ref: 'nombre' },
             ]));
         })
     },
@@ -1385,31 +1521,83 @@ var Formulario = {
     Medicion: (id, filled) => {
         Formulario.Modal("Medicion", id, filled).then((def) => {
             $(".modal-body").empty().append(Template.Formulario('Medicion', 'Medicion', [
-                { type: 'text', col: 6, disabled: '', def: (filled) ? def.nombre : "", label: "nombre", ref: 'nombre' },
-                { type: 'text', col: 6, disabled: '', def: (filled) ? def.abreviacion : "", label: "abreviacion", ref: 'abreviacion' },
+                { type: 'text', col: 6, disabled: '', def: (filled) ? def.nombre : "", label: "nombre", ref: 'nombre', orow: true },
+                { type: 'text', col: 6, disabled: '', def: (filled) ? def.abreviacion : "", label: "abreviacion", ref: 'abreviacion', crow: true },
             ]));
         })
     },
     Tienda: (id, filled) => {
         Formulario.Modal("Tienda", id, filled).then((def) => {
             $(".modal-body").empty().append(Template.Formulario('Tienda', 'Tienda', [
-                { type: 'text', col: 6, disabled: '', def: (filled) ? def.nombre : "", label: "nombre", ref: 'nombre' },
+                { type: 'text', col: 6, disabled: '', def: (filled) ? def.nombre : "", label: "nombre", ref: 'nombre', orow: true },
                 { type: 'text', col: 6, disabled: '', def: (filled) ? def.direccion : "", label: "direccion", ref: 'direccion' },
                 { type: 'select', col: 6, disabled: '', def: (filled) ? def.comuna : "", label: "comuna", ref: 'comuna', cparam: ['nombre'] },
                 { type: 'select', col: 6, disabled: '', def: (filled) ? def.region : "", label: "region", ref: 'region', cparam: ['nombre'] },
                 { type: 'number', col: 6, disabled: '', def: (filled) ? def.telefono : "", label: "telefono", ref: 'telefono' },
-                { type: 'email', col: 6, disabled: '', def: (filled) ? def.correo : "", label: "correo", ref: 'correo' },
+                { type: 'email', col: 6, disabled: '', def: (filled) ? def.correo : "", label: "correo", ref: 'correo', crow: true },
             ]));
+            $('select').select2({ dropdownParent: $('#modal') });
         })
     },
     Impresora: (id, filled) => {
         Formulario.Modal("Impresora", id, filled).then((def) => {
             $(".modal-body").empty().append(Template.Formulario('Impresora', 'Impresora', [
-                { type: 'text', col: 6, disabled: '', def: (filled) ? def.nombre : "", label: "nombre", ref: 'nombre' },
+                { type: 'text', col: 6, disabled: '', def: (filled) ? def.nombre : "", label: "nombre", ref: 'nombre', orow: true },
                 { type: 'number', col: 6, disabled: '', def: (filled) ? def.kwh : "", label: "kwh", ref: 'kwh' },
-                { type: 'select', col: 6, disabled: '', def: (filled) ? def.marca : "", label: "marca", ref: 'marca', cparam: ['nombre'] },
+                { type: 'select', col: 6, disabled: '', def: (filled) ? def.marca : "", label: "marca", ref: 'marca', cparam: ['nombre'], crow: true },
+            ]));
+            $('select').select2({ dropdownParent: $('#modal') });
+        })
+    },
+    Tinta: (id, filled) => {
+        Formulario.Modal("Tinta", id, filled).then((def) => {
+            $(".modal-body").empty().append(Template.Formulario('Tinta', 'Tinta', [
+                { type: 'select', col: 6, disabled: '', def: (filled) ? def.marca : "", label: "marca", ref: 'marca', cparam: ['nombre'], orow: true },
+                { type: 'text', col: 6, disabled: '', def: (filled) ? def.nombre : "", label: "nombre", ref: 'nombre' },
+                { type: 'number', col: 6, disabled: '', def: (filled) ? def.cantidad : "", label: "cantidad", ref: 'cantidad' },
+                { type: 'number', col: 6, disabled: '', def: (filled) ? def.rendimiento : "", label: "rendimiento", ref: 'rendimiento' },
+                { type: 'select', col: 6, disabled: '', def: (filled) ? def.medicion : "", label: "medicion", ref: 'medicion', cparam: ['abreviacion'] },
+                { type: 'select', col: 6, disabled: '', def: (filled) ? def.color : "", label: "color", ref: 'color', cparam: ['nombre'] },
+                { type: 'number', col: 6, disabled: '', def: (filled) ? def.costo : "", label: "costo", ref: 'costo', crow: true },
+            ]));
+            $('select').select2({ dropdownParent: $('#modal') });
+        })
+    },
+    SolicitudPapel: () => {
+        $("#Solicitud > .card > .card-body").empty().append(Template.Formulario('Solicitud', 'Solicitud', [
+            { type: 'number', col: 3, disabled: '', label: "descuento (Opcional)", def: 0, ref: 'descuento', fn: 'oninput="Functions.DetallePapel()"', required: 'required', min: 0, orow: true },
+            { type: 'number', col: 3, disabled: '', label: "cantidad", def: 1, ref: 'cantidad', fn: 'oninput="Functions.DetallePapel()"', crow: true },
+
+            { type: 'select', col: 12, disabled: '', label: "documento", ref: 'documento', fn: 'onchange="Functions.DetallePapel()"', pers: true, cparam: ['nombre'], orow: true },
+            { type: 'select', col: 3, disabled: '', label: "impresora", ref: 'impresora', fn: 'onchange="Functions.DetallePapel()"', cparam: ['marca', 'nombre'] },
+            { type: 'select', col: 3, disabled: '', label: "hoja", ref: 'hoja', fn: 'onchange="Functions.DetallePapel()"', cparam: ['nombre', 'color', 'marca'], pers: true, filter: { campo: 'tipo_hoja', filtro: 'Impresion' } },
+            { type: 'select', col: 3, disabled: '', label: "mica", ref: 'hoja', fn: 'onchange="Functions.DetallePapel()"', cref: 'mica', cparam: ['nombre', 'color', 'marca'], filter: { campo: 'tipo_hoja', filtro: 'Mica' } },
+            { type: 'select', col: 3, disabled: '', label: "anillo", ref: 'anillo', fn: 'onchange="Functions.DetallePapel()"', cparam: ['nombre', 'diametro', 'color'], pers: true, crow: true },
+
+            { type: 'prety-checkbox', col: 1, disabled: '', label: "color", ref: 'color', fn: 'onchange="Functions.DetallePapel()"', orow: true },
+            { type: 'prety-checkbox', col: 1, disabled: '', label: "doble cara", ref: 'doble_cara', fn: 'onchange="Functions.DetallePapel()"' },
+            { type: 'prety-checkbox', col: 1, disabled: '', label: "personalizado", ref: 'personalizado', fn: 'onchange="Functions.DetallePapel()"' },
+        ]));
+        $('select').select2();
+    },
+    Documento: (id, filled) => {
+        Formulario.Modal("Documento", id, filled).then((def) => {
+            $(".modal-body").empty().append(Template.Formulario('Documento', 'Documento', [
+                { type: 'text', col: 12, disabled: '', def: (filled) ? def.nombre : "", label: "nombre", ref: 'nombre', orow: true },
+                { type: 'text', col: 6, disabled: '', def: (filled) ? def.formato : "", label: "formato", ref: 'formato' },
+                { type: 'number', col: 6, disabled: '', def: (filled) ? def.cantidad_paginas : "", label: "cantidad de paginas", ref: 'cantidad_paginas' },
+                { type: 'text', col: 6, disabled: '', def: (filled) ? def.ruta : "", label: "ruta", ref: 'ruta' },
+                { type: 'date', col: 6, disabled: '', def: (filled) ? def.fecha_recepcion : "", label: "fecha de recepcion", ref: 'fecha_recepcion', crow: true },
             ]));
         })
+    },
+    AddFile: () => {
+        $("#modal").modal("show");
+        $(".modal-body").empty().append(Template.Formulario('File', 'File', [
+            { type: 'file', col: 12, disabled: '', label: "documento", ref: 'documento0', orow: true, crow: true },
+            { type: 'file', col: 12, disabled: '', label: "documento", ref: 'documento1', orow: true, crow: true },
+        ]));
+        $(".modal-footer").empty().append('<button class="btn btn-success" onclick="Functions.setFile(\'Documento\', \'Carga-Documento\', \'#File\', \'ListDocument\')">Guardar</button>');
     }
 }
 
@@ -1417,7 +1605,7 @@ var Functions = {
     SelectTab: obj => {
         $(".tab-panel").removeClass("tab-panel-active")
         $("#" + obj.attributes.tab.value).addClass("tab-panel-active")
-    },
+    }, test: (obj) => { debugger },
     ChargeData: (funcion, accion, persistant = false, filtro = '') => {
         let datos = $.ajax({
             url: "connection/model.php",
@@ -1457,10 +1645,35 @@ var Functions = {
                 });
         })
     },
+    setFile: (funcion, accion, form, charge) => {
+        let fd = new FormData($(form)[0]);
+        fd.append('Funcion', funcion);
+        fd.append('Accion', accion);
+        fd.append('count', $('form#File [type="file"]').length);
+        $.ajax({
+            url: "connection/model.php",
+            type: "POST",
+            data: fd,
+            processData: false,
+            contentType: false,
+            success: function (response) {
+                let datos = JSON.parse(response);
+                Template.Toast('success', datos.status);
+                Charge[charge]();
+            }
+        });
+    },
     addParte: () => {
         let version = Persistant.Incremental++;
         $("#Solicitud").append(Template.CardTable('Parte' + version, false, 12, true, 'Parte', false, false, true, 'margin-top:50px'));
         $("#Parte" + version + " > .card > .card-body").append(Formulario.Parte(0, false, 3, true));
+        $('select').select2();
+    },
+    setFileForm: () => {
+        let fd = new FormData($("#File")[0]);
+        let name = fd.get('documento').name;
+        $("#formato").val(name.slice(name.lastIndexOf('.') + 1));
+        $("#nombre").val(name.slice(0, name.lastIndexOf('.')));
     },
     CalcularHoras: (valor) => {
         Persistant.Horas = parseInt(valor) / 60;
@@ -1492,13 +1705,13 @@ var Functions = {
 
                 // parte.horas = Persistant.Horas;
                 // parte.kw = parseFloat(Persistant.KW);
-                parte.costo = Math.round(((Persistant.Valorizacion[0].costo * parte.gramos) * Calc.Cantidad) + (Persistant.Valorizacion[1].costo * Persistant.KW) + (Persistant.Valorizacion[2].costo * Persistant.Horas));
-                parte.total = Math.round(((Persistant.Valorizacion[0].venta * parte.gramos) * Calc.Cantidad) + (Persistant.Valorizacion[1].venta * Persistant.KW) + (Persistant.Valorizacion[2].venta * Persistant.Horas));
+                parte.costo = Math.round(((Persistant.Valorizacion.find(x => x.material == 'Filamento PLA').costo * parte.gramos) * Calc.Cantidad) + (Persistant.Valorizacion.find(x => x.material == 'Electricidad').costo * Persistant.KW) + (Persistant.Valorizacion.find(x => x.material == 'Impresora').costo * Persistant.Horas));
+                parte.total = Math.round(((Persistant.Valorizacion.find(x => x.material == 'Filamento PLA').venta * parte.gramos) * Calc.Cantidad) + (Persistant.Valorizacion.find(x => x.material == 'Electricidad').venta * Persistant.KW) + (Persistant.Valorizacion.find(x => x.material == 'Impresora').venta * Persistant.Horas));
 
                 Calc.Horas += Persistant.Horas;
                 Calc.Kw += parseFloat(Persistant.KW);
-                Calc.Costo += Math.round(((Persistant.Valorizacion[0].costo * $(this).find("#gramos").val()) * Calc.Cantidad) + (Persistant.Valorizacion[1].costo * Persistant.KW) + (Persistant.Valorizacion[2].costo * Persistant.Horas));
-                Calc.Subtotal += Math.round(((Persistant.Valorizacion[0].venta * $(this).find("#gramos").val()) * Calc.Cantidad) + (Persistant.Valorizacion[1].venta * Persistant.KW) + (Persistant.Valorizacion[2].venta * Persistant.Horas));
+                Calc.Costo += Math.round(((Persistant.Valorizacion.find(x => x.material == 'Filamento PLA').costo * $(this).find("#gramos").val()) * Calc.Cantidad) + (Persistant.Valorizacion.find(x => x.material == 'Electricidad').costo * Persistant.KW) + (Persistant.Valorizacion.find(x => x.material == 'Impresora').costo * Persistant.Horas));
+                Calc.Subtotal += Math.round(((Persistant.Valorizacion.find(x => x.material == 'Filamento PLA').venta * $(this).find("#gramos").val()) * Calc.Cantidad) + (Persistant.Valorizacion.find(x => x.material == 'Electricidad').venta * Persistant.KW) + (Persistant.Valorizacion.find(x => x.material == 'Impresora').venta * Persistant.Horas));
             }
         });
 
@@ -1541,6 +1754,7 @@ var Functions = {
         })
     },
     FloatToTime: number => {
+        let time;
         var sign = (number >= 0) ? 1 : -1;
         number = number * sign;
         var hour = Math.floor(number);
@@ -1577,21 +1791,21 @@ var Functions = {
         Template.Toast('error', Er.Lista)
         return (Er.Count == 0) ? false : true
     },
-    Graphics: () => {
-        var ctx = document.getElementById("chart-bars").getContext("2d");
+    GraphicBar: (id, labels, dslabel, dsdata, legend = false) => {
+        var ctx = document.getElementById(id).getContext("2d");
 
         new Chart(ctx, {
             type: "bar",
             data: {
-                labels: ["M", "T", "W", "T", "F", "S", "S"],
+                labels: labels,
                 datasets: [{
-                    label: "Sales",
+                    label: dslabel,
                     tension: 0.4,
                     borderWidth: 0,
                     borderRadius: 4,
                     borderSkipped: false,
                     backgroundColor: "rgba(255, 255, 255, .8)",
-                    data: [50, 20, 10, 22, 50, 10, 40],
+                    data: dsdata,
                     maxBarThickness: 6
                 },],
             },
@@ -1600,7 +1814,7 @@ var Functions = {
                 maintainAspectRatio: false,
                 plugins: {
                     legend: {
-                        display: false,
+                        display: legend,
                     }
                 },
                 interaction: {
@@ -1657,16 +1871,16 @@ var Functions = {
                 },
             },
         });
-
-
-        var ctx2 = document.getElementById("chart-line").getContext("2d");
+    },
+    GraphicLine: (id, labels, dslabel, dsdata, legend = false) => {
+        var ctx2 = document.getElementById(id).getContext("2d");
 
         new Chart(ctx2, {
             type: "line",
             data: {
-                labels: ["Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+                labels: labels,
                 datasets: [{
-                    label: "Mobile apps",
+                    label: dslabel,
                     tension: 0,
                     borderWidth: 0,
                     pointRadius: 5,
@@ -1677,7 +1891,7 @@ var Functions = {
                     borderWidth: 4,
                     backgroundColor: "transparent",
                     fill: true,
-                    data: [50, 40, 300, 320, 500, 350, 200, 230, 500],
+                    data: dsdata,
                     maxBarThickness: 6
 
                 }],
@@ -1708,88 +1922,6 @@ var Functions = {
                             display: true,
                             color: '#f8f9fa',
                             padding: 10,
-                            font: {
-                                size: 14,
-                                weight: 300,
-                                family: "Roboto",
-                                style: 'normal',
-                                lineHeight: 2
-                            },
-                        }
-                    },
-                    x: {
-                        grid: {
-                            drawBorder: false,
-                            display: false,
-                            drawOnChartArea: false,
-                            drawTicks: false,
-                            borderDash: [5, 5]
-                        },
-                        ticks: {
-                            display: true,
-                            color: '#f8f9fa',
-                            padding: 10,
-                            font: {
-                                size: 14,
-                                weight: 300,
-                                family: "Roboto",
-                                style: 'normal',
-                                lineHeight: 2
-                            },
-                        }
-                    },
-                },
-            },
-        });
-
-        var ctx3 = document.getElementById("chart-line-tasks").getContext("2d");
-
-        new Chart(ctx3, {
-            type: "line",
-            data: {
-                labels: ["Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
-                datasets: [{
-                    label: "Mobile apps",
-                    tension: 0,
-                    borderWidth: 0,
-                    pointRadius: 5,
-                    pointBackgroundColor: "rgba(255, 255, 255, .8)",
-                    pointBorderColor: "transparent",
-                    borderColor: "rgba(255, 255, 255, .8)",
-                    borderWidth: 4,
-                    backgroundColor: "transparent",
-                    fill: true,
-                    data: [50, 40, 300, 220, 500, 250, 400, 230, 500],
-                    maxBarThickness: 6
-
-                }],
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        display: false,
-                    }
-                },
-                interaction: {
-                    intersect: false,
-                    mode: 'index',
-                },
-                scales: {
-                    y: {
-                        grid: {
-                            drawBorder: false,
-                            display: true,
-                            drawOnChartArea: true,
-                            drawTicks: false,
-                            borderDash: [5, 5],
-                            color: 'rgba(255, 255, 255, .2)'
-                        },
-                        ticks: {
-                            display: true,
-                            padding: 10,
-                            color: '#f8f9fa',
                             font: {
                                 size: 14,
                                 weight: 300,
@@ -1831,7 +1963,7 @@ var Functions = {
         var activeWidth = activeItem.innerWidth();
         $(".selector").css({
             "left": activeItem.position.left + "px",
-            "width": activeWidth + 13 + "px"
+            "width": activeWidth + "px"
         });
 
         $(".tabs").on("click", "a", function (e) {
@@ -1851,7 +1983,7 @@ var Functions = {
         $("a[page=" + page + "]").addClass("active " + color + ' ' + animation);
         setTimeout(() => { $("a[page=" + page + "]").removeClass(animation) }, 1000);
     },
-    Transition: (target, empty = false, animateOut = 'animate__fadeOut', animateIn = 'animate__fadeInRight', durationOut = '0.25s', durationIN = '0.5s', velocity = 'animate__fast') => {
+    Transition: (target, empty = false, animateOut = 'animate__fadeOut', animateIn = 'animate__fadeIn', durationOut = '0.25s', durationIN = '0.5s', velocity = 'animate__fast') => {
         return new Promise((res, rej) => {
             $(target).addClass('animate__animated ' + animateOut + ' ' + velocity).css({ '--animate-duration': durationOut });
             setTimeout(() => {
@@ -1862,10 +1994,15 @@ var Functions = {
             }, 390);
         })
     },
-    TooltipInit: () => {
+    TooltipInit: (delay) => {
         var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
         var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-            return new bootstrap.Tooltip(tooltipTriggerEl)
+            return new bootstrap.Tooltip(tooltipTriggerEl, {
+                delay: {
+                    show: delay.show,
+                    hide: delay.hide
+                }
+            })
         })
     },
     ContextMenu: () => {
@@ -1891,7 +2028,7 @@ var Functions = {
             json.forEach(e => {
                 (Object.keys(e)).forEach((k, i) => {
                     conv = {};
-                    conv.nombre = k;
+                    conv.name = k;
                     conv.value = e[k];
                     serialized.push(conv);
                 })
@@ -1900,6 +2037,87 @@ var Functions = {
             });
             res(toreturn);
         })
+    },
+    PageCountPDF: (id) => {
+        return new Promise((res, rej) => {
+            let value = 0;
+            var input = document.getElementById(id);
+            var reader = new FileReader();
+            reader.readAsBinaryString(input.files[0]);
+            reader.onloadend = function () {
+                res(reader.result.match(/\/Type[\s]*\/Page[^s]/g).length);
+            }
+        })
+    },
+    Preview: (id, List) => {
+        let doc = Persistant[List].find(x => x.id == id);
+        $('#modal-preview').remove();
+        $('body').append(Template.Modal('modal-preview', [], 'modal-xl', false));
+        $('#modal-preview .modal-header').prepend('<h5 class="modal-title">Previsualizar - ' + doc.nombre + '</h5>')
+        if (doc.formato == 'pdf') $('#modal-preview .modal-body').append('<embed src="' + doc.ruta + '/' + doc.nombre + '.' + doc.formato + '" width="100%" height="825" alt="pdf" pluginspage="http://www.adobe.com/products/acrobat/readstep2.html">');
+        if (doc.formato == 'docx') $('#modal-preview .modal-body').append('Previsualizacion no disponible');
+
+        $('#modal-preview').modal('show');
+    },
+    Download: (id, List) => {
+        let doc = Persistant[List].find(x => x.id == id);
+        var a = document.createElement("a");
+        a.href = doc.ruta + '/' + doc.nombre + '.' + doc.formato;
+        a.setAttribute("download", doc.nombre + '.' + doc.formato);
+        a.click();
+    },
+    DetallePapel: () => {
+        try {
+            let D = { Cantidad: $("#cantidad").val(), Hojas: Persistant['documento'].find(x => x.id == $("select#documento")[0].selectedOptions[0].value).cantidad_paginas };
+            let Hoja = $("#hoja")[0].selectedOptions[0].value;
+            let Mica = $("#mica")[0].selectedOptions[0].value;
+            let Anillo = $("#anillo")[0].selectedOptions[0].value;
+            let CHoja = 0, CMicas = 0, CAnillo = 0;
+            if (Hoja != -1) CHoja = Persistant['hoja'].find(x => x.id == Hoja).costo;
+            if (Mica != -1) CMicas = Persistant['hoja'].find(x => x.id == Mica).costo;
+            if (Anillo != -1) CAnillo = Persistant['anillo'].find(x => x.id == Anillo).costo;
+            $('#Hoja').html(D.Cantidad * (D.Hojas * CHoja));
+            $('#Micas').html(D.Cantidad * (2 * CMicas));
+            $('#Anillo').html(CAnillo);
+
+            let costo = (D.Cantidad * (D.Hojas * CHoja)) + (D.Cantidad * (2 * CMicas)) + parseInt(CAnillo);
+
+            let subtotal =
+                ((Hoja != -1) ? (D.Cantidad * (D.Hojas * Persistant['hoja'].find(x => x.id == Hoja).venta)) : 0) +
+                ((Anillo != -1) ? parseInt(Persistant['anillo'].find(x => x.id == Anillo).venta) : 0) +
+                ((Mica != -1) ? (D.Cantidad * (2 * Persistant['hoja'].find(x => x.id == Mica).venta)) : 0);
+
+            $("#Costo").html(costo);
+
+            $("#Subtotal").html(subtotal);
+        } catch (error) {
+
+        }
+    }
+}
+
+var Charge = {
+    ListDocument: () => {
+        $("#Contenedor").empty().append(Template.CardTable('Documentos', true, 12, true, 'Documentos', false, { fn: 'Formulario.AddFile()' }));
+        $("#Documentos .card-body").append(Template.Table("Documentos", Functions.ChargeData('Documento', 'Read', true),
+            [
+                {
+                    class: 'btn btn-success btn-accion', cattr: '', icon: 'fas fa-edit', text: '', title: 'Editar',
+                    fn: 'Formulario.Documento(this.attributes.rowid.value, true)'
+                },
+                {
+                    class: 'btn btn-danger btn-accion', cattr: '', icon: 'fas fa-file', text: '', title: 'Previsualizar',
+                    fn: 'Functions.Preview(this.attributes.rowid.value, \'Documento\')'
+                },
+                {
+                    class: 'btn btn-info btn-accion', cattr: '', icon: 'fas fa-download', text: '', title: 'Descargar',
+                    fn: 'Functions.Download(this.attributes.rowid.value, \'Documento\')'
+                }
+            ],
+            [],
+            []
+        ));
+        (Persistant.Documento.length > 0) ? $("table").DataTable() : console.log('No se inicializo datatable');
     }
 }
 

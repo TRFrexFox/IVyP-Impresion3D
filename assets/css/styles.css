@@ -7,7 +7,7 @@ body {
     display: inline-block;
 }
 
-.icon-lg i{
+.icon-lg i {
     top: 21% !important;
     font-size: 2.3rem !important;
 }
@@ -17,11 +17,11 @@ li {
     text-transform: capitalize;
 }
 
-table{
+table {
     width: 100% !important;
 }
 
-.modal-title{
+.modal-title {
     text-transform: capitalize;
 }
 
@@ -33,12 +33,17 @@ table{
     margin-top: -1px;
 }
 
-.mr-3{
+.card-body{
+    overflow: hidden;
+}
+
+.mr-3 {
     margin-right: 3px;
 }
 
 .custom-input {
     padding-left: 12px !important;
+    padding-right: 10px !important;
     border: 1px solid #d2d6da !important;
     margin-bottom: 15px;
 }
@@ -145,6 +150,12 @@ table{
     height: 36px !important;
 }
 
+/*Override PretyCheck*/
+.pretty.p-switch .state label:before,
+.pretty.p-switch .state label:after {
+    /* left: 3.5px !important; */
+    top: -0.5px !important;
+}
 
 /*Formulario*/
 #Clientes .row {
