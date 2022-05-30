@@ -10,13 +10,15 @@ var Init = {
             $("body").prepend(Template.Sidebar('./assets/img/Logo.png', [
                 { fn: 'Init.Home()', page: 'Dashboard', icon: 'dashboard', name: 'Dashboard' },
                 { name: 'Impresion 3D', separator: true },
-                { fn: 'Init.Impresiones()', page: 'Impresiones', icon: 'assignment', name: 'Impresiones' },
-                { fn: 'Init.Pendientes()', page: 'Pendientes', icon: 'assignment_late', name: 'Pendientes' },
                 { fn: 'Init.Formulario3D()', page: 'Solicitud3D', icon: 'content_paste', name: 'Solicitud' },
+                { fn: 'Init.Pendientes3D()', page: 'Pendientes3D', icon: 'assignment_late', name: 'Pendientes' },
+                { fn: 'Init.Impresiones3D()', page: 'Impresiones3D', icon: 'assignment', name: 'Impresiones' },
                 { name: 'Agendas y Libretas', separator: true },
                 { fn: 'Init.FormularioAgenda()', page: 'SolicitudAgenda', icon: 'style', name: 'Solicitud' },
                 { name: 'Impresion Papel', separator: true },
                 { fn: 'Init.FormularioPapel()', page: 'SolicitudPapel', icon: 'import_contacts', name: 'Solicitud' },
+                { fn: 'Init.PendientesPapel()', page: 'PendientesPapel', icon: 'assignment_late', name: 'PendientesPapel' },
+                { fn: 'Init.ImpresionesPapel()', page: 'ImpresionesPapel', icon: 'assignment', name: 'ImpresionesPapel' },
                 { fn: 'Init.Documentos()', page: 'Documentos', icon: 'description', name: 'Documentos' },
                 { name: 'Administracion', separator: true },
                 { fn: 'Init.Mantenedor()', page: 'Mantenedor', icon: 'settings', name: 'Mantenedor' },
@@ -65,6 +67,9 @@ var Init = {
             $(".tabs a").click((obj) => {
                 let atr = obj.currentTarget.attributes.tab.value;
                 let ref = obj.currentTarget.attributes.ref.value;
+                let hidden = [];
+
+                if(ref == 'Partes') hidden = [0, 1, 8, 9, 11];
 
                 $("#DTask").empty().append(Template.CardTable('List', true, 12, true, 'Partes', false, false));
                 $("#List .card-body").append(Template.Table("List", Functions.ChargeData('Parte', 'Listar-' + ref + '-Pendientes', true),
@@ -74,7 +79,7 @@ var Init = {
                             fn: 'Formulario.DetParte(this.attributes.rowid.value, true)'
                         }
                     ],
-                    [0, 8, 9],
+                    hidden,
                     []
                 ));
                 $("table").DataTable();
@@ -189,8 +194,8 @@ var Init = {
             $("table").DataTable({ searching: false, info: false, "lengthChange": false, "pageLength": 5 });
         })
     },
-    Impresiones: () => {
-        Functions.MenuSelection("Impresiones", "bg-gradient-primary", 'animate__animated animate__headShake');
+    Impresiones3D: () => {
+        Functions.MenuSelection("Impresiones3D", "bg-gradient-primary", 'animate__animated animate__headShake');
         Functions.Transition('main', '#Contenedor').then(() => {
             $("#Contenedor").append(Template.CardTable('ListImpresiones', true, 12, true, 'Impresiones', false, false));
             $("#ListImpresiones .card-body").append(Template.Table("ListImpresiones", Functions.ChargeData('Impresion', 'Listar-Impresiones-y-Partes', true),
@@ -227,8 +232,8 @@ var Init = {
             $("table").DataTable();
         })
     },
-    Pendientes: () => {
-        Functions.MenuSelection("Pendientes", "bg-gradient-primary", 'animate__animated animate__headShake');
+    Pendientes3D: () => {
+        Functions.MenuSelection("Pendientes3D", "bg-gradient-primary", 'animate__animated animate__headShake');
         Functions.Transition('main', '#Contenedor').then(() => {
             $("#Contenedor").append(Template.CardTable('ListImpresiones', true, 12, true, 'Impresion - Partes', false, false));
             $("#ListImpresiones .card-body").append(Template.Table("ListImpresiones", Functions.ChargeData('Parte', 'Listar-Partes-Pendientes', true),
@@ -673,6 +678,103 @@ var Template = {
             '<div class="collapse navbar-collapse mt-sm-0 mt-2 me-md-0 me-sm-4" id="navbar">' +
             '<div class="ms-md-auto pe-md-3 d-flex align-items-center">' +
             '</div>' +
+
+            '<ul class="navbar-nav  justify-content-end">' +
+            '<li class="nav-item d-flex align-items-center">' +
+              '<a href="javascript:;" class="nav-link text-body font-weight-bold px-0">' +
+                '<i class="fa fa-user me-sm-1" aria-hidden="true"></i>' +
+                '<span class="d-sm-inline d-none">Sign In</span>' +
+              '</a>' +
+            '</li>' +
+            '<li class="nav-item d-xl-none ps-3 d-flex align-items-center">' +
+              '<a href="javascript:;" class="nav-link text-body p-0" id="iconNavbarSidenav">' +
+                '<div class="sidenav-toggler-inner">' +
+                  '<i class="sidenav-toggler-line"></i>' +
+                  '<i class="sidenav-toggler-line"></i>' +
+                  '<i class="sidenav-toggler-line"></i>' +
+                '</div>' +
+              '</a>' +
+            '</li>' +
+            '<li class="nav-item px-3 d-flex align-items-center">' +
+              '<a href="javascript:;" class="nav-link text-body p-0">' +
+                '<i class="fa fa-cog fixed-plugin-button-nav cursor-pointer" aria-hidden="true"></i>' +
+              '</a>' +
+            '</li>' +
+            '<li class="nav-item dropdown pe-2 d-flex align-items-center">' +
+              '<a href="javascript:;" class="nav-link text-body p-0" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">' +
+                '<i class="fa fa-bell cursor-pointer" aria-hidden="true"></i>' +
+              '</a>' +
+              '<ul class="dropdown-menu  dropdown-menu-end  px-2 py-3 me-sm-n4" aria-labelledby="dropdownMenuButton">' +
+                '<li class="mb-2">' +
+                  '<a class="dropdown-item border-radius-md" href="javascript:;">' +
+                    '<div class="d-flex py-1">' +
+                      '<div class="my-auto">' +
+                        '<img src="../assets/img/team-2.jpg" class="avatar avatar-sm  me-3 ">' +
+                      '</div>' +
+                      '<div class="d-flex flex-column justify-content-center">' +
+                        '<h6 class="text-sm font-weight-normal mb-1">' +
+                          '<span class="font-weight-bold">New message</span> from Laur' +
+                        '</h6>' +
+                        '<p class="text-xs text-secondary mb-0">' +
+                          '<i class="fa fa-clock me-1" aria-hidden="true"></i>' +
+                          '13 minutes ago' +
+                        '</p>' +
+                      '</div>' +
+                    '</div>' +
+                  '</a>' +
+                '</li>' +
+                '<li class="mb-2">' +
+                  '<a class="dropdown-item border-radius-md" href="javascript:;">' +
+                    '<div class="d-flex py-1">' +
+                      '<div class="my-auto">' +
+                        '<img src="../assets/img/small-logos/logo-spotify.svg" class="avatar avatar-sm bg-gradient-dark  me-3 ">' +
+                      '</div>' +
+                      '<div class="d-flex flex-column justify-content-center">' +
+                        '<h6 class="text-sm font-weight-normal mb-1">' +
+                          '<span class="font-weight-bold">New album</span> by Travis Scott' +
+                        '</h6>' +
+                        '<p class="text-xs text-secondary mb-0">' +
+                          '<i class="fa fa-clock me-1" aria-hidden="true"></i>' +
+                          '1 day' +
+                        '</p>' +
+                      '</div>' +
+                    '</div>' +
+                  '</a>' +
+                '</li>' +
+                '<li>' +
+                  '<a class="dropdown-item border-radius-md" href="javascript:;">' +
+                    '<div class="d-flex py-1">
+                      '<div class="avatar avatar-sm bg-gradient-secondary  me-3  my-auto">
+                        '<svg width="12px" height="12px" viewBox="0 0 43 36" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+                          '<title>credit-card</title>
+                          '<g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                            '<g transform="translate(-2169.000000, -745.000000)" fill="#FFFFFF" fill-rule="nonzero">
+                              '<g transform="translate(1716.000000, 291.000000)">
+                                '<g transform="translate(453.000000, 454.000000)">
+                                  '<path class="color-background" d="M43,10.7482083 L43,3.58333333 C43,1.60354167 41.3964583,0 39.4166667,0 L3.58333333,0 C1.60354167,0 0,1.60354167 0,3.58333333 L0,10.7482083 L43,10.7482083 Z" opacity="0.593633743"></path>
+                                  '<path class="color-background" d="M0,16.125 L0,32.25 C0,34.2297917 1.60354167,35.8333333 3.58333333,35.8333333 L39.4166667,35.8333333 C41.3964583,35.8333333 43,34.2297917 43,32.25 L43,16.125 L0,16.125 Z M19.7083333,26.875 L7.16666667,26.875 L7.16666667,23.2916667 L19.7083333,23.2916667 L19.7083333,26.875 Z M35.8333333,26.875 L28.6666667,26.875 L28.6666667,23.2916667 L35.8333333,23.2916667 L35.8333333,26.875 Z"></path>
+                                '</g>
+                              '</g>
+                            '</g>
+                          '</g>
+                        '</svg>
+                      '</div>
+                      '<div class="d-flex flex-column justify-content-center">
+                        '<h6 class="text-sm font-weight-normal mb-1">
+                          'Payment successfully completed
+                        '</h6>
+                        '<p class="text-xs text-secondary mb-0">
+                          '<i class="fa fa-clock me-1" aria-hidden="true"></i>
+                          '2 days
+                        '</p>
+                      '</div>
+                    '</div>
+                  '</a>
+                '</li>
+              '</ul>
+            '</li>
+          '</ul>
+
             '<ul class="dropdown-menu  dropdown-menu-end  px-2 py-3 me-sm-n4" aria-labelledby="dropdownMenuButton">' +
             '<li class="mb-2">' +
             '<a class="dropdown-item border-radius-md" href="javascript:;">' +
@@ -692,6 +794,7 @@ var Template = {
             '</div>' +
             '</a>' +
             '</li>' +
+
             '<li class="mb-2">' +
             '<a class="dropdown-item border-radius-md" href="javascript:;">' +
             '<div class="d-flex py-1">' +
@@ -1382,7 +1485,8 @@ var Formulario = {
                 { type: 'text', col: 6, disabled: '', def: (filled) ? def.temperatura : "", label: "temperatura", ref: 'temperatura' },
                 { type: 'number', col: 6, disabled: '', def: (filled) ? def.gramos : "", label: "gramos", ref: 'gramos' },
                 { type: 'select', col: 6, disabled: '', def: (filled) ? def.categoria : "", label: "categoria", ref: 'categoria', cparam: ['nombre'] },
-                { type: 'number', col: 6, disabled: '', def: (filled) ? def.valor : "", label: "valor", ref: 'valor', crow: true },
+                { type: 'number', col: 6, disabled: '', def: (filled) ? def.costo : "", label: "costo", ref: 'costo' },
+                { type: 'number', col: 6, disabled: '', def: (filled) ? def.venta : "", label: "venta", ref: 'venta', crow: true },
             ]));
             $('select').select2({ dropdownParent: $('#modal') });
         })
@@ -1407,17 +1511,17 @@ var Formulario = {
     Solicitud: () => {
         $("#Solicitud > .card > .card-body").empty().append(Template.Formulario('Solicitud', 'Solicitud', [
             { type: 'text', col: 3, disabled: '', label: "nombre*", ref: 'nombre', required: 'required', orow: true },
-            { type: 'number', col: 3, disabled: '', label: "descuento (Opcional)", ref: 'descuento', fn: 'oninput="Functions.CalcularDetalle()"', required: 'required', min: 0, crow: true },
+            { type: 'number', col: 3, disabled: '', label: "descuento (Opcional)", ref: 'descuento', fn: 'oninput="Functions.CalcularDetalle3D()"', required: 'required', min: 0, crow: true },
         ]));
     },
     Parte: (obj, filled, col, wfn = false) => {
         return Template.Formulario('Parte', 'Parte', [
             { type: 'text', col: col, disabled: '', def: (filled) ? obj.nombre : '', label: "nombre", ref: 'nombre', orow: true },
-            { type: 'number', col: col, disabled: '', def: (filled) ? obj.cantidad : '', label: "cantidad", ref: 'cantidad', fn: (wfn) ? 'oninput="Functions.CalcularDetalle()"' : '' },
-            { type: 'number', col: col, disabled: '', def: (filled) ? obj.minutos : '', label: "minutos", ref: 'minutos', fn: (wfn) ? 'oninput="Functions.CalcularDetalle()"' : '' },
-            { type: 'select', col: col, disabled: '', def: (filled) ? obj.impresora : '', label: "impresora", ref: 'impresora', fn: (wfn) ? 'onchange="Functions.CalcularDetalle()"' : '', cparam: ['nombre'] },
-            { type: 'select', col: col, disabled: '', def: (filled) ? obj.color : '', label: "color", ref: 'color', fn: (wfn) ? 'oninput="Functions.CalcularDetalle()"' : '', cparam: ['nombre'] },
-            { type: 'number', col: col, disabled: '', def: (filled) ? obj.gramos : '', label: "gramos", ref: 'gramos', fn: (wfn) ? 'oninput="Functions.CalcularDetalle()"' : '', crow: true },
+            { type: 'number', col: col, disabled: '', def: (filled) ? obj.cantidad : '', label: "cantidad", ref: 'cantidad', fn: (wfn) ? 'oninput="Functions.CalcularDetalle3D()"' : '' },
+            { type: 'number', col: col, disabled: '', def: (filled) ? obj.minutos : '', label: "minutos", ref: 'minutos', fn: (wfn) ? 'oninput="Functions.CalcularDetalle3D()"' : '' },
+            { type: 'select', col: col, disabled: '', def: (filled) ? obj.impresora : '', label: "impresora", ref: 'impresora', fn: (wfn) ? 'onchange="Functions.CalcularDetalle3D()"' : '', cparam: ['nombre'] },
+            { type: 'select', col: col, disabled: '', def: (filled) ? obj.color : '', label: "color", ref: 'color', fn: (wfn) ? 'oninput="Functions.CalcularDetalle3D()"' : '', cparam: ['nombre'] },
+            { type: 'number', col: col, disabled: '', def: (filled) ? obj.gramos : '', label: "gramos", ref: 'gramos', fn: (wfn) ? 'oninput="Functions.CalcularDetalle3D()"' : '', crow: true },
         ]);
     },
     DetParte: (id, filled) => {
@@ -1440,10 +1544,11 @@ var Formulario = {
     Impresion: (id, filled) => {
         Formulario.Modal("Impresion", id, filled).then((def) => {
             $(".modal-body").empty().append(Template.Formulario('Impresion', 'Impresion', [
-                { type: 'select', col: 6, disabled: '', def: (filled) ? def.cliente : "", label: "cliente", ref: 'cliente', cparam: ['nombre', 'apellido_paterno', 'apellido_materno'] },
+                { type: 'select', col: 6, disabled: '', def: (filled) ? def.cliente : "", label: "cliente", ref: 'cliente', cparam: ['nombre', 'apellido_paterno', 'apellido_materno'], orow: true },
                 { type: 'select', col: 6, disabled: '', def: (filled) ? def.estado : "", label: "estado", ref: 'estado', cparam: ['nombre'] },
-                { type: 'number', col: 6, disabled: '', def: (filled) ? def.descuento : "", label: "descuento", ref: 'descuento', fn: '' },
+                { type: 'number', col: 6, disabled: '', def: (filled) ? def.descuento : "", label: "descuento", ref: 'descuento', fn: '', crow: true },
             ]));
+            $('select').select2({ dropdownParent: $('#modal') });
         })
     },
     Hoja: (id, filled) => {
@@ -1531,8 +1636,8 @@ var Formulario = {
             $(".modal-body").empty().append(Template.Formulario('Tienda', 'Tienda', [
                 { type: 'text', col: 6, disabled: '', def: (filled) ? def.nombre : "", label: "nombre", ref: 'nombre', orow: true },
                 { type: 'text', col: 6, disabled: '', def: (filled) ? def.direccion : "", label: "direccion", ref: 'direccion' },
-                { type: 'select', col: 6, disabled: '', def: (filled) ? def.comuna : "", label: "comuna", ref: 'comuna', cparam: ['nombre'] },
-                { type: 'select', col: 6, disabled: '', def: (filled) ? def.region : "", label: "region", ref: 'region', cparam: ['nombre'] },
+                { type: 'select', col: 6, disabled: '', def: (filled) ? def.region : "", label: "region", ref: 'region', cparam: ['nombre'], fn: 'onchange="Functions.ChargeSelect(\'#comuna\', \'Comuna\', \'Filter-Region\', false, this.value)"' },
+                { type: 'select', col: 6, disabled: 'disabled: disabled', def: (filled) ? def.comuna : "", label: "comuna", ref: 'comuna', cparam: ['nombre'] },
                 { type: 'number', col: 6, disabled: '', def: (filled) ? def.telefono : "", label: "telefono", ref: 'telefono' },
                 { type: 'email', col: 6, disabled: '', def: (filled) ? def.correo : "", label: "correo", ref: 'correo', crow: true },
             ]));
@@ -1683,7 +1788,7 @@ var Functions = {
         Persistant.KW = (valor * Persistant.Horas).toFixed(2);
         // $("#KW").empty().html(Persistant.KW);
     },
-    CalcularDetalle: () => {
+    CalcularDetalle3D: () => {
         let Calc = Persistant.Detalle = { Costo: 0, Subtotal: 0, Horas: 0, Kw: 0, Descuento: 0, Total: 0, Ganancia: 0, Cantidad: 0 };
         let Part = Persistant.Partes = [];
         Calc.Descuento = $('#descuento').val();

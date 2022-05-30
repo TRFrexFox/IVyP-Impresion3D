@@ -17,115 +17,179 @@ switch (ucwords($Funcion)) {
         (SELECT COUNT(id) FROM impresion3d.parte) impresiones_realizadas,
         (SELECT COUNT(id) FROM impresion3d.impresion) pedidos_realizados,
         (SELECT COUNT(id) FROM impresion3d.parte WHERE estado IN (1,2,3)) partes_pendientes", true);
-        if ($Accion == 'Graph-Data') echo $process->read("*", "comun", "marca", "", "", true);
-        if ($Accion == 'Task-Data') echo $process->read("*", "comun", "marca", "", "", true);
+        if ($Accion == 'Graph-Data') echo $process->read("*", "comun", "marca", "", "", "", true);
+        if ($Accion == 'Task-Data') echo $process->read("*", "comun", "marca", "", "", "", true);
         break;
     case 'Cliente':
-        if ($Accion == 'Read') echo $process->read("a.id, a.nombre, a.apellido_paterno, a.apellido_materno, b.nombre region, c.nombre comuna, a.codigo_postal, a.rut, a.correo, a.telefono, a.fecha_nacimiento", "cliente", "cliente a", "", "LEFT JOIN comun.region b ON a.region = b.id LEFT JOIN comun.comuna c ON a.comuna = c.id", true);
+        if ($Accion == 'Read') echo $process->read(
+            "a.id, a.nombre, a.apellido_paterno, a.apellido_materno, b.nombre region, c.nombre comuna, a.codigo_postal, a.rut, a.correo, a.telefono, a.fecha_nacimiento",
+            "cliente",
+            "cliente a",
+            "",
+            "LEFT JOIN comun.region b ON a.region = b.id LEFT JOIN comun.comuna c ON a.comuna = c.id",
+            "a.nombre asc",
+            true
+        );
         else if ($Accion == 'Create') echo $process->create("cliente", "cliente", $_POST['Obj']);
         else if ($Accion == 'Update') echo $process->update("cliente", "cliente", $_POST['Obj'], $_POST['Id']);
         else if ($Accion == 'Delete') echo $process->delete("cliente", "cliente", $_POST['Id']);
         break;
     case 'Marca':
-        if ($Accion == 'Read') echo $process->read("*", "comun", "marca", "", "", true);
+        if ($Accion == 'Read') echo $process->read("*", "comun", "marca", "", "", "nombre asc", true);
         else if ($Accion == 'Create') echo $process->create("comun", "marca", $_POST['Obj']);
         else if ($Accion == 'Update') echo $process->update("comun", "marca", $_POST['Obj'], $_POST['Id']);
         else if ($Accion == 'Delete') echo $process->delete("comun", "marca", $_POST['Id']);
         break;
     case 'Estado':
-        if ($Accion == 'Read') echo $process->read("*", "comun", "estado", "", "", true);
+        if ($Accion == 'Read') echo $process->read("*", "comun", "estado", "", "", "nombre asc", true);
         else if ($Accion == 'Create') echo $process->create("comun", "estado", $_POST['Obj']);
         else if ($Accion == 'Update') echo $process->update("comun", "estado", $_POST['Obj'], $_POST['Id']);
         else if ($Accion == 'Delete') echo $process->delete("comun", "estado", $_POST['Id']);
         break;
     case 'Color':
-        if ($Accion == 'Read') echo $process->read("*", "comun", "color", "", "", true);
+        if ($Accion == 'Read') echo $process->read("*", "comun", "color", "", "", "nombre asc", true);
         else if ($Accion == 'Delete') echo $process->delete("comun", "color", $_POST['Id']);
         else if ($Accion == 'Create') echo $process->create("comun", "color", $_POST['Obj']);
         else if ($Accion == 'Update') echo $process->update("comun", "color", $_POST['Obj'], $_POST['Id']);
         break;
     case 'Comuna':
-        if ($Accion == 'Read') echo $process->read("a.id, a.nombre, b.nombre region, a.cut", "comun", "comuna a", "", "LEFT JOIN comun.region b ON a.region = b.id", true);
+        if ($Accion == 'Read') echo $process->read(
+            "a.id, a.nombre, b.nombre region, a.cut",
+            "comun",
+            "comuna a",
+            "",
+            "LEFT JOIN comun.region b ON a.region = b.id",
+            "a.nombre asc",
+            true
+        );
         else if ($Accion == 'Delete') echo $process->delete("comun", "comuna", $_POST['Id']);
         else if ($Accion == 'Create') echo $process->create("comun", "comuna", $_POST['Obj']);
         else if ($Accion == 'Update') echo $process->update("comun", "comuna", $_POST['Obj'], $_POST['Id']);
-        else if ($Accion == 'Filter-Region') echo $process->read("a.id, a.nombre, b.nombre region, a.cut", "comun", "comuna a", "a.region = " . $_POST['Filtro'], "LEFT JOIN comun.region b ON a.region = b.id", true);
+        else if ($Accion == 'Filter-Region') echo $process->read(
+            "a.id, a.nombre, b.nombre region, a.cut",
+            "comun",
+            "comuna a",
+            "a.region = " . $_POST['Filtro'],
+            "LEFT JOIN comun.region b ON a.region = b.id",
+            "a.nombre asc",
+            true
+        );
         break;
     case 'Region':
-        if ($Accion == 'Read') echo $process->read("*", "comun", "region", "", "", true);
+        if ($Accion == 'Read') echo $process->read("*", "comun", "region", "", "", "nombre asc", true);
         else if ($Accion == 'Delete') echo $process->delete("comun", "region", $_POST['Id']);
         else if ($Accion == 'Create') echo $process->create("comun", "region", $_POST['Obj']);
         else if ($Accion == 'Update') echo $process->update("comun", "region", $_POST['Obj'], $_POST['Id']);
         break;
     case 'Pla':
-        if ($Accion == 'Read') echo $process->read("a.id, b.nombre color, c.nombre marca, a.diametro, a.temperatura, a.gramos, d.nombre categoria, a.valor", "materia", "pla a", "", "LEFT JOIN comun.color b ON a.color = b.id LEFT JOIN comun.marca c ON a.marca = c.id LEFT JOIN materia.categoria d ON a.categoria = d.id", true);
+        if ($Accion == 'Read') echo $process->read(
+            "a.id, b.nombre color, c.nombre marca, a.diametro, a.temperatura, a.gramos, d.nombre categoria, a.costo, a.venta",
+            "materia",
+            "pla a",
+            "",
+            "LEFT JOIN comun.color b ON a.color = b.id LEFT JOIN comun.marca c ON a.marca = c.id LEFT JOIN materia.categoria d ON a.categoria = d.id",
+            "",
+            true
+        );
         else if ($Accion == 'Create') echo $process->create("materia", "pla", $_POST['Obj']);
         else if ($Accion == 'Update') echo $process->update("materia", "pla", $_POST['Obj'], $_POST['Id']);
         else if ($Accion == 'Delete') echo $process->delete("materia", "pla", $_POST['Id']);
         break;
     case 'Categoria':
-        if ($Accion == 'Read') echo $process->read("*", "materia", "categoria", "", "", true);
+        if ($Accion == 'Read') echo $process->read("*", "materia", "categoria", "", "", "nombre asc", true);
         else if ($Accion == 'Create') echo $process->create("materia", "categoria", $_POST['Obj']);
         else if ($Accion == 'Update') echo $process->update("materia", "categoria", $_POST['Obj'], $_POST['Id']);
         else if ($Accion == 'Delete') echo $process->delete("materia", "categoria", $_POST['Id']);
         break;
     case 'Valorizacion':
-        if ($Accion == 'Read') echo $process->read("*", "comun", "valorizacion", "", "", true);
+        if ($Accion == 'Read') echo $process->read("*", "comun", "valorizacion", "", "", "", true);
         else if ($Accion == 'Create') echo $process->create("comun", "valorizacion", $_POST['Obj']);
         else if ($Accion == 'Update') echo $process->update("comun", "valorizacion", $_POST['Obj'], $_POST['Id']);
         else if ($Accion == 'Delete') echo $process->delete("comun", "valorizacion", $_POST['Id']);
         break;
     case 'Formato_hoja':
     case 'Formato_Hoja':
-        if ($Accion == 'Read') echo $process->read("a.id, a.nombre, a.medida, b.nombre medicion", "comun", "formato_hoja a", "", "JOIN comun.medicion b ON a.medicion = b.id", true);
+        if ($Accion == 'Read') echo $process->read(
+            "a.id, a.nombre, a.medida, b.nombre medicion",
+            "comun",
+            "formato_hoja a",
+            "",
+            "JOIN comun.medicion b ON a.medicion = b.id",
+            "a.nombre asc",
+            true
+        );
         else if ($Accion == 'Create') echo $process->create("comun", "formato_hoja", $_POST['Obj']);
         else if ($Accion == 'Update') echo $process->update("comun", "formato_hoja", $_POST['Obj'], $_POST['Id']);
         else if ($Accion == 'Delete') echo $process->delete("comun", "formato_hoja", $_POST['Id']);
         break;
     case 'Tipo_hoja':
     case 'Tipo_Hoja':
-        if ($Accion == 'Read') echo $process->read("*", "comun", "tipo_hoja", "", "", true);
+        if ($Accion == 'Read') echo $process->read("*", "comun", "tipo_hoja", "", "", "nombre asc", true);
         else if ($Accion == 'Create') echo $process->create("comun", "tipo_hoja", $_POST['Obj']);
         else if ($Accion == 'Update') echo $process->update("comun", "tipo_hoja", $_POST['Obj'], $_POST['Id']);
         else if ($Accion == 'Delete') echo $process->delete("comun", "tipo_hoja", $_POST['Id']);
         break;
     case 'Textura':
-        if ($Accion == 'Read') echo $process->read("*", "comun", "textura", "", "", true);
+        if ($Accion == 'Read') echo $process->read("*", "comun", "textura", "", "", "nombre asc", true);
         else if ($Accion == 'Create') echo $process->create("comun", "textura", $_POST['Obj']);
         else if ($Accion == 'Update') echo $process->update("comun", "textura", $_POST['Obj'], $_POST['Id']);
         else if ($Accion == 'Delete') echo $process->delete("comun", "textura", $_POST['Id']);
         break;
     case 'Hoja':
-        if ($Accion == 'Read') echo $process->read("a.id, a.nombre, b.nombre marca, a.cantidad, a.gramaje, d.nombre color, c.nombre formato_hoja, e.nombre textura, f.nombre tipo_hoja, a.costo, a.venta", "materia", "hoja a", "", "JOIN comun.marca b ON a.marca = b.id JOIN comun.formato_hoja c ON a.formato_hoja = c.id JOIN comun.color d ON a.color = d.id JOIN comun.textura e ON a.textura = e.id JOIN comun.tipo_hoja f ON a.tipo_hoja = f.id ", true);
+        if ($Accion == 'Read') echo $process->read(
+            "a.id, a.nombre, b.nombre marca, a.cantidad, a.gramaje, d.nombre color, c.nombre formato_hoja, e.nombre textura, f.nombre tipo_hoja, a.costo, a.venta",
+            "materia",
+            "hoja a",
+            "",
+            "JOIN comun.marca b ON a.marca = b.id JOIN comun.formato_hoja c ON a.formato_hoja = c.id JOIN comun.color d ON a.color = d.id JOIN comun.textura e ON a.textura = e.id JOIN comun.tipo_hoja f ON a.tipo_hoja = f.id ",
+            "",
+            true
+        );
         else if ($Accion == 'Create') echo $process->create("materia", "hoja", $_POST['Obj']);
         else if ($Accion == 'Update') echo $process->update("materia", "hoja", $_POST['Obj'], $_POST['Id']);
         else if ($Accion == 'Delete') echo $process->delete("materia", "hoja", $_POST['Id']);
         break;
     case 'Medicion':
-        if ($Accion == 'Read') echo $process->read("*", "comun", "medicion", "", "", true);
+        if ($Accion == 'Read') echo $process->read("*", "comun", "medicion", "", "", "nombre asc", true);
         else if ($Accion == 'Create') echo $process->create("comun", "medicion", $_POST['Obj']);
         else if ($Accion == 'Update') echo $process->update("comun", "medicion", $_POST['Obj'], $_POST['Id']);
         else if ($Accion == 'Delete') echo $process->delete("comun", "medicion", $_POST['Id']);
         break;
     case 'Tienda':
-        if ($Accion == 'Read') echo $process->read("a.id, a.nombre, a.direccion, b.nombre comuna, c.nombre region, a.telefono, a.correo", "comun", "tienda a", "", "JOIN comun.comuna b ON a.comuna = b.id JOIN comun.region c ON a.region = c.id", true);
+        if ($Accion == 'Read') echo $process->read(
+            "a.id, a.nombre, a.direccion, b.nombre comuna, c.nombre region, a.telefono, a.correo",
+            "comun",
+            "tienda a",
+            "",
+            "JOIN comun.comuna b ON a.comuna = b.id JOIN comun.region c ON a.region = c.id",
+            "",
+            true
+        );
         else if ($Accion == 'Create') echo $process->create("comun", "tienda", $_POST['Obj']);
         else if ($Accion == 'Update') echo $process->update("comun", "tienda", $_POST['Obj'], $_POST['Id']);
         else if ($Accion == 'Delete') echo $process->delete("comun", "tienda", $_POST['Id']);
         break;
     case 'Impresora':
-        if ($Accion == 'Read') echo $process->read("a.id, a.nombre, a.kwh, b.nombre marca", "comun", "impresora a", "", "JOIN comun.marca b ON a.marca = b.id", true);
+        if ($Accion == 'Read') echo $process->read(
+            "a.id, a.nombre, a.kwh, b.nombre marca",
+            "comun",
+            "impresora a",
+            "",
+            "JOIN comun.marca b ON a.marca = b.id",
+            "a.nombre asc",
+            true
+        );
         else if ($Accion == 'Create') echo $process->create("comun", "impresora", $_POST['Obj']);
         else if ($Accion == 'Update') echo $process->update("comun", "impresora", $_POST['Obj'], $_POST['Id']);
         else if ($Accion == 'Delete') echo $process->delete("comun", "impresora", $_POST['Id']);
         break;
     case 'Categoria':
     case 'Parte':
-        if ($Accion == 'Read') echo $process->read("*", "impresion3d", "parte", "", "", true);
+        if ($Accion == 'Read') echo $process->read("*", "impresion3d", "parte", "", "", "", true);
         else if ($Accion == 'Create') echo $process->create("impresion3d", "parte", $_POST['Obj']);
         else if ($Accion == 'Update') echo $process->update("impresion3d", "parte", $_POST['Obj'], $_POST['Id']);
         else if ($Accion == 'Listar-Partes-Pendientes') echo $process->read(
-            "a.id, b.modelo, a.nombre, c.nombre impresora, a.minutos, a.gramos, a.cantidad, d.nombre color, a.costo, a.total, e.nombre estado",
+            "a.id, b.modelo, a.nombre, c.nombre impresora, a.minutos, a.gramos, a.cantidad, d.nombre color, a.costo, a.total, e.nombre estado, a.fecha_impresion",
             "impresion3d",
             "parte a",
             "a.estado NOT IN (5,6)",
@@ -133,11 +197,12 @@ switch (ucwords($Funcion)) {
             JOIN comun.impresora c ON a.impresora = c.id
             JOIN comun.color d ON a.color = d.id
             JOIN comun.estado e ON a.estado = e.id",
+            "",
             true
         );
         break;
     case 'Impresion':
-        if ($Accion == 'Read') echo $process->read("*", "impresion3d", "impresion", "", "", true);
+        if ($Accion == 'Read') echo $process->read("*", "impresion3d", "impresion", "", "", "", true);
         else if ($Accion == 'Create') echo $process->create("impresion3d", "impresion", $_POST['Obj']);
         else if ($Accion == 'Update') echo $process->update("impresion3d", "impresion", $_POST['Obj'], $_POST['Id']);
         else if ($Accion == 'Listar-Partes') echo $process->read(
@@ -153,6 +218,7 @@ switch (ucwords($Funcion)) {
             JOIN comun.color f ON b.color = f.id
             JOIN comun.region g ON c.region = g.id
             JOIN comun.comuna h ON c.comuna = h.id",
+            "",
             true
         );
         else if ($Accion == 'Listar-Impresiones') echo $process->read(
@@ -168,6 +234,7 @@ switch (ucwords($Funcion)) {
             JOIN comun.color f ON b.color = f.id
             JOIN comun.region g ON c.region = g.id
             JOIN comun.comuna h ON c.comuna = h.id",
+            "",
             true
         );
         else if ($Accion == 'Listar-Impresiones-y-Partes') {
@@ -189,7 +256,8 @@ switch (ucwords($Funcion)) {
                 'impresion a',
                 '',
                 'JOIN cliente.cliente b ON a.cliente = b.id
-            JOIN comun.estado c ON a.estado = c.id',
+                JOIN comun.estado c ON a.estado = c.id',
+                "",
                 false
             );
             foreach ($Datos as $key => $value) {
@@ -201,6 +269,7 @@ switch (ucwords($Funcion)) {
                     "impresion = $value[id]",
                     'JOIN comun.impresora b ON a.impresora = b.id
                     JOIN comun.color c ON a.color = c.id',
+                    "",
                     false
                 );
                 // array_push($Datos->Impresiones[$key],$Parte);
@@ -210,7 +279,7 @@ switch (ucwords($Funcion)) {
         }
         break;
     case 'Documento':
-        if ($Accion == 'Read') echo $process->read("*", "impresionpapel", "documento", "", "", true);
+        if ($Accion == 'Read') echo $process->read("*", "impresionpapel", "documento", "", "", "", true);
         else if ($Accion == 'Update') echo $process->update("impresionpapel", "documento", $_POST['Obj'], $_POST['Id']);
         else if ($Accion == 'Delete') echo $process->delete("impresionpapel", "documento", $_POST['Id']);
         else if ($Accion == 'Carga-Documento') echo $process->setDocument("impresionpapel", "documento");
@@ -225,6 +294,7 @@ switch (ucwords($Funcion)) {
             JOIN comun.color c ON a.color = c.id
             JOIN comun.marca d ON a.marca = d.id
             JOIN comun.forma e ON a.forma = e.id",
+            "",
             true
         );
         else if ($Accion == 'Create') echo $process->create("materia", "anillo", $_POST['Obj']);
@@ -232,26 +302,29 @@ switch (ucwords($Funcion)) {
         else if ($Accion == 'Delete') echo $process->delete("materia", "anillo", $_POST['Id']);
         break;
     case 'Material':
-        if ($Accion == 'Read') echo $process->read("*", "comun", "material", "", "", true);
+        if ($Accion == 'Read') echo $process->read("*", "comun", "material", "", "", "nombre asc", true);
         else if ($Accion == 'Create') echo $process->create("comun", "material", $_POST['Obj']);
         else if ($Accion == 'Update') echo $process->update("comun", "material", $_POST['Obj'], $_POST['Id']);
         else if ($Accion == 'Delete') echo $process->delete("comun", "material", $_POST['Id']);
         break;
     case 'Forma':
-        if ($Accion == 'Read') echo $process->read("*", "comun", "forma", "", "", true);
+        if ($Accion == 'Read') echo $process->read("*", "comun", "forma", "", "", "nombre asc", true);
         else if ($Accion == 'Create') echo $process->create("comun", "forma", $_POST['Obj']);
         else if ($Accion == 'Update') echo $process->update("comun", "forma", $_POST['Obj'], $_POST['Id']);
         else if ($Accion == 'Delete') echo $process->delete("comun", "forma", $_POST['Id']);
         break;
     case 'Tinta':
         if ($Accion == 'Read') echo $process->read(
-            "a.id, a.nombre, b.nombre marca, a.cantidad, c.abreviacion medicion, a.rendimiento, d.nombre color, a.costo", 
-            "materia", "tinta a", 
-            "", 
+            "a.id, a.nombre, b.nombre marca, a.cantidad, c.abreviacion medicion, a.rendimiento, d.nombre color, a.costo",
+            "materia",
+            "tinta a",
+            "",
             "JOIN comun.marca b ON a.marca = b.id
             JOIN comun.medicion c ON a.medicion = c.id
-            JOIN comun.color d ON a.color = d.id", 
-            true);
+            JOIN comun.color d ON a.color = d.id",
+            "",
+            true
+        );
         else if ($Accion == 'Create') echo $process->create("materia", "tinta", $_POST['Obj']);
         else if ($Accion == 'Update') echo $process->update("materia", "tinta", $_POST['Obj'], $_POST['Id']);
         else if ($Accion == 'Delete') echo $process->delete("materia", "tinta", $_POST['Id']);
@@ -267,11 +340,12 @@ class Process
         $this->conexion = $conexion;
     }
 
-    public function read($columns, $schema, $table, $where, $join, $json)
+    public function read($columns, $schema, $table, $where, $join, $order, $json)
     {
         $query = "SELECT $columns FROM $schema.$table";
         $query .= (strlen($join) > 0) ? " " . $join : "";
         $query .= (strlen($where) > 0) ? " WHERE " . $where : "";
+        $query .= (strlen($order) > 0) ? " ORDER BY " . $order : "";
 
         $QRes = pg_query($this->conexion, $query);
         $Values = pg_fetch_all($QRes);
